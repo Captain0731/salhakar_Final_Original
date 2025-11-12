@@ -20,13 +20,15 @@ const FeatureCard = ({ feature, index, onClick }) => {
       case 2: // Law Mapping
         return { linkColor: '#CF9B63', buttonBg: '#FED7AA', buttonIcon: '#CF9B63' };
       case 3: // Law Library
-        return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
+        return { linkColor: '#8C969F', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
       case 4: // Legal Templates
         return { linkColor: '#1E65AD', buttonBg: '#1E65AD', buttonIcon: '#FFFFFF' };
       case 5: // Smart Dashboard
-        return { linkColor: '#CF9B63', buttonBg: '#FED7AA', buttonIcon: '#CF9B63' };
+        return { linkColor: '#1E65AD', buttonBg: '#1E65AD', buttonIcon: '#FFFFFF'  };
       case 6: // YouTube Summarizer
-        return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
+        return { linkColor: '#CF9B63', buttonBg: '#FED7AA', buttonIcon: '#CF9B63' };
+      case 7: // Kiki AI
+        return {linkColor: '#8C969F', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
       default:
         return { linkColor: '#1E65AD', buttonBg: '#E5E7EB', buttonIcon: '#6B7280' };
     }
@@ -194,8 +196,8 @@ const Features = React.forwardRef((props, ref) => {
       id: 5,
       title: "Smart Dashboard",
       description: "Intelligent legal assistant powered by AI to answer queries, provide legal guidance, and assist with research.",
-      color: "#CF9B63",
-      secondaryColor: "#8C969F",
+      color: "#1E65AD",
+      secondaryColor: "#CF9B63",
       path: "/dashboard"
     },
     {
@@ -205,6 +207,14 @@ const Features = React.forwardRef((props, ref) => {
       color: "#8C969F",
       secondaryColor: "#CF9B63",
       path: "/youtube-summary"
+    },
+    {
+      id: 7,
+      title: "Kiki AI",
+      description: "Smart assistant answers, automates, and guides your legal research.",
+      color: "#8C969F",
+      secondaryColor: "#CF9B63",
+      path: "/legal-chatbot"
     }
   ];
 

@@ -7,6 +7,7 @@ const QuickLinks = () => {
     { label: "Legal Judgment", path: "/judgment-access" },
     { label: "Law Library", path: "/law-library" },
     { label: "Law Mapping", path: "/law-mapping" },
+    { label: "YouTube Summarizer", path: "/youtube-summary" },
     // { label: "Legal Templates", path: "/legal-template" },
     // { label: "YouTube Summarizer", path: "/youtube-summary" }
   ];

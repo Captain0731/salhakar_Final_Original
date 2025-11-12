@@ -97,7 +97,7 @@ const BookmarkButton = ({
     
     // Check authentication first
     if (!isUserAuthenticated()) {
-      navigate('/pricing');
+      navigate('/login');
       return;
     }
     

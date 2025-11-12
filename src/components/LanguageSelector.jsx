@@ -26,18 +26,18 @@ const LanguageSelector = () => {
   const measureRef = useRef(null);
 
   const languages = [
-    { code: 'en', langCode: 'Eng', name: 'English', country: 'US', flag: '🇺🇸', display: 'English' },
-    { code: 'gu', langCode: 'Gujarati', name: 'ગુજરાતી', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'hi', langCode: 'Hindi', name: 'हिन्दी  ', flag: '🇮🇳', country: 'IN', display: 'IN' },
-    { code: 'as', langCode: 'Assamese', name: 'অসমীয়া', flag: '🇮🇳', country: 'IN', display: 'IN' },
-    { code: 'bn', langCode: 'Bengali', name: 'বাংলা', flag: '🇧🇩', country: 'BD', display: 'BD' },  
-    { code: 'kn', langCode: 'Kannada', name: 'ಕನ್ನಡ', flag: '🇮🇳', country: 'IN', display: 'IN' },
-    { code: 'ml', langCode: 'Malayalam', name: 'മലയാളം', country: 'IN', flag: '🇮🇳', display: 'IN' },
-    { code: 'mr', langCode: 'Marathi', name: 'मराठी', flag: '🇮🇳', country: 'IN', display: 'IN' },
-    { code: 'or', langCode: 'Odia', name: 'ଓଡ଼ିଆ', flag: '🇮🇳', country: 'IN', display: 'IN' },
-    { code: 'pa', langCode: 'Punjabi', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳', country: 'IN', display: 'IN' },
-    { code: 'ta', langCode: 'Tamil', name: 'தமிழ்', flag: '🇮🇳', country: 'IN', display: 'IN' },
-      { code: 'te', langCode: 'Telugu', name: 'తెలుగు', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'en', langCode: 'En', name: 'English', country: 'US', flag: '🇺🇸', display: 'English' },
+    { code: 'gu', langCode: 'Gu', name: 'ગુજરાતી', country: 'IN', flag: '🇮🇳', display: 'IN' },
+    { code: 'hi', langCode: 'Hi', name: 'हिन्दी  ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'as', langCode: 'As', name: 'অসমীয়া', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'bn', langCode: 'Be', name: 'বাংলা', flag: '🇧🇩', country: 'BD', display: 'BD' },  
+    { code: 'kn', langCode: 'Ka', name: 'ಕನ್ನಡ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'ml', langCode: 'Ma', name: 'മലയാളം', country: 'IN', flag: '🇮🇳', display: 'IN' },
+    { code: 'mr', langCode: 'Mr', name: 'मराठी', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'or', langCode: 'Odi', name: 'ଓଡ଼ିଆ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'pa', langCode: 'Pu', name: 'ਪੰਜਾਬੀ', flag: '🇮🇳', country: 'IN', display: 'IN' },
+    { code: 'ta', langCode: 'Ta', name: 'தமிழ்', flag: '🇮🇳', country: 'IN', display: 'IN' },
+      { code: 'te', langCode: 'Te', name: 'తెలుగు', flag: '🇮🇳', country: 'IN', display: 'IN' },
   ];
 
   // Get current language from cookie

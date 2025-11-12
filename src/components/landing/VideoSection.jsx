@@ -153,45 +153,7 @@ const VideoSection = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 px-4 lg:px-0 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 sm:grid-cols-2 gap-4">
-              <button
-                className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg text-sm sm:text-base"
-                style={{ 
-                  backgroundColor: '#1E65AD', 
-                  fontFamily: 'Roboto, sans-serif',
-                  boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#CF9B63';
-                  e.target.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#1E65AD';
-                  e.target.style.boxShadow = '0 4px 15px rgba(30, 101, 173, 0.3)';
-                }}
-              >
-                Get Started Free
-              </button>
-              
-              <button
-                className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold border-2 transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
-                style={{ 
-                  borderColor: '#1E65AD',
-                  color: '#1E65AD',
-                  fontFamily: 'Roboto, sans-serif'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#1E65AD';
-                  e.target.style.color = 'white';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.color = '#1E65AD';
-                }}
-              >
-                Watch Demo
-              </button>
-            </div>
+        
           </div>
 
           {/* Right Side - Video Section */}

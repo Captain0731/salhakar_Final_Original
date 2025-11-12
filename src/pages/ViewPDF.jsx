@@ -487,7 +487,7 @@ export default function ViewPDF() {
                         <button
                           onClick={() => {
                             if (!isUserAuthenticated) {
-                              navigate('/pricing');
+                              navigate('/login');
                               return;
                             }
                             const url = window.location.href;
@@ -518,7 +518,7 @@ export default function ViewPDF() {
                           <button
                             onClick={() => {
                               if (!isUserAuthenticated) {
-                                navigate('/pricing');
+                                navigate('/login');
                                 return;
                               }
                               setShowDownloadDropdown(!showDownloadDropdown);
@@ -549,9 +549,9 @@ export default function ViewPDF() {
                               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
                                 <button
                                   onClick={() => {
-                                    // If user is not logged in, redirect to pricing page
+                                    // If user is not logged in, redirect to login page
                                     if (!isUserAuthenticated) {
-                                      navigate('/pricing');
+                                      navigate('/login');
                                       setShowDownloadDropdown(false);
                                       return;
                                     }
@@ -1239,7 +1239,7 @@ export default function ViewPDF() {
                       className="summary-animated-button"
                       onClick={() => {
                         if (!isUserAuthenticated) {
-                          navigate('/pricing');
+                          navigate('/login');
                           return;
                         }
                         // Open summary popup
@@ -1511,12 +1511,12 @@ export default function ViewPDF() {
                         )}
                       </button>
                     ) : (
-                      // Fake Notes Button (when not logged in - navigates to pricing)
+                      // Fake Notes Button (when not logged in - navigates to login)
                       <button
                         type="button"
                         className="notes-animated-button"
                         onClick={() => {
-                          navigate('/pricing');
+                          navigate('/login');
                         }}
                         title="Login to Add Notes"
                       >
@@ -1562,9 +1562,9 @@ export default function ViewPDF() {
                       
                       <motion.button
                         onClick={() => {
-                          // If user is not logged in, redirect to pricing page
+                          // If user is not logged in, redirect to login page
                           if (!isUserAuthenticated) {
-                            navigate('/pricing');
+                            navigate('/login');
                             return;
                           }
                           // If logged in, allow switching to Original view

@@ -1093,34 +1093,19 @@ export default function LegalJudgments() {
                   >
                   <AnimatePresence mode="popLayout">
                     {judgments.map((judgment, index) => (
-                    <motion.div
+                    <div
                       key={judgment.cnr || judgment.id || `${courtType}-${index}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ 
-                        duration: 0.3, 
-                        delay: index * 0.03,
-                        ease: [0.4, 0, 0.2, 1]
-                      }}
-                      whileHover={{ 
-                        y: -2,
-                        transition: { duration: 0.2 }
-                      }}
                     >
                       <div 
                         onClick={() => viewJudgment(judgment)}
-                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer"
-                        style={{
-                          borderLeft: '4px solid #1E65AD'
-                        }}
+                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
                       >
                         {/* Simple Card Header */}
                         <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-100">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <h3 
-                                className="text-base sm:text-lg md:text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors" 
+                                className="text-base sm:text-lg md:text-xl font-bold mb-2 line-clamp-2" 
                                 style={{ 
                                   color: '#1E65AD', 
                                   fontFamily: 'Helvetica Hebrew Bold, sans-serif',
@@ -1220,36 +1205,28 @@ export default function LegalJudgments() {
 
                             {/* Right side - Button */}
                             <div className="flex-shrink-0 flex items-center lg:items-start lg:pt-0">
-                              <motion.button
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   viewJudgment(judgment);
                                 }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
+                                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 whitespace-nowrap hover:bg-blue-700"
                                 style={{ 
                                   backgroundColor: '#1E65AD',
                                   color: '#FFFFFF',
                                   fontFamily: 'Roboto, sans-serif'
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = '#155a9a';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = '#1E65AD';
                                 }}
                               >
                                 <span>View Details</span>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
-                              </motion.button>
+                              </button>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   ))}
                 </AnimatePresence>
                 

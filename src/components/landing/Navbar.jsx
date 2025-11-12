@@ -35,10 +35,10 @@ const navItems = [
     label: "About",
     path: "/about",
   },
-  {
-    label: "Pricing",
-    path: "/pricing",
-  },
+  // {
+  //   label: "Pricing",
+  //   path: "/pricing",
+  // },
   {
     label: "More",
     links: [
@@ -50,10 +50,10 @@ const navItems = [
         label: "Support", 
         path: "/support"
       },
-      { 
-        label: "Referral Program", 
-        path: "/referral",
-      },
+      // { 
+      //   label: "Referral Program", 
+      //   path: "/referral",
+      // },
       
     ],
   },

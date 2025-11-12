@@ -6,30 +6,34 @@ const Stats = () => {
   const stats = [
     {
       number: "16",
-      CharacterDataSupported: "M",
+      unit: "M",
       label: "Legal Judgments",
       suffix: "+"
     },
     {
       number: "11",
-      CharacterDataSupported: "K",
+      unit: "K",
       label: "Total Acts",
       suffix: "+"
     },
     {
-      number: "10",
-      CharacterDataSupported: "K",
-      label: "Legal Templates",
+      number: "12",
+      unit: "",
+      label: "Languages Supported",
       suffix: "+"
     },
     {
-      number: "12",
-      // CharacterDataSupported: "M",
-      label: "Languages Supported",
-      // suffix: "+"
+      number: "24/7",
+      unit: "/7",
+      label: "Consumer Support",
+      suffix: ""
     }
+  
   ];
-  const [countedStats, setCountedStats] = useState(stats.map(stat => parseInt(stat.number)));
+  const [countedStats, setCountedStats] = useState(stats.map(stat => {
+    const num = parseInt(stat.number);
+    return isNaN(num) ? stat.number : num;
+  }));
 
   // Count up animation
   useEffect(() => {
@@ -45,6 +49,11 @@ const Stats = () => {
         
         stats.forEach((stat, index) => {
           const target = parseInt(stat.number);
+          // Skip animation for non-numeric values like "24/7"
+          if (isNaN(target)) {
+            return;
+          }
+          
           const increment = target / steps;
           let current = 0;
           
@@ -151,17 +160,21 @@ const Stats = () => {
                     }}>
                       {countedStats[index]}
                     </span>
-                    <span style={{ 
-                      display: 'inline-block',
-                      color: '#1E65AD',
-                      textShadow: '0 2px 8px rgba(30, 101, 173, 0.2)'
-                    }}>{stat.CharacterDataSupported}</span>
-                    <span style={{ 
-                      color: '#CF9B63',
-                      marginLeft: '2px',
-                      display: 'inline-block',
-                      fontWeight: 'bold'
-                    }}>{stat.suffix}</span>
+                    {stat.unit && (
+                      <span style={{ 
+                        display: 'inline-block',
+                        color: '#1E65AD',
+                        textShadow: '0 2px 8px rgba(30, 101, 173, 0.2)'
+                      }}>{stat.unit}</span>
+                    )}
+                    {stat.suffix && (
+                      <span style={{ 
+                        color: '#CF9B63',
+                        marginLeft: '2px',
+                        display: 'inline-block',
+                        fontWeight: 'bold'
+                      }}>{stat.suffix}</span>
+                    )}
                   </div>
                   
                   {/* Label */}

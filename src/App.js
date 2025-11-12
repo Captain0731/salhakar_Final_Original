@@ -91,7 +91,7 @@ function AppLayout() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/about" element={<About />} />
-        <Route path="/pricing" element={<PricingPage />} />
+        {/* <Route path="/pricing" element={<PricingPage />} /> */}
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/support" element={<Support />} />
@@ -118,9 +118,9 @@ function AppLayout() {
         {/* Additional Routes for Navigation */}
         <Route path="/judgment-access" element={<LegalJudgments />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
-        <Route path="/invite-friends" element={<InviteFriends />} />
-        <Route path="/earn-rewards" element={<EarnRewards />} />
-        <Route path="/track-referrals" element={<TrackReferrals />} />
+        {/* <Route path="/invite-friends" element={<InviteFriends />} /> */}
+        {/* <Route path="/earn-rewards" element={<EarnRewards />} /> */}
+        {/* <Route path="/track-referrals" element={<TrackReferrals />} /> */}
         
         {/* Dashboard - Public Route (no login required) */}
         <Route path="/dashboard" element={<Dashboard />} />
@@ -129,10 +129,10 @@ function AppLayout() {
         <Route path="/notes/:id" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
         
         {/* Referral Program Routes */}
-        <Route path="/referral" element={<Referral />} />
-        <Route path="/referral/invite" element={<InviteFriends />} />
-        <Route path="/referral/rewards" element={<EarnRewards />} />
-        <Route path="/referral/track" element={<TrackReferrals />} />
+        {/* <Route path="/referral" element={<Referral />} /> */}
+        {/* <Route path="/referral/invite" element={<InviteFriends />} /> */}
+        {/* <Route path="/referral/rewards" element={<EarnRewards />} /> */}
+        {/* <Route path="/referral/track" element={<TrackReferrals />} /> */}
         
         {/* {chatbot routes} */}
         <Route path="/chatbot" element={<LegalChatbot />} />
