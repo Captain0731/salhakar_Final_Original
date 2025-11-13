@@ -91,7 +91,7 @@ function AppLayout() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/about" element={<About />} />
-        {/* <Route path="/pricing" element={<PricingPage />} /> */}
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPost />} />
         <Route path="/support" element={<Support />} />

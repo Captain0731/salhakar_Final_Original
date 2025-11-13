@@ -1,56 +1,109 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "../components/landing/Navbar";
+import { motion } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const About = () => {
+  // const features = [
+  //   "AI-Powered Legal Research",
+  //   "Multilingual Support",
+  //   "Comprehensive Legal Database",
+  //   "Advanced Search & Mapping"
+  // ];
+
+  const location = useLocation();
+
+  useEffect(() => {
+    // Scroll to section if hash is present
+    if (location.hash) {
+      setTimeout(() => {
+        const hash = location.hash.substring(1); // Remove the # symbol
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [location]);
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' , border: '1px solid rgba(30, 101, 173, 0.1)' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
-      <div className="py-2 sm:py-3 md:py-5">
-         {/* Hero Section */}
-        <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-6 sm:pb-8 md:pb-12 lg:pb-16 bg-white relative z-20 w-full border-2 border-gray-200 shadow-lg overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
-          }}
-        >
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-20 left-10 w-72 h-72 rounded-full"
-              style={{ backgroundColor: '#1E65AD', filter: 'blur(80px)' }}
-            ></div>
-            <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full"
-              style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
-            ></div>
-          </div>
-          <div className="w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 text-center pt-4 sm:pt-6 md:pt-7 relative z-10">
-            <h1
-              className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
-            style={{
-              color: "#1E65AD",
-              fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
-                fontWeight: 700,
-                letterSpacing: '-0.02em'
-            }}
+      
+      {/* Hero Section - Matching Support Page Style */}
+      <div 
+        className="pt-20 sm:pt-36 md:pt-40 pb-12 sm:pb-20 md:pb-24 relative overflow-hidden h-96"
+        style={{
+          background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
+        }}
+      >
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-96 h-96 rounded-full"
+            style={{ backgroundColor: '#1E65AD', filter: 'blur(100px)' }}
+          ></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full"
+            style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
+          ></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            Experience Salhakar
-          </h1>
-            <div className="w-16 sm:w-20 md:w-24 h-1 sm:h-1.5 mx-auto rounded-full mb-3 sm:mb-4 md:mb-6"
-              style={{ backgroundColor: '#CF9B63' }}
+            <h1 
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-2"
+              style={{ 
+                fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                lineHeight: '1.2'
+              }}
+            >
+              Experience Salhakar
+            </h1>
+              <div className="w-24 sm:w-32 md:w-40 h-1.5 sm:h-2 mx-auto rounded-full mb-2"
+              style={{ backgroundColor: '#FFFFFF', opacity: 0.9 }}
             ></div>
-            <p
-              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl max-w-3xl mx-auto leading-relaxed px-2"
-            style={{
-                color: '#8C969F',
+            <p 
+              className="text-lg sm:text-xl md:text-2xl text-white max-w-3xl mx-auto mb-2"
+              style={{ 
                 fontFamily: "'Roboto', sans-serif",
-                fontWeight: 400,
+                opacity: 0.95,
                 lineHeight: '1.6'
               }}
             >
               where legal research doesn't just keep up, but leads the way.
             </p>
-          </div>
-      </section>
+            
+            {/* Features List */}
+            {/* <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                  className="flex items-center gap-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 sm:px-6 py-2 sm:py-3"
+                >
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  <span 
+                    className="text-sm sm:text-base text-white font-medium"
+                    style={{ fontFamily: "'Roboto', sans-serif" }}
+                  >
+                    {feature}
+                  </span>
+                </motion.div>
+              ))}
+            </div> */}
+          </motion.div>
+        </div>
+      </div>
 
-        {/* Main Content Section */}
-        <div className="max-w-6xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pt-8 sm:pt-12 md:pt-16 lg:pt-20 pb-8 sm:pb-12 md:pb-16 lg:pb-20">
+      {/* Main Content Section */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-24 -mt-8 sm:-mt-12">
           {/* Section 1: About Salhakar */}
           <section className="mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24 relative">
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 shadow-lg mx-2 sm:mx-0"
@@ -195,7 +248,7 @@ const About = () => {
           </div>
 
           {/* Team Section */}
-          <section className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28 mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24">
+          <section id="our-team" className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28 mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24">
            <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16 px-2">
                  <h2
                    className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4"
@@ -276,7 +329,7 @@ const About = () => {
                         lineHeight: '1.6'
                       }}
                     >
-                      Legal research specialist with deep knowledge of case law and legal precedents. Expert in legal document analysis and research methodologies.
+                      I'm Pratham Shah, the Founder & CEO at Salhakar. My focus is on shaping the vision of what we're building and understanding the real challenges lawyers & Law students face every day in their life. I believe technology can solve that especially AI, it can solve many of these pain points and make legal research far more accessible and efficient.
                     </p>
                     <div className="flex justify-center gap-3 sm:gap-4">
                       <a
@@ -351,7 +404,7 @@ const About = () => {
                         lineHeight: '1.6'
                       }}
                     >
-                      Operations expert with experience in scaling legal tech startups. Focused on process optimization and team coordination.
+                      I'm Parth Chelani, Salhakar's Co-founder and COO. I'm focused on making that idea into actual reality. My responsibility is to provide structure and execution to our ideas, ensuring that what we create is unique, practical for lawyers and law students. I'm excited about bridging the gap between concepts and real-world solutions so that Salhakar may actually make an effect in the legal field.
                     </p>
                     <div className="flex justify-center gap-3 sm:gap-4">
                       <a
@@ -612,9 +665,8 @@ const About = () => {
           </section>
 
           {/* Career Section */}
-          <section className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28 mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24">
-            <div className="max-w-6xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
-              <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16">
+          <section id="careers" className="mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28 mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-24">
+            <div className="text-center mb-6 sm:mb-8 md:mb-12 lg:mb-16">
                 <h2
                   className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4"
                   style={{
@@ -849,16 +901,12 @@ const About = () => {
                         
                       </div>
                     </div>
-
-              
-            </div>
-          </div>
-        </div>
-      </div>
+                  </div>
+                </div>
+              </div>
           </section>
         </div>
       </div>
-    </div>
   );
 };
 

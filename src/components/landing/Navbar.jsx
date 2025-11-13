@@ -35,10 +35,10 @@ const navItems = [
     label: "About",
     path: "/about",
   },
-  // {
-  //   label: "Pricing",
-  //   path: "/pricing",
-  // },
+  {
+    label: "Pricing",
+    path: "/pricing",
+  },
   {
     label: "More",
     links: [

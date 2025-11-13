@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
-import { Mail, MessageCircle, HelpCircle, FileText, Clock, Headphones, ArrowRight, CheckCircle2, Phone } from "lucide-react";
-import { motion } from "framer-motion";
+import { Mail, MessageCircle, HelpCircle, FileText, Clock, Headphones, ArrowRight, CheckCircle2, Phone, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Support() {
+  const navigate = useNavigate();
+  const [showComingSoon, setShowComingSoon] = useState(false);
   const supportOptions = [
     {
       icon: <MessageCircle className="w-8 h-8" />,
@@ -20,7 +23,7 @@ export default function Support() {
       description: "Send us a detailed message and we'll respond",
       action: "Send Email",
       iconBg: "#CF9B63",
-      email: "support@salhakar.com",
+      email: "inquiry@salhakar.com",
       delay: 0.2
     },
     {
@@ -41,15 +44,27 @@ export default function Support() {
     }
   ];
 
-  const features = [
-    "24/7 Support Available",
-    "Quick Response Time",
-    "Expert Assistance",
-    "Multiple Contact Channels"
-  ];
+  // const features = [
+  //   "24/7 Support Available",
+  //   "Quick Response Time",
+  //   "Expert Assistance",
+  //   "Multiple Contact Channels"
+  // ];
 
   const handleEmailClick = () => {
-    window.location.href = "mailto:support@salhakar.com?subject=Support Request";
+    window.location.href = "mailto:inquiry@salhakar.com";
+  };
+
+  const handleFAQClick = () => {
+    navigate("/#faq");
+  };
+
+  const handleLiveChatClick = () => {
+    setShowComingSoon(true);
+  };
+
+  const closeComingSoon = () => {
+    setShowComingSoon(false);
   };
 
   return (
@@ -58,7 +73,7 @@ export default function Support() {
       
       {/* Hero Section */}
       <div 
-        className="pt-32 sm:pt-36 md:pt-40 pb-16 sm:pb-20 md:pb-24 relative overflow-hidden"
+        className="pt-32 sm:pt-36 md:pt-40 pb-16 sm:pb-20 md:pb-24 relative overflow-hidden h-96"
         style={{
           background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
         }}
@@ -71,7 +86,7 @@ export default function Support() {
             style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
           ></div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -79,7 +94,7 @@ export default function Support() {
             className="text-center"
           >
             <h1 
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-2"
               style={{ 
                 fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
                 fontWeight: 700,
@@ -89,11 +104,11 @@ export default function Support() {
             >
               We're Here to Help
             </h1>
-            <div className="w-24 sm:w-32 md:w-40 h-1.5 sm:h-2 mx-auto rounded-full mb-6"
+            <div className="w-24 sm:w-32 md:w-40 h-1.5 sm:h-2 mx-auto rounded-full mb-2"
               style={{ backgroundColor: '#FFFFFF', opacity: 0.9 }}
             ></div>
             <p 
-              className="text-lg sm:text-xl md:text-2xl text-white max-w-3xl mx-auto mb-8"
+              className="text-lg sm:text-xl md:text-2xl text-white max-w-3xl mx-auto mb-2"
               style={{ 
                 fontFamily: "'Roboto', sans-serif",
                 opacity: 0.95,
@@ -104,7 +119,7 @@ export default function Support() {
             </p>
             
             {/* Features List */}
-            <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+            {/* <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
@@ -122,7 +137,7 @@ export default function Support() {
                   </span>
                 </motion.div>
               ))}
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </div>
@@ -186,6 +201,42 @@ export default function Support() {
                     {option.email ? (
                       <button
                         onClick={handleEmailClick}
+                        className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium text-sm sm:text-base group/btn"
+                        style={{ 
+                          fontFamily: "'Roboto', sans-serif",
+                          background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                      >
+                        {option.action}
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </button>
+                    ) : option.title === "FAQ" ? (
+                      <button
+                        onClick={handleFAQClick}
+                        className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium text-sm sm:text-base group/btn"
+                        style={{ 
+                          fontFamily: "'Roboto', sans-serif",
+                          background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                      >
+                        {option.action}
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                      </button>
+                    ) : option.title === "Live Chat" ? (
+                      <button
+                        onClick={handleLiveChatClick}
                         className="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-medium text-sm sm:text-base group/btn"
                         style={{ 
                           fontFamily: "'Roboto', sans-serif",
@@ -268,12 +319,12 @@ export default function Support() {
               {
                 icon: <Mail className="w-8 h-8" />,
                 title: "Email Us",
-                content: "support@salhakar.com",
+                content: "inquiry@salhakar.com",
                 description: "Send us an email anytime",
                 bgColor: "rgba(30, 101, 173, 0.1)",
                 iconColor: "#1E65AD",
                 isLink: true,
-                link: "mailto:support@salhakar.com"
+                link: "mailto:inquiry@salhakar.com"
               },
               {
                 icon: <Clock className="w-8 h-8" />,
@@ -410,6 +461,88 @@ export default function Support() {
         </div>
       </div>
 
+      {/* Coming Soon Popup */}
+      <AnimatePresence>
+        {showComingSoon && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onClick={closeComingSoon}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black bg-opacity-50" />
+
+            {/* Popup */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative z-10 bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 sm:p-8"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={closeComingSoon}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Close popup"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+
+              {/* Content */}
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
+                  }}
+                >
+                  <MessageCircle className="w-8 h-8 text-white" />
+                </div>
+                
+                <h2
+                  className="text-2xl sm:text-3xl font-bold mb-3"
+                  style={{
+                    color: '#1E65AD',
+                    fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                    fontWeight: 700
+                  }}
+                >
+                  Coming Soon
+                </h2>
+                
+                <div className="w-24 h-1.5 mx-auto rounded-full mb-4"
+                  style={{ backgroundColor: '#CF9B63' }}
+                ></div>
+                
+                <p
+                  className="text-base sm:text-lg mb-6"
+                  style={{
+                    color: '#8C969F',
+                    fontFamily: "'Roboto', sans-serif",
+                    lineHeight: '1.6'
+                  }}
+                >
+                  Live Chat feature is currently under development. We're working hard to bring you instant support. In the meantime, please use email support or check our FAQ section.
+                </p>
+                
+                <button
+                  onClick={closeComingSoon}
+                  className="px-6 py-3 text-white rounded-xl font-semibold transition-all duration-300 hover:shadow-lg"
+                  style={{
+                    fontFamily: "'Roboto', sans-serif",
+                    background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
+                  }}
+                >
+                  Got it
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
      
     </div>
   );

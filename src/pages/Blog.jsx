@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, User, ArrowRight, Search, Tag } from "lucide-react";
+import { Calendar, Clock, User, ArrowRight, Search, Tag, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Blog = () => {
   const navigate = useNavigate();
@@ -10,6 +11,13 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const categories = ["All", "Legal Updates", "AI & Technology", "Case Studies", "Legal Tips", "Industry News"];
+
+  // const features = [
+  //   "Latest Legal Insights",
+  //   "Expert Analysis",
+  //   "Industry Updates",
+  //   "Research Tips & Guides"
+  // ];
 
   const blogPosts = [
     {
@@ -96,52 +104,79 @@ const Blog = () => {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="pt-14 sm:pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 relative z-20 overflow-hidden border-2 border-gray-200 shadow-lg"
+      {/* Hero Section - Matching Support Page Style */}
+      <div 
+        className="pt-20 sm:pt-36 md:pt-40 pb-12 sm:pb-20 md:pb-24 relative overflow-hidden h-96"
         style={{
-          background: 'linear-gradient(135deg, #F9FAFC 0%, #FFFFFF 100%)'
+          background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
         }}
       >
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-10 w-72 h-72 rounded-full"
-            style={{ backgroundColor: '#1E65AD', filter: 'blur(80px)' }}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-96 h-76 rounded-full"
+            style={{ backgroundColor: '#1E65AD', filter: 'blur(100px)' }}
           ></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full"
             style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
           ></div>
         </div>
-        
-        <div className="max-w-4xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 text-center pt-4 sm:pt-6 md:pt-7 relative z-10">
-          <h1
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
-            style={{
-              color: "#1E65AD",
-              fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
-              fontWeight: 700,
-              letterSpacing: '-0.02em'
-            }}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            Salhakar Blog
-          </h1>
-          <div className="w-16 sm:w-20 md:w-24 h-1 sm:h-1.5 mx-auto rounded-full mb-3 sm:mb-4 md:mb-6"
-            style={{ backgroundColor: '#CF9B63' }}
-          ></div>
-          <p
-            className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl max-w-3xl mx-auto leading-relaxed px-2"
-            style={{
-              color: '#8C969F',
-              fontFamily: "'Roboto', sans-serif",
-              fontWeight: 400,
-              lineHeight: '1.6'
-            }}
-          >
-            Insights, updates, and expert guidance on legal research, technology, and the future of law.
-          </p>
+            <h1 
+              className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white"
+              style={{ 
+                fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                lineHeight: '1.2'
+              }}
+            >
+              Salhakar Blog
+            </h1>
+            <div className="w-24 sm:w-32 md:w-40 h-1.5 sm:h-2 mx-auto rounded-full mb-2"
+              style={{ backgroundColor: '#FFFFFF', opacity: 0.9 }}
+            ></div>
+            <p 
+              className="text-lg sm:text-xl md:text-2xl text-white max-w-3xl mx-auto mb-8"
+              style={{ 
+                fontFamily: "'Roboto', sans-serif",
+                opacity: 0.95,
+                lineHeight: '1.6'
+              }}
+            >
+              Insights, updates, and expert guidance on legal research, technology, and the future of law.
+            </p>
+            
+            {/* Features List */}
+            {/* <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
+                  className="flex items-center gap-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 sm:px-6 py-2 sm:py-3"
+                >
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  <span 
+                    className="text-sm sm:text-base text-white font-medium"
+                    style={{ fontFamily: "'Roboto', sans-serif" }}
+                  >
+                    {feature}
+                  </span>
+                </motion.div>
+              ))}
+            </div> */}
+          </motion.div>
         </div>
-      </section>
+      </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 pb-8 sm:pb-12 md:pb-16 lg:pb-20 pt-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-24 -mt-8 sm:-mt-12">
         {/* Search and Filter Section */}
         <div className="mb-6 sm:mb-8 md:mb-10 lg:mb-12">
           <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 lg:p-6 shadow-lg mx-2 sm:mx-0"

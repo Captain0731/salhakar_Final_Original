@@ -1,47 +1,59 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Linkedin, X, Youtube, Mail, Phone, MapPin, Instagram, Facebook } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const handleSubscribe = () => {
+    if (isAuthenticated) {
+      // If already logged in, redirect to landing page
+      navigate("/");
+    } else {
+      // If not logged in, redirect to login page
+      navigate("/login");
+    }
+  };
 
   const footerLinks = {
-    product: [
-      { name: "Features", href: "#features" },
-      { name: "Pricing", href: "#pricing" },
-      { name: "API Documentation", href: "#api" },
-      { name: "Integrations", href: "#integrations" }
+    services: [
+      { name: "Legal Judgment", href: "/judgment-access" },
+      { name: "Law Library", href: "/law-library" },
+      { name: "Law Mapping", href: "/law-mapping" },
+      { name: "YouTube Summarizer", href: "/youtube-summary" }
     ],
     company: [
-      { name: "About Us", href: "#about" },
-      { name: "Our Team", href: "#team" },
-      { name: "Careers", href: "#careers" },
-      { name: "Press", href: "#press" }
+      { name: "About Us", href: "/about" },
+      { name: "Our Team", href: "/about#our-team" },
+      { name: "Careers", href: "/about#careers" },
+      { name: "Blog", href: "/blog" }
     ],
-    resources: [
-      { name: "Blog", href: "#blog" },
-      { name: "Help Center", href: "#help" },
-      { name: "Legal Templates", href: "#templates" },
-      { name: "Case Studies", href: "#cases" }
-    ],
+    // resources: [
+    //   { name: "Help Center", href: "/help-center" },
+    //   { name: "Legal Templates", href: "/legal-templates" },
+    //   { name: "Case Studies", href: "/case-studies" }
+    // ],
     legal: [
       { name: "Privacy Policy", href: "/privacy-policy" },
       { name: "Terms of Service", href: "/terms-of-service" },
-      { name: "Cookie Policy", href: "/cookie-policy" },
-      { name: "Refund Policy", href: "/refund-policy" }
+      { name: "Cookie Policy", href: "/cookie-policy" }
     ]
   };
 
   const socialLinks = [
-    { name: "LinkedIn", icon: "💼", href: "#linkedin" },
-    { name: "Twitter", icon: "🐦", href: "#twitter" },
-    { name: "Facebook", icon: "📘", href: "#facebook" },
-    { name: "YouTube", icon: "📺", href: "#youtube" }
+    { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/salhakar/" },
+    { name: "Twitter", icon: null, image: "/twitter.png", href: "/" },
+    { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/salhakar.legal/" },
+    { name: "YouTube", icon: Youtube, href: "#youtube" }
   ];
-
+  
   const contactInfo = [
-    { icon: "📧", text: "support@salhakar.com" },
-    { icon: "📞", text: "+91 98765 43210" },
-    { icon: "📍", text: "New Delhi, India" }
+    { icon: Mail, text: "inquiry@salhakar.com" },
+    { icon: Phone, text: "+91 7069900088" },
+    { icon: MapPin, text: "Gandhinagar, Gujarat, India" }
   ];
 
   return (
@@ -67,12 +79,7 @@ const Footer = () => {
             <div className="lg:col-span-2">
               <div className="mb-6">
                 <div className="mb-4">
-                  <h3 
-                    className="text-xl sm:text-2xl font-bold"
-                    style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
-                  >
-                    सलहाकार
-                  </h3>
+                  <img src="/salahakar .PNG" alt="Salhakar" className="w-50 h-20 object-contain" />
                 </div>
                 
                 <p 
@@ -86,50 +93,71 @@ const Footer = () => {
 
               {/* Contact Information */}
               <div className="space-y-3 mb-6">
-                {contactInfo.map((contact, index) => (
-                  <div key={index} className="flex items-center">
-                    <span className="text-xl mr-3">{contact.icon}</span>
-                    <span 
-                      className="text-sm"
-                      style={{ color: 'rgba(255, 255, 255, 0.9)', fontFamily: 'Roboto, sans-serif' }}
-                    >
-                      {contact.text}
-                    </span>
-                  </div>
-                ))}
+                {contactInfo.map((contact, index) => {
+                  const IconComponent = contact.icon;
+                  return (
+                    <div key={index} className="flex items-center">
+                      <IconComponent className="w-5 h-5 mr-3" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
+                      <span 
+                        className="text-sm"
+                        style={{ color: 'rgba(255, 255, 255, 0.9)', fontFamily: 'Roboto, sans-serif' }}
+                      >
+                        {contact.text}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Social Links */}
               <div className="flex space-x-4">
-                {socialLinks.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.href}
-                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110"
-                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = '#CF9B63';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    }}
-                  >
-                    <span className="text-lg">{social.icon}</span>
-                  </a>
-                ))}
+                {socialLinks.map((social, index) => {
+                  const IconComponent = social.icon;
+                  return (
+                    <a
+                      key={index}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#CF9B63';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                      }}
+                      aria-label={social.name}
+                    >
+                      {social.image ? (
+                        <img 
+                          src={social.image} 
+                          alt={social.name}
+                          className="w-5 h-5 object-contain"
+                          style={{ 
+                            filter: 'brightness(0) invert(1)',
+                            opacity: 0.9
+                          }}
+                        />
+                      ) : (
+                        <IconComponent className="w-5 h-5" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
+                      )}
+                    </a>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Product Links */}
+            {/* Services Links */}
             <div>
               <h4 
                 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6"
                 style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
               >
-                Product
+                Services
               </h4>
               <ul className="space-y-3">
-                {footerLinks.product.map((link, index) => (
+                {footerLinks.services.map((link, index) => (
                   <li key={index}>
                     <a
                       href={link.href}
@@ -179,7 +207,7 @@ const Footer = () => {
             </div>
 
             {/* Resources Links */}
-            <div>
+            {/* <div>
               <h4 
                 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6"
                 style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
@@ -205,7 +233,7 @@ const Footer = () => {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -241,6 +269,7 @@ const Footer = () => {
                 }}
               />
               <button
+                onClick={handleSubscribe}
                 className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold text-white transition-all duration-300 transform hover:scale-105 whitespace-nowrap text-sm sm:text-base"
                 style={{ 
                   backgroundColor: '#CF9B63', 
