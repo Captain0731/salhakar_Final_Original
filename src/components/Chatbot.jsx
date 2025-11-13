@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Spline from '@splinetool/react-spline';
 
 const Chatbot = () => {
   const navigate = useNavigate();
@@ -13,19 +14,16 @@ const Chatbot = () => {
       className="fixed bottom-8 sm:bottom-6 md:bottom-2 right-3 sm:right-4 z-50 transition-transform duration-300 hover:scale-110 cursor-pointer"
       onClick={handleChatbotClick}
       style={{
-        width: '100px',
-        height: '125px',
+        width: '200px',
+        height: '150px',
         backgroundColor: 'transparent',
       }}
     >
-      <img
-        src="/uit3.gif"
-        alt="Chatbot"
-        className="w-full h-full object-contain"
+      <Spline
+        scene="https://prod.spline.design/vZcNPvy5-bMhs2LF/scene.splinecode"
         style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain'
+          width: '200px',
+          height: '150px'
         }}
       />
     </div>

@@ -53,6 +53,7 @@ function AppLayout() {
     '/act-details',
     '/mapping-details',
     '/law-library',
+    '/legal-chatbot',
     '/law-mapping'
   ];
   
@@ -67,6 +68,7 @@ function AppLayout() {
     '/act-details',
     '/mapping-details',
     '/law-library',
+    '/legal-chatbot',
     '/law-mapping'
   ];
   

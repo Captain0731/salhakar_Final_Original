@@ -176,7 +176,6 @@ const pricingData = {
 
 function PricingPage() {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState("student");
   const [billingCycle, setBillingCycle] = useState("monthly");
   const [openFaqs, setOpenFaqs] = useState([]);
 
@@ -335,98 +334,39 @@ function PricingPage() {
 
 
 
-      {/* Category Toggle Section */}
+      {/* Student Plans Section */}
       <section className="py-4 sm:py-6 md:py-8 lg:py-10 xl:py-12 bg-[#F9FAFC]">
         <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
 
-
-          {/* Category Toggle */}
-          <div className="flex justify-center mb-4 sm:mb-6 md:mb-8">
-            <div className="relative inline-flex items-center bg-gray-100 rounded-lg sm:rounded-xl p-0.5 sm:p-1 shadow-inner w-full sm:w-auto max-w-full">
-              {/* Sliding background indicator */}
-              <div
-                className={`absolute top-0.5 sm:top-1 bottom-0.5 sm:bottom-1 rounded-md sm:rounded-lg transition-all duration-300 ease-in-out z-0`}
-                style={{
-                  left: activeCategory === 'student' ? '2px' : activeCategory === 'professional' ? 'calc(33.33% + 1px)' : 'calc(66.66% + 1px)',
-                  width: 'calc(33.33% - 2px)',
-                  backgroundColor: activeCategory === 'student' ? '#1E65AD' : activeCategory === 'professional' ? '#CF9B63' : '#1E65AD',
-                  boxShadow: activeCategory === 'student'
-                    ? '0 2px 8px rgba(30, 101, 173, 0.3)'
-                    : activeCategory === 'professional'
-                      ? '0 2px 8px rgba(207, 155, 99, 0.3)'
-                      : '0 2px 8px rgba(30, 101, 173, 0.3)',
-                }}
-              />
-
-              {["student", "professional", "corporate"].map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setActiveCategory(category)}
-                  className={`px-2 sm:px-4 md:px-6 lg:px-8 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-md sm:rounded-lg font-semibold text-xs sm:text-sm md:text-base capitalize transition-all duration-300 relative z-10 flex-1 sm:flex-none min-w-0 sm:min-w-[100px] md:min-w-[120px] lg:min-w-[160px] ${activeCategory === category
-                      ? "text-white"
-                      : "text-[#8C969F] hover:text-[#1E65AD]"
-                    }`}
-                  style={{
-                    fontFamily: "'Roboto', sans-serif",
-                    fontWeight: 600
-                  }}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+          {/* Student Heading */}
+          <div className="text-center mb-4 sm:mb-6 md:mb-8">
+            <h2
+              className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 leading-tight"
+              style={{
+                color: "#1E65AD",
+                fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                fontWeight: 700
+              }}
+            >
+              Student
+            </h2>
+            <div className="w-12 sm:w-14 md:w-16 h-0.5 sm:h-1 bg-[#CF9B63] mx-auto rounded-full"></div>
           </div>
 
-          {activeCategory === "student" && (
-            <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
-              <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
-                <p
-                  className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
-                  style={{
-                    fontFamily: "'Roboto', sans-serif",
-                    fontWeight: 400
-                  }}
-                >
-
-                  Premium tools and unlimited legal research for students and academic learners who want to ace their law studies. </p>
-              </span>
-            </div>
-
-          )}
-
-          {activeCategory === "professional" && (
-            <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
-              <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
-                <p
-                  className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
-                  style={{
-                    fontFamily: "'Roboto', sans-serif",
-                    fontWeight: 400
-                  }}
-                >
-
-                  Full-featured legal research for independent lawyers and professionals needing smarter, faster case solutions.
-                </p>
-              </span>
-            </div>
-          )}
-
-          {activeCategory === "corporate" && (
-            <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
-              <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
-                <p
-                  className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
-                  style={{
-                    fontFamily: "'Roboto', sans-serif",
-                    fontWeight: 400
-                  }}
-                >
-
-                  Ultimate premium for law firms, legal teams, and businesses requiring unlimited access, analytics, and team collaboration.
-                </p>
-              </span>
-            </div>
-          )}
+          {/* Student Description */}
+          <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
+            <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
+              <p
+                className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
+                style={{
+                  fontFamily: "'Roboto', sans-serif",
+                  fontWeight: 400
+                }}
+              >
+                Premium tools and unlimited legal research for students and academic learners who want to ace their law studies.
+              </p>
+            </span>
+          </div>
 
 
 
@@ -503,7 +443,7 @@ function PricingPage() {
 
           {/* Pricing Cards Section */}
           {(() => {
-            const filteredPlans = pricingData[activeCategory].filter((plan) => {
+            const filteredPlans = pricingData.student.filter((plan) => {
               // When yearly billing is selected, only show Pro and Ultimate plans
               if (billingCycle === "yearly") {
                 const planTitle = plan.title.toLowerCase();
@@ -751,7 +691,9 @@ function PricingPage() {
                 {/* Social Media Icons */}
                 <div className="flex items-center gap-3 sm:gap-4">
                   <a
-                    href="#"
+                    href="https://www.linkedin.com/company/salhakar/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
                     aria-label="LinkedIn"
                   >
@@ -760,22 +702,32 @@ function PricingPage() {
                     </svg>
                   </a>
                   <a
-                    href="#"
+                    href="https://www.instagram.com/salhakar.legal/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
-                    aria-label="Facebook"
+                    aria-label="Instagram"
                   >
                     <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
                   </a>
                   <a
-                    href="#"
+                    href="https://x.com/Salhakar_legal"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full bg-[#1E65AD] flex items-center justify-center hover:bg-[#185a9a] transition-colors duration-200"
                     aria-label="Twitter"
                   >
-                    <svg className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                    </svg>
+                    <img 
+                      src="/twitter.png" 
+                      alt="Twitter"
+                      className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 object-contain"
+                      style={{ 
+                        filter: 'brightness(0) invert(1)',
+                        opacity: 0.9
+                      }}
+                    />
                   </a>
                 </div>
               </div>
@@ -1027,7 +979,7 @@ function PricingPage() {
         </div>
       </section>
 
-      <Footer />
+      
     </div>
   );
 }

@@ -381,7 +381,7 @@ const Blog = () => {
         )}
       </div>
 
-      <Footer />
+      
     </div>
   );
 };

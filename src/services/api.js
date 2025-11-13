@@ -1,5 +1,5 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://operantly-unchattering-ernie.ngrok-free.dev';
+const API_BASE_URL = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
 
 // Fallback URLs in case the primary one fails
 const FALLBACK_URLS = [

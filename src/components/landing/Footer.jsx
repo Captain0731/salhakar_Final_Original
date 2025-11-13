@@ -45,7 +45,7 @@ const Footer = () => {
 
   const socialLinks = [
     { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/salhakar/" },
-    { name: "Twitter", icon: null, image: "/twitter.png", href: "/" },
+    { name: "Twitter", icon: null, image: "/twitter.png", href: "https://x.com/Salhakar_legal" },
     { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/salhakar.legal/" },
     { name: "YouTube", icon: Youtube, href: "#youtube" }
   ];
