@@ -179,20 +179,20 @@ const Navbar = () => {
         ? 'bg-white/20 backdrop-blur-lg shadow-xl py-2' 
         : 'bg-white/90 backdrop-blur-md shadow-lg py-3 sm:py-4 md:py-4'
     }`} style={{ borderColor: '#E5E7EB' }}>
-      <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center ">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 flex justify-between items-center w-full overflow-x-hidden">
         
         {/* Brand Logo - Left Corner */}
         <div
-          className="cursor-pointer group flex items-center"
+          className="cursor-pointer group flex items-center flex-shrink-0"
           onClick={() => navigate("/")}
         >
           <img
             src="/logo4.png"
             alt="सलहाकार Logo"
-            className={`max-h-24 sm:max-h-16 md:max-h-18 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out ${
-              isScrolled ? 'max-h-16 sm:max-h-16 md:max-h-18' : 'max-h-16 sm:max-h-16 md:max-h-18'
+            className={`max-h-12 sm:max-h-14 md:max-h-16 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out flex-shrink-0 ${
+              isScrolled ? 'max-h-12 sm:max-h-14 md:max-h-16' : 'max-h-12 sm:max-h-14 md:max-h-16'
             }`}
-            style={{ height: 'auto' }}
+            style={{ height: 'auto', maxWidth: '120px' }}
             onError={(e) => {
               if (e.target.src.includes('logo4.png')) {
                 e.target.src = '/logo.png';
@@ -208,28 +208,29 @@ const Navbar = () => {
         </div>
 
         {/* Right Side - Mobile: Language Selector + Menu Button */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 md:hidden flex-shrink-0">
           {/* Language Selector - Mobile (in navbar bar) */}
-          <div className="flex-shrink-0 max-w-[100px] sm:max-w-[120px]">
+          <div className="flex-shrink-0 w-auto min-w-0 max-w-[90px] sm:max-w-[120px]">
             <LanguageSelector />
           </div>
           
           {/* Menu Button - Mobile */}
           <button
-            className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 touch-manipulation flex items-center justify-center"
+            className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 touch-manipulation flex items-center justify-center flex-shrink-0"
             onClick={() => setMenuOpen(!menuOpen)}
             style={{ 
               minWidth: '44px', 
               minHeight: '44px',
-              color: '#1E65AD'
+              color: '#1E65AD',
+              flexShrink: 0
             }}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
           >
             {menuOpen ? (
-              <X className="w-6 h-6" strokeWidth={2.5} />
+              <X className="w-6 h-6 flex-shrink-0" strokeWidth={2.5} />
             ) : (
-              <Menu className="w-6 h-6" strokeWidth={2.5} />
+              <Menu className="w-6 h-6 flex-shrink-0" strokeWidth={2.5} />
             )}
           </button>
         </div>

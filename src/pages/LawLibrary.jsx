@@ -439,41 +439,41 @@ export default function LawLibrary() {
   }, [activeSection]); // Reload when section changes
 
   return (
-    <div className="min-h-screen animate-fade-in-up" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="min-h-screen animate-fade-in-up overflow-x-hidden" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
       {/* Enhanced Header Section */}
-      <div className="bg-white border-b border-gray-200 pt-16 sm:pt-20 animate-slide-in-bottom">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
+      <div className="bg-white border-b border-gray-200 pt-14 sm:pt-16 md:pt-20 animate-slide-in-bottom w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12 w-full">
           <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Law Library
             </h1>
-            <div className="w-16 sm:w-20 h-1 mx-auto mb-4 sm:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
-            <p className="text-sm sm:text-base md:text-lg max-w-3xl mx-auto px-2 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
+            <div className="w-12 sm:w-16 md:w-20 h-0.5 sm:h-1 mx-auto mb-3 sm:mb-4 md:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-3xl mx-auto px-2 sm:px-4 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
               Your comprehensive resource for accessing legal acts, regulations, and legislative documents from across India
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="px-2 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 w-full max-w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto w-full">
 
           {/* Enhanced Search and Filter Section */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 mb-4 sm:mb-6 md:mb-8 w-full max-w-full overflow-x-hidden"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                 Search {sectionLabel}
               </h2>
               
               {/* Toggle Button */}
-              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-0.5 sm:p-1 shadow-inner w-full sm:w-auto">
                 {/* Sliding background indicator */}
                 <motion.div
                   className="absolute top-1 bottom-1 rounded-lg z-0"
@@ -501,7 +501,7 @@ export default function LawLibrary() {
                   }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[100px] sm:min-w-[120px] md:min-w-[140px] text-xs sm:text-sm ${
+                  className={`flex-1 sm:flex-none px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-300 relative z-10 text-xs sm:text-sm md:text-base ${
                     activeSection === 'central'
                       ? 'text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -520,7 +520,7 @@ export default function LawLibrary() {
                   }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[100px] sm:min-w-[120px] md:min-w-[140px] text-xs sm:text-sm ${
+                  className={`flex-1 sm:flex-none px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-300 relative z-10 text-xs sm:text-sm md:text-base ${
                     activeSection === 'state'
                       ? 'text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -539,13 +539,13 @@ export default function LawLibrary() {
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Search {sectionLabel}
                 {activeSection === "central" && (
-                  <span className="ml-2 text-xs text-blue-600 font-normal">
+                  <span className="block sm:inline sm:ml-2 text-xs text-blue-600 font-normal mt-1 sm:mt-0">
                     (Full-text search in PDF content)
                   </span>
                 )}
               </label>
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                <div className="relative flex-1 w-full">
                 <input
                   type="text"
                   value={filters.search}
@@ -559,16 +559,16 @@ export default function LawLibrary() {
                       applyFilters();
                     }
                   }}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base md:text-lg"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
-                <div className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 flex items-center pointer-events-none">
                   <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
                   <button
-                    className="absolute inset-y-0 right-0 pr-2 sm:pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
                     title="Voice Search"
                   >
                     <svg 
@@ -585,7 +585,7 @@ export default function LawLibrary() {
                   onClick={() => setShowFilters(!showFilters)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium text-sm sm:text-base whitespace-nowrap"
+                  className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium text-sm sm:text-base whitespace-nowrap w-full sm:w-auto"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 >
                   <svg 
@@ -619,10 +619,10 @@ export default function LawLibrary() {
                 
                 {activeSection === "central" ? (
                   /* Central Acts Filters */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
                     {/* Act ID Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Act ID
                       </label>
                       <input
@@ -630,20 +630,20 @@ export default function LawLibrary() {
                         value={filters.act_id || ''}
                         onChange={(e) => handleFilterChange('act_id', e.target.value)}
                         placeholder="e.g., 186901"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       />
                     </div>
 
                     {/* Ministry Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Ministry
                       </label>
                       <select
                         value={filters.ministry || ''}
                         onChange={(e) => handleFilterChange('ministry', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
                         <option value="">All Ministries</option>
@@ -657,7 +657,7 @@ export default function LawLibrary() {
 
                     {/* Department Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Department
                       </label>
                       <input
@@ -665,20 +665,20 @@ export default function LawLibrary() {
                         value={filters.department || ''}
                         onChange={(e) => handleFilterChange('department', e.target.value)}
                         placeholder="e.g., Legislative Department"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       />
                     </div>
 
                     {/* Year Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Year
                       </label>
                       <select
                         value={filters.year || ''}
                         onChange={(e) => handleFilterChange('year', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
                         <option value="">All Years</option>
@@ -690,13 +690,13 @@ export default function LawLibrary() {
 
                     {/* Type Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Type
                       </label>
                       <select
                         value={filters.type || ''}
                         onChange={(e) => handleFilterChange('type', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
                         <option value="">All Types</option>
@@ -710,16 +710,16 @@ export default function LawLibrary() {
                   </div>
                 ) : (
                   /* State Acts Filters */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
                     {/* State Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         State
                       </label>
                       <select
                         value={filters.state || ''}
                         onChange={(e) => handleFilterChange('state', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
                         <option value="">All States</option>
@@ -733,7 +733,7 @@ export default function LawLibrary() {
 
                     {/* Act Number Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Act Number
                       </label>
                       <input
@@ -741,14 +741,14 @@ export default function LawLibrary() {
                         value={filters.act_number || ''}
                         onChange={(e) => handleFilterChange('act_number', e.target.value)}
                         placeholder="e.g., Act 12 of 2023"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       />
                     </div>
 
                     {/* Department Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Department
                       </label>
                       <input
@@ -756,20 +756,20 @@ export default function LawLibrary() {
                         value={filters.department || ''}
                         onChange={(e) => handleFilterChange('department', e.target.value)}
                         placeholder="e.g., Legislative Department"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       />
                     </div>
 
                     {/* Year Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Year
                       </label>
                       <select
                         value={filters.year || ''}
                         onChange={(e) => handleFilterChange('year', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                        className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                         style={{ fontFamily: 'Roboto, sans-serif' }}
                       >
                         <option value="">All Years</option>
@@ -873,11 +873,11 @@ export default function LawLibrary() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-full overflow-x-hidden"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div className="flex-1">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {Object.values(filters).some(val => {
                     if (!val) return false;
                     if (typeof val === 'string') return val.trim() !== '';
@@ -903,7 +903,7 @@ export default function LawLibrary() {
                     : `Showing the most recent ${sectionLabel.toLowerCase()} first`}
                 </p>
               </div>
-              <div className="text-left sm:text-right">
+              <div className="flex-shrink-0">
                 <div className="flex flex-col items-start sm:items-end gap-1">
                   <span className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     {acts.length} {acts.length === 1 ? 'Act' : 'Acts'}
@@ -1022,21 +1022,21 @@ export default function LawLibrary() {
                     >
                       <div 
                         onClick={() => viewActDetails(act)}
-                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer"
+                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer w-full max-w-full"
                         style={{
                           borderLeft: '4px solid #1E65AD'
                         }}
                       >
                         {/* Simple Card Header */}
-                        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-100">
-                          <div className="flex items-start justify-between gap-3">
+                        <div className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 border-b border-gray-100">
+                          <div className="flex items-start justify-between gap-2 sm:gap-3">
                             <div className="flex-1 min-w-0">
                               <h3 
-                                className="text-base sm:text-lg md:text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors" 
+                                className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors" 
                                 style={{ 
                                   color: '#1E65AD', 
                                   fontFamily: 'Helvetica Hebrew Bold, sans-serif',
-                                  lineHeight: '1.5'
+                                  lineHeight: '1.4'
                                 }}
                               >
                                 {/* Display highlighted title if available */}
@@ -1063,11 +1063,11 @@ export default function LawLibrary() {
                         </div>
 
                         {/* Simple Card Body */}
-                        <div className="px-5 sm:px-6 py-4 sm:py-5">
-                          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+                        <div className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5">
+                          <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:gap-6">
                             {/* Left side - Details */}
-                            <div className="flex-1">
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 md:gap-4">
                                 {act.year && (
                                   <div className="flex items-center gap-2">
                                     <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#CF9B63' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1168,7 +1168,7 @@ export default function LawLibrary() {
                             </div>
 
                             {/* Right side - Button */}
-                            <div className="flex-shrink-0 flex items-center lg:items-start lg:pt-0">
+                            <div className="flex-shrink-0 flex items-center justify-start lg:justify-end lg:items-start pt-2 lg:pt-0">
                               <motion.button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -1176,17 +1176,11 @@ export default function LawLibrary() {
                                 }}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
+                                className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-2.5 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap hover:bg-blue-700"
                                 style={{ 
                                   backgroundColor: '#1E65AD',
                                   color: '#FFFFFF',
                                   fontFamily: 'Roboto, sans-serif'
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = '#155a9a';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = '#1E65AD';
                                 }}
                               >
                                 <span>View Details</span>
@@ -1229,7 +1223,7 @@ export default function LawLibrary() {
             exit={{ opacity: 0, scale: 0.5, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-2.5 sm:p-3 md:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             style={{ 
               fontFamily: 'Roboto, sans-serif',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -1239,7 +1233,7 @@ export default function LawLibrary() {
             aria-label="Scroll to top"
           >
             <svg 
-              className="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:-translate-y-1 transition-transform duration-300" 
+              className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transform group-hover:-translate-y-1 transition-transform duration-300" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"

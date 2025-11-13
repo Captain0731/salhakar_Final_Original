@@ -261,7 +261,7 @@ const LanguageSelector = () => {
                 setShowTooltip(false);
                 setIsHovered(false);
               }}
-              className="flex items-center justify-between gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[32px] sm:min-h-[38px] notranslate"
+              className="flex items-center justify-between gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full max-w-full relative z-10 group min-h-[32px] sm:min-h-[38px] notranslate"
               style={{ 
                 color: '#1E65AD',
                 fontFamily: 'Roboto, sans-serif',
@@ -287,7 +287,7 @@ const LanguageSelector = () => {
                 </svg>
                 
                 {/* Auto-scrolling language display */}
-                <div className="h-4 sm:h-5 md:h-6 w-auto min-w-[45px] sm:min-w-[60px] overflow-hidden relative language-carousel select-none">
+                <div className="h-4 sm:h-5 md:h-6 w-auto min-w-[35px] sm:min-w-[45px] md:min-w-[60px] overflow-hidden relative language-carousel select-none">
                   {/* ticker content */}
                   <div
                     className="will-change-transform"

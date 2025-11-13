@@ -586,47 +586,47 @@ export default function LegalJudgments() {
   ];
 
   return (
-    <div className="min-h-screen animate-fade-in-up" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="min-h-screen animate-fade-in-up overflow-x-hidden" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
       {/* Enhanced Header Section */}
-      <div className="bg-white border-b border-gray-200 pt-16 sm:pt-20 animate-slide-in-bottom">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
+      <div className="bg-white border-b border-gray-200 pt-14 sm:pt-16 md:pt-20 animate-slide-in-bottom w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12 w-full">
           <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Legal Judgments
             </h1>
-            <div className="w-16 sm:w-20 h-0.5 sm:h-1 mx-auto mb-4 sm:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
-            <p className="text-sm sm:text-base md:text-lg max-w-3xl mx-auto px-2 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
+            <div className="w-12 sm:w-16 md:w-20 h-0.5 sm:h-1 mx-auto mb-3 sm:mb-4 md:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-3xl mx-auto px-2 sm:px-4 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
               Search and access legal judgments from High Courts and Supreme Court of India
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="px-2 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6 w-full max-w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto w-full">
 
           {/* Enhanced Search and Filter Section */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 md:mb-8"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 mb-4 sm:mb-6 md:mb-8 w-full max-w-full overflow-x-hidden"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+              <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                 Search {courtTypeLabel} Judgments
               </h2>
               
               {/* Toggle Button */}
-              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-1 shadow-inner">
+              <div className="relative inline-flex items-center bg-gray-100 rounded-xl p-0.5 sm:p-1 shadow-inner w-full sm:w-auto">
                 {/* Sliding background indicator */}
                 <motion.div
-                  className="absolute top-1 bottom-1 rounded-lg z-0"
+                  className="absolute top-0.5 sm:top-1 bottom-0.5 sm:bottom-1 rounded-lg z-0"
                   initial={false}
                   animate={{
-                    left: courtType === 'highcourt' ? '4px' : 'calc(50% + 2px)',
+                    left: courtType === 'highcourt' ? '2px' : 'calc(50% + 1px)',
                     backgroundColor: courtType === 'highcourt' ? '#1E65AD' : '#CF9B63',
                   }}
                   transition={{ 
@@ -635,7 +635,7 @@ export default function LegalJudgments() {
                     damping: 30 
                   }}
                   style={{
-                    width: 'calc(50% - 4px)',
+                    width: 'calc(50% - 2px)',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
                   }}
                 />
@@ -644,7 +644,7 @@ export default function LegalJudgments() {
                   onClick={() => setCourtType('highcourt')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[100px] sm:min-w-[120px] md:min-w-[140px] text-xs sm:text-sm ${
+                  className={`flex-1 sm:flex-none px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-300 relative z-10 text-xs sm:text-sm md:text-base ${
                     courtType === 'highcourt'
                       ? 'text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -659,7 +659,7 @@ export default function LegalJudgments() {
                   onClick={() => setCourtType('supremecourt')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-lg font-semibold transition-all duration-300 relative z-10 min-w-[100px] sm:min-w-[120px] md:min-w-[140px] text-xs sm:text-sm ${
+                  className={`flex-1 sm:flex-none px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-300 relative z-10 text-xs sm:text-sm md:text-base ${
                     courtType === 'supremecourt'
                       ? 'text-white'
                       : 'text-gray-600 hover:text-gray-800'
@@ -678,8 +678,8 @@ export default function LegalJudgments() {
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 Search Judgments
               </label>
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                <div className="relative flex-1 w-full">
                   <input
                     type="text"
                     value={filters.search}
@@ -691,7 +691,7 @@ export default function LegalJudgments() {
                         applyFilters();
                       }
                     }}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base md:text-lg"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                   <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 flex items-center pointer-events-none">
@@ -717,7 +717,7 @@ export default function LegalJudgments() {
                   onClick={() => setShowFilters(!showFilters)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium text-sm sm:text-base whitespace-nowrap"
+                  className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors font-medium text-sm sm:text-base whitespace-nowrap w-full sm:w-auto"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 >
                   <svg 
@@ -748,9 +748,9 @@ export default function LegalJudgments() {
                 </h3>
             {courtType === "supremecourt" ? (
               /* Supreme Court Filters */
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Case Title
                   </label>
                   <input
@@ -758,12 +758,12 @@ export default function LegalJudgments() {
                     value={filters.title}
                     onChange={(e) => handleFilterChange('title', e.target.value)}
                     placeholder="e.g., State vs John Doe"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Judge Name
                   </label>
                   <input
@@ -771,12 +771,12 @@ export default function LegalJudgments() {
                     value={filters.judge}
                     onChange={(e) => handleFilterChange('judge', e.target.value)}
                     placeholder="e.g., Justice Singh"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Petitioner
                   </label>
                   <input
@@ -784,12 +784,12 @@ export default function LegalJudgments() {
                     value={filters.petitioner}
                     onChange={(e) => handleFilterChange('petitioner', e.target.value)}
                     placeholder="e.g., State of Maharashtra"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Respondent
                   </label>
                   <input
@@ -797,16 +797,16 @@ export default function LegalJudgments() {
                     value={filters.respondent}
                     onChange={(e) => handleFilterChange('respondent', e.target.value)}
                     placeholder="e.g., Union of India"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                 </div>
               </div>
             ) : (
               /* High Court Filters */
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Case Title
                   </label>
                   <input
@@ -814,12 +814,12 @@ export default function LegalJudgments() {
                     value={filters.title}
                     onChange={(e) => handleFilterChange('title', e.target.value)}
                     placeholder="e.g., State vs John Doe"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Judge Name
                   </label>
                   <input
@@ -827,17 +827,17 @@ export default function LegalJudgments() {
                     value={filters.judge}
                     onChange={(e) => handleFilterChange('judge', e.target.value)}
                     placeholder="e.g., Justice Singh"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                 </div>
               </div>
             )}
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6">
               {/* CNR Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   CNR Number
                 </label>
                 <input
@@ -845,7 +845,7 @@ export default function LegalJudgments() {
                   value={filters.cnr}
                   onChange={(e) => handleFilterChange('cnr', e.target.value)}
                   placeholder={courtType === "supremecourt" ? "e.g., SC-123456-2023" : "e.g., HPHC010019512005"}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
               </div>
@@ -853,13 +853,13 @@ export default function LegalJudgments() {
               {/* High Court Filter - Only for High Court */}
               {courtType === "highcourt" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     High Court
                   </label>
                   <select
                     value={filters.highCourt}
                     onChange={(e) => handleFilterChange('highCourt', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     {highCourts.map((court) => (
@@ -873,14 +873,14 @@ export default function LegalJudgments() {
 
               {/* Decision Date From */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Decision Date From
                 </label>
                 <input
                   type="date"
                   value={filters.decisionDateFrom}
                   onChange={(e) => handleFilterChange('decisionDateFrom', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
               </div>
@@ -937,15 +937,15 @@ export default function LegalJudgments() {
 
                 {/* Active Filters Display */}
                 {Object.values(filters).some(val => val && val.trim() !== '') && (
-                  <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h3 className="text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 className="text-xs sm:text-sm font-medium text-blue-800 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Active Filters:
                     </h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
                       {Object.entries(filters).map(([key, value]) => {
                         if (value && value.trim() !== '') {
                           return (
-                            <span key={key} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                            <span key={key} className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800 break-words">
                               {key === 'highCourt' ? 'Court' : key.charAt(0).toUpperCase() + key.slice(1)}: "{value}"
                             </span>
                           );
@@ -965,11 +965,11 @@ export default function LegalJudgments() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 md:p-6 lg:p-8 w-full max-w-full overflow-x-hidden"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+            <div className="flex flex-col gap-3 sm:gap-0 mb-4 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {Object.values(filters).some(val => val && val.trim() !== '') 
                     ? `Search Results - ${courtTypeLabel} Judgments` 
                     : `Latest ${courtTypeLabel} Judgments`}
@@ -980,8 +980,8 @@ export default function LegalJudgments() {
                     : `Showing the most recent ${courtTypeLabel.toLowerCase()} judgments first`}
                 </p>
               </div>
-              <div className="text-left sm:text-right">
-                <div className="flex flex-col items-start sm:items-end gap-1">
+              <div className="text-left">
+                <div className="flex flex-col items-start gap-1">
                   <span className="text-xs sm:text-sm font-medium text-gray-700" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     {judgments.length} {judgments.length === 1 ? 'Judgment' : 'Judgments'}
                   </span>
@@ -1001,18 +1001,18 @@ export default function LegalJudgments() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3 }}
-                  className="mb-4 sm:mb-6 p-4 sm:p-5 bg-red-50 border-l-4 border-red-400 rounded-lg shadow-sm"
+                  className="mb-3 sm:mb-4 md:mb-6 p-3 sm:p-4 md:p-5 bg-red-50 border-l-4 border-red-400 rounded-lg shadow-sm"
                 >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-0">
+                <div className="flex flex-col gap-3">
                   <div className="flex items-start flex-1">
                     <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h4 className="text-red-800 font-semibold mb-1 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         Error Loading Judgments
                       </h4>
-                      <p className="text-red-700 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      <p className="text-red-700 text-xs sm:text-sm break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {error}
                       </p>
                     </div>
@@ -1023,7 +1023,7 @@ export default function LegalJudgments() {
                       fetchJudgments(false);
                     }}
                     disabled={loading}
-                    className="sm:ml-4 px-4 sm:px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0 w-full sm:w-auto"
+                    className="px-4 sm:px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0 w-full sm:w-auto self-start sm:self-auto"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1054,17 +1054,17 @@ export default function LegalJudgments() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="text-center py-8 sm:py-12 md:py-16 px-4"
+                  className="text-center py-6 sm:py-8 md:py-12 lg:py-16 px-3 sm:px-4"
                 >
-                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 bg-blue-50 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-3 sm:mb-4 md:mb-6 bg-blue-50 rounded-full flex items-center justify-center">
+                  <svg className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-3" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-2 sm:mb-3 px-2" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   No {courtTypeLabel.toLowerCase()} judgments found
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto px-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   {Object.values(filters).some(val => val && val.trim() !== '')
                     ? 'No judgments match your current search criteria. Try adjusting your filters or search terms.'
                     : `No ${courtTypeLabel.toLowerCase()} judgments are currently available. Please check back later.`}
@@ -1072,7 +1072,7 @@ export default function LegalJudgments() {
                 {Object.values(filters).some(val => val && val.trim() !== '') && (
                   <button
                     onClick={clearFilters}
-                    className="px-5 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
+                    className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-xs sm:text-sm md:text-base"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
                     Clear All Filters
@@ -1085,7 +1085,7 @@ export default function LegalJudgments() {
                   className="relative"
                 >
                   <motion.div 
-                    className="space-y-5 sm:space-y-6"
+                    className="space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -1098,24 +1098,24 @@ export default function LegalJudgments() {
                     >
                       <div 
                         onClick={() => viewJudgment(judgment)}
-                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                        className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer w-full max-w-full"
                       >
                         {/* Simple Card Header */}
-                        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-100">
-                          <div className="flex items-start justify-between gap-3">
+                        <div className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 border-b border-gray-100">
+                          <div className="flex items-start justify-between gap-2 sm:gap-3">
                             <div className="flex-1 min-w-0">
                               <h3 
-                                className="text-base sm:text-lg md:text-xl font-bold mb-2 line-clamp-2" 
+                                className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-2 line-clamp-2" 
                                 style={{ 
                                   color: '#1E65AD', 
                                   fontFamily: 'Helvetica Hebrew Bold, sans-serif',
-                                  lineHeight: '1.5'
+                                  lineHeight: '1.4'
                                 }}
                               >
                                 {judgment.title || judgment.case_info || judgment.case_title || judgment.case_number || 'Untitled Judgment'}
                               </h3>
                               {index === 0 && judgments.length > 0 && !loading && (
-                                <span className="inline-flex items-center px-2.5 py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold">
+                                <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold">
                                   Latest
                                 </span>
                               )}
@@ -1124,11 +1124,11 @@ export default function LegalJudgments() {
                         </div>
 
                         {/* Simple Card Body */}
-                        <div className="px-5 sm:px-6 py-4 sm:py-5">
-                          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+                        <div className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5">
+                          <div className="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:gap-6">
                             {/* Left side - Details */}
-                            <div className="flex-1">
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 md:gap-4">
                                 {(judgment.court_name || judgment.court) && (
                                   <div className="flex items-center gap-2">
                                     <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#1E65AD' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1204,13 +1204,13 @@ export default function LegalJudgments() {
                             </div>
 
                             {/* Right side - Button */}
-                            <div className="flex-shrink-0 flex items-center lg:items-start lg:pt-0">
+                            <div className="flex-shrink-0 flex items-center justify-start sm:justify-end lg:items-start lg:pt-0 pt-2 sm:pt-0">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   viewJudgment(judgment);
                                 }}
-                                className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 whitespace-nowrap hover:bg-blue-700"
+                                className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-2.5 rounded-lg font-semibold text-sm sm:text-base transition-colors duration-200 flex items-center justify-center gap-2 whitespace-nowrap hover:bg-blue-700"
                                 style={{ 
                                   backgroundColor: '#1E65AD',
                                   color: '#FFFFFF',
@@ -1276,7 +1276,7 @@ export default function LegalJudgments() {
             exit={{ opacity: 0, scale: 0.5, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+            className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-2.5 sm:p-3 md:p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
             style={{ 
               fontFamily: 'Roboto, sans-serif',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
@@ -1286,7 +1286,7 @@ export default function LegalJudgments() {
             aria-label="Scroll to top"
           >
             <svg 
-              className="w-5 h-5 sm:w-6 sm:h-6 transform group-hover:-translate-y-1 transition-transform duration-300" 
+              className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transform group-hover:-translate-y-1 transition-transform duration-300" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
