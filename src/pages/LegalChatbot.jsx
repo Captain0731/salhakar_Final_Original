@@ -535,7 +535,7 @@ export default function LegalChatbot() {
                 {/* Messages Container */}
                 <div 
                   ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 sm:py-6 md:py-8 lg:py-12 space-y-4 sm:space-y-6 md:space-y-8 w-full scrollbar-hide"
+              className="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 sm:py-6 md:py-8 lg:py-12 pb-24 sm:pb-6 md:pb-8 lg:pb-12 space-y-4 sm:space-y-6 md:space-y-8 w-full scrollbar-hide"
                   style={{ 
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
@@ -694,8 +694,9 @@ export default function LegalChatbot() {
                 </div>
 
             {/* Input Area - Bottom Fixed */}
-            <div className="border-t bg-white px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-6 pb-6 sm:pb-8 md:pb-10 lg:pb-12" style={{ 
-              borderColor: '#E5E7EB'
+            <div className="fixed sm:relative bottom-0 left-0 right-0 sm:left-auto sm:right-auto border-t bg-white px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-6 pb-3 sm:pb-6 md:pb-8 lg:pb-10 z-50 mobile-input-safe-area" style={{ 
+              borderColor: '#E5E7EB',
+              boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)'
             }}>
               {/* Voice Recording Waveform Indicator */}
               {isRecording && (
@@ -845,6 +846,13 @@ export default function LegalChatbot() {
         
         .animate-voice-bar {
           animation: voice-bar 1s ease-in-out infinite;
+        }
+        
+        /* Mobile input safe area support */
+        @media (max-width: 640px) {
+          .mobile-input-safe-area {
+            padding-bottom: max(0.75rem, calc(0.75rem + env(safe-area-inset-bottom))) !important;
+          }
         }
       `}</style>
     </div>
