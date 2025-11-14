@@ -76,7 +76,7 @@ const Footer = () => {
         <div className="py-12 sm:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
             {/* Brand Section */}
-            <div className="lg:col-span-2">
+            <div className="sm:col-span-2 lg:col-span-2">
               <div className="mb-6">
                 <div className="mb-4">
                   <img src="/salahakar .PNG" alt="Salhakar" className="w-50 h-20 object-contain" />
@@ -148,62 +148,65 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Services Links */}
-            <div>
-              <h4 
-                className="text-base sm:text-lg font-semibold mb-4 sm:mb-6"
-                style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
-              >
-                Services
-              </h4>
-              <ul className="space-y-3">
-                {footerLinks.services.map((link, index) => (
-                  <li key={index}>
-                    <a
-                      href={link.href}
-                      className="text-sm transition-colors duration-300 hover:opacity-80"
-                      style={{ color: 'rgba(255, 255, 255, 0.8)', fontFamily: 'Roboto, sans-serif' }}
-                      onMouseEnter={(e) => {
-                        e.target.style.color = '#CF9B63';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.color = 'rgba(255, 255, 255, 0.8)';
-                      }}
-                    >
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* Services and Company - Side by Side */}
+            <div className="sm:col-span-2 lg:col-span-3 grid grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+              {/* Services Links */}
+              <div>
+                <h4 
+                  className="text-base sm:text-lg font-semibold mb-4 sm:mb-6"
+                  style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
+                >
+                  Services
+                </h4>
+                <ul className="space-y-3">
+                  {footerLinks.services.map((link, index) => (
+                    <li key={index}>
+                      <a
+                        href={link.href}
+                        className="text-sm transition-colors duration-300 hover:opacity-80"
+                        style={{ color: 'rgba(255, 255, 255, 0.8)', fontFamily: 'Roboto, sans-serif' }}
+                        onMouseEnter={(e) => {
+                          e.target.style.color = '#CF9B63';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                        }}
+                      >
+                        {link.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-            {/* Company Links */}
-            <div>
-              <h4 
-                className="text-base sm:text-lg font-semibold mb-4 sm:mb-6"
-                style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
-              >
-                Company
-              </h4>
-              <ul className="space-y-3">
-                {footerLinks.company.map((link, index) => (
-                  <li key={index}>
-                    <a
-                      href={link.href}
-                      className="text-sm transition-colors duration-300 hover:opacity-80"
-                      style={{ color: 'rgba(255, 255, 255, 0.8)', fontFamily: 'Roboto, sans-serif' }}
-                      onMouseEnter={(e) => {
-                        e.target.style.color = '#CF9B63';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.color = 'rgba(255, 255, 255, 0.8)';
-                      }}
-                    >
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              {/* Company Links */}
+              <div>
+                <h4 
+                  className="text-base sm:text-lg font-semibold mb-4 sm:mb-6"
+                  style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
+                >
+                  Company
+                </h4>
+                <ul className="space-y-3">
+                  {footerLinks.company.map((link, index) => (
+                    <li key={index}>
+                      <a
+                        href={link.href}
+                        className="text-sm transition-colors duration-300 hover:opacity-80"
+                        style={{ color: 'rgba(255, 255, 255, 0.8)', fontFamily: 'Roboto, sans-serif' }}
+                        onMouseEnter={(e) => {
+                          e.target.style.color = '#CF9B63';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.color = 'rgba(255, 255, 255, 0.8)';
+                        }}
+                      >
+                        {link.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* Resources Links */}
@@ -242,8 +245,8 @@ const Footer = () => {
           className="py-6 sm:py-8 border-t border-opacity-20"
           style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}
         >
-          <div className="flex flex-col lg:flex-row items-center justify-between">
-            <div className="mb-6 lg:mb-0 text-center lg:text-left">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6">
+            <div className="mb-4 lg:mb-0 text-center lg:text-left w-full lg:w-auto">
               <h4 
                 className="text-lg sm:text-xl font-semibold mb-2"
                 style={{ color: 'white', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}
@@ -258,11 +261,11 @@ const Footer = () => {
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            <div className="flex flex-row gap-2 sm:gap-3 w-full lg:w-auto">
               <input
                 type="email"
                 placeholder="Enter your email address"
-                className="px-4 py-3 rounded-xl border-0 focus:outline-none focus:ring-4 focus:ring-opacity-50 w-full sm:w-64"
+                className="px-3 sm:px-4 py-2 sm:py-3 rounded-xl border-0 focus:outline-none focus:ring-4 focus:ring-opacity-50 flex-1 lg:flex-none lg:w-64 text-sm sm:text-base"
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
                   focusRingColor: 'rgba(207, 155, 99, 0.3)'
@@ -270,7 +273,7 @@ const Footer = () => {
               />
               <button
                 onClick={handleSubscribe}
-                className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold text-white transition-all duration-300 transform hover:scale-105 whitespace-nowrap text-sm sm:text-base"
+                className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold text-white transition-all duration-300 transform hover:scale-105 whitespace-nowrap text-sm sm:text-base flex-shrink-0"
                 style={{ 
                   backgroundColor: '#CF9B63', 
                   fontFamily: 'Roboto, sans-serif',

@@ -79,7 +79,7 @@ function AppLayout() {
   });
   
   return (
-    <div style={{ minHeight: "100vh", overflowY: "auto", overflowX: "hidden", width: "100%", maxWidth: "100vw" }}>
+    <div style={{ minHeight: "100vh", overflowY: "auto", overflowX: "hidden", width: "100%", maxWidth: "100vw", scrollbarWidth: "none", msOverflowStyle: "none" }} className="scrollbar-hide">
       {/* Google Translate Component - Global mount point */}
       <GoogleTranslate />
       {/* Cookie Consent Popup - Shows on first visit */}

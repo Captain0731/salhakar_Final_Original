@@ -176,10 +176,10 @@ const Navbar = () => {
   return (
     <nav ref={navRef} className={`fixed top-0 left-0 right-0 z-[9999] border-b transition-all duration-500 ease-in-out ${
       isScrolled 
-        ? 'bg-white/20 backdrop-blur-lg shadow-xl py-2' 
-        : 'bg-white/90 backdrop-blur-md shadow-lg py-3 sm:py-4 md:py-4'
+        ? 'bg-white shadow-xl py-1.5 sm:py-2 md:bg-white/20 md:backdrop-blur-lg' 
+        : 'bg-white shadow-lg py-2 sm:py-3 md:py-4 md:bg-white/90 md:backdrop-blur-md'
     }`} style={{ borderColor: '#E5E7EB' }}>
-      <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center ">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 flex justify-between items-center">
         
         {/* Brand Logo - Left Corner */}
         <div
@@ -189,8 +189,8 @@ const Navbar = () => {
           <img
             src="/logo4.png"
             alt="सलहाकार Logo"
-            className={`max-h-24 sm:max-h-12 md:max-h-16 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out ${
-              isScrolled ? 'max-h-16 sm:max-h-12 md:max-h-16' : 'max-h-16 sm:max-h-12 md:max-h-16'
+            className={`max-h-10 sm:max-h-12 md:max-h-16 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out ${
+              isScrolled ? 'max-h-10 sm:max-h-12 md:max-h-16' : 'max-h-10 sm:max-h-12 md:max-h-16'
             }`}
             style={{ height: 'auto' }}
             onError={(e) => {
@@ -208,36 +208,36 @@ const Navbar = () => {
         </div>
 
         {/* Right Side - Mobile: Language Selector + Menu Button */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
           {/* Language Selector - Mobile (in navbar bar) */}
-          <div className="flex-shrink-0 max-w-[100px] sm:max-w-[120px]">
+          <div className="flex-shrink-0 max-w-[80px] sm:max-w-[100px] md:max-w-[120px]">
             <LanguageSelector />
           </div>
           
           {/* Menu Button - Mobile */}
           <button
-            className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 touch-manipulation flex items-center justify-center"
+            className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-300 touch-manipulation flex items-center justify-center"
             onClick={() => setMenuOpen(!menuOpen)}
             style={{ 
-              minWidth: '44px', 
-              minHeight: '44px',
+              minWidth: '36px', 
+              minHeight: '36px',
               color: '#1E65AD'
             }}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
           >
             {menuOpen ? (
-              <X className="w-6 h-6" strokeWidth={2.5} />
+              <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
             ) : (
-              <Menu className="w-6 h-6" strokeWidth={2.5} />
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
             )}
           </button>
         </div>
 
         {/* Nav Links */}
         <ul
-          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static left-0 w-full md:w-auto backdrop-blur-lg md:bg-transparent p-6 sm:p-8 md:p-0 transition-all duration-500 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0  ${
-            isScrolled ? 'bg-white/70 backdrop-blur-lg top-16 sm:top-18' : 'bg-white/90 backdrop-blur-md top-20 sm:top-24'
+          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static left-0 w-full md:w-auto bg-white md:bg-transparent md:backdrop-blur-lg p-4 sm:p-6 md:p-0 transition-all duration-500 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0  ${
+            isScrolled ? 'top-12 sm:top-14 md:top-16 md:bg-white/70 md:backdrop-blur-lg' : 'top-14 sm:top-16 md:top-20 md:bg-white/90 md:backdrop-blur-md'
           } ${menuOpen ? "flex opacity-100 translate-y-0" : "hidden md:flex opacity-0 md:opacity-100 -translate-y-2 md:translate-y-0"}`}
           style={{ borderTopColor: '#E5E7EB', zIndex: 9999 }}
         >
@@ -278,11 +278,11 @@ const Navbar = () => {
                     handleNavClick(item.path);
                   }
                 }}
-                className={`flex items-center justify-between w-full md:w-auto py-3 sm:py-3 px-4 sm:px-4 rounded-xl transition-all duration-300 font-medium hover:scale-105 text-sm sm:text-base touch-manipulation relative overflow-hidden group ${(item.path && location.pathname === item.path) ? 'bg-blue-50 text-blue-600' : ''}`}
+                className={`flex items-center justify-between w-full md:w-auto py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 rounded-xl transition-all duration-300 font-medium hover:scale-105 text-xs sm:text-sm md:text-base touch-manipulation relative overflow-hidden group ${(item.path && location.pathname === item.path) ? 'bg-blue-50 text-blue-600' : ''}`}
                 style={{ 
                   color: (item.path && location.pathname === item.path) ? '#1E65AD' : '#8C969F', 
                   fontFamily: 'Roboto, sans-serif',
-                  minHeight: '44px'
+                  minHeight: '36px'
                 }}
                 onMouseEnter={(e) => {
                   if (window.innerWidth >= 768) {
@@ -322,9 +322,7 @@ const Navbar = () => {
                 {/* Main Dropdown - uses smooth animation class */}
                 {item.links && item.links.length > 0 && (
                   <ul
-                    className={`w-full md:absolute md:left-0 md:top-full backdrop-blur-md shadow-2xl rounded-lg sm:rounded-xl md:rounded-2xl py-2 sm:py-3 mt-2 sm:mt-3 md:min-w-[300px] border ${
-                      isScrolled ? 'bg-white/95' : 'bg-white/95'
-                    } ${
+                    className={`w-full md:absolute md:left-0 md:top-full bg-white md:backdrop-blur-md shadow-2xl rounded-lg sm:rounded-xl md:rounded-2xl py-2 sm:py-3 mt-2 sm:mt-3 md:min-w-[300px] border ${
                       dropdownOpen === idx ? "block opacity-100" : "hidden opacity-0"
                     } ${animatedDropdownClass(dropdownOpen === idx)}`}
                   style={{ 
@@ -397,11 +395,11 @@ const Navbar = () => {
                               handleNavClick(link.path, link.filter);
                             }
                           }}
-                          className="flex items-center justify-between w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm md:text-base touch-manipulation rounded-lg mx-1 sm:mx-2 group"
+                          className="flex items-center justify-between w-full text-left px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base touch-manipulation rounded-lg mx-1 sm:mx-2 group"
                           style={{ 
                             color: '#1f2937', 
                             fontFamily: 'Roboto, sans-serif',
-                            minHeight: '44px',
+                            minHeight: '36px',
                             transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                           }}
                           onMouseEnter={(e) => {
@@ -441,9 +439,7 @@ const Navbar = () => {
                         {link.subLinks && link.subLinks.length > 0 && (
                           <ul
                             // On md+: absolute flyout; on mobile: static block below parent
-                            className={`w-full backdrop-blur-md shadow-lg rounded-lg sm:rounded-xl md:rounded-2xl py-2 sm:py-3 mt-2 sm:mt-2.5 md:mt-0 ml-0 md:ml-2 md:absolute md:left-full md:top-0 md:min-w-[220px] border ${
-                              isScrolled ? 'bg-white/95' : 'bg-white/95'
-                            } 
+                            className={`w-full bg-white md:backdrop-blur-md shadow-lg rounded-lg sm:rounded-xl md:rounded-2xl py-2 sm:py-3 mt-2 sm:mt-2.5 md:mt-0 ml-0 md:ml-2 md:absolute md:left-full md:top-0 md:min-w-[220px] border 
                               ${(subDropdownOpen.main === idx && subDropdownOpen.sub === i) ? "block opacity-100" : "hidden opacity-0"}
                               ${animatedSubDropdownClass(subDropdownOpen.main === idx && subDropdownOpen.sub === i)}`}
                           style={{ 
@@ -483,11 +479,11 @@ const Navbar = () => {
                             >
                               <button
                                 onClick={() => handleNavClick(subLink.path, subLink.filter)}
-                                className="block w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm md:text-base touch-manipulation rounded-lg mx-1 sm:mx-2 group"
+                                className="block w-full text-left px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-xs sm:text-sm md:text-base touch-manipulation rounded-lg mx-1 sm:mx-2 group"
                                 style={{ 
                                   color: '#1f2937', 
                                   fontFamily: 'Roboto, sans-serif',
-                                  minHeight: '44px',
+                                  minHeight: '36px',
                                   transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                                 }}
                                 onMouseEnter={(e) => {
@@ -538,9 +534,9 @@ const Navbar = () => {
           <li className="w-full md:hidden mt-2">
             {isAuthenticated ? (
               <div className="w-full">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-2">
+                <div className="flex items-center justify-between p-2 sm:p-2.5 md:p-3 bg-gray-50 rounded-lg mb-2">
                   <div>
-                    <div className="font-semibold text-gray-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="font-semibold text-gray-800 text-sm sm:text-base" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {user?.name || 'name'}
                     </div>
                   </div>
@@ -552,12 +548,12 @@ const Navbar = () => {
                     navigate("/profile");
                     setMenuOpen(false);
                   }}
-                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
+                  className="text-white px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-xs sm:text-sm md:text-base touch-manipulation relative overflow-hidden group mb-2"
                   style={{ 
                     backgroundColor: '#1E65AD', 
                     fontFamily: 'Roboto, sans-serif',
                     boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
-                    minHeight: '44px'
+                    minHeight: '36px'
                   }}
                 >
                   View Profile
@@ -568,12 +564,12 @@ const Navbar = () => {
                     navigate("/dashboard");
                     setMenuOpen(false);
                   }}
-                  className="text-white px-6 sm:px-8 py-3 sm:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-sm sm:text-base touch-manipulation relative overflow-hidden group mb-2"
+                  className="text-white px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold hover:shadow-xl hover:scale-110 transition-all duration-500 ease-out transform w-full text-xs sm:text-sm md:text-base touch-manipulation relative overflow-hidden group mb-2"
                   style={{ 
                     backgroundColor: '#1E65AD', 
                     fontFamily: 'Roboto, sans-serif',
                     boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)',
-                    minHeight: '44px'
+                    minHeight: '36px'
                   }}
                 >
                   Dashboard
@@ -609,9 +605,9 @@ const Navbar = () => {
                   borderRadius: '0.75rem',
                   border: '2px solid #CF9B63',
                   outline: 'none',
-                  padding: '12px 18px',
+                  padding: '10px 16px',
                   width: '100%',
-                  height: '48px'
+                  height: '40px'
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {

@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
-import { Send, Bot, User, X, RotateCcw, Mic, MicOff, Upload } from "lucide-react";
+import { 
+  Send, Bot, User, X, RotateCcw, Mic, MicOff, Upload, 
+  Search, Code, Image, BookOpen, Globe, Copy, ThumbsUp, 
+  ThumbsDown, Save, MoreVertical, ArrowLeft, RefreshCw, 
+  Edit, Paperclip, ChevronRight, HelpCircle, Building2, 
+  SquareStack, Lightbulb, Settings, Share2, Shuffle
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import apiService from "../services/api";
@@ -331,71 +337,209 @@ export default function LegalChatbot() {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const regenerate = async (messageId) => {
+    // Find the user message that triggered this bot response
+    const botMessageIndex = messages.findIndex(m => m.id === messageId);
+    if (botMessageIndex === -1 || botMessageIndex === 0) return;
+    
+    const userMessage = messages[botMessageIndex - 1];
+    if (userMessage.sender !== 'user') return;
+
+    // Remove the old bot response
+    const updatedMessages = messages.slice(0, botMessageIndex);
+    setMessages(updatedMessages);
+
+    // Regenerate response
+    setLoading(true);
+    setIsTyping(true);
+
+    try {
+      const response = await apiService.llmChat(userMessage.text);
+      
+      const botResponse = {
+        id: Date.now() + 1,
+        text: response.reply || "I'm sorry, I couldn't process your request. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString(),
+        usedTools: response.used_tools || false,
+        toolUsed: response.tool_used || null,
+        searchInfo: response.search_info || null
+      };
+
+      setMessages(prev => [...prev, botResponse]);
+      setTimeout(() => scrollToBottom(), 100);
+    } catch (error) {
+      console.error('Error regenerating response:', error);
+      const errorResponse = {
+        id: Date.now() + 1,
+        text: "I'm sorry, there was an error processing your message. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+      setTimeout(() => scrollToBottom(), 100);
+    } finally {
+      setLoading(false);
+      setIsTyping(false);
+    }
+  };
+
+  const hasUserMessages = messages.some(m => m.sender === 'user');
+
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
       <Navbar />
 
-      {/* Chat Interface - Full Page */}
-      <div className="flex-1 flex flex-col pt-14 sm:pt-16 md:pt-20 w-full overflow-x-hidden">
+      {/* Perplexity Pro Inspired Interface */}
+      <div className="flex-1 flex flex-col pt-14 sm:pt-16 md:pt-20 w-full overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+        {!hasUserMessages ? (
+          /* Initial State - Logo and Input */
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[calc(100vh-200px)] pb-6 sm:pb-12 md:pb-16 lg:pb-20 px-4">
+            {/* Centered Logo */}
+            <div className="mb-6 sm:mb-8 md:mb-12 flex items-center justify-center gap-2 sm:gap-3">
+              <img 
+                src="/logo31.png" 
+                alt="Kiki AI Logo" 
+                className="h-6 sm:h-8 md:h-10 lg:h-12 w-auto"
+                style={{ objectFit: 'contain' }}
+              />
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight" style={{ 
+                color: '#000000knwv',
+                fontFamily: "'Helvetica Hebrew Bold', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif"
+              }}>
+                Kiki AI
+              </h1>
+            </div>
+
+            {/* Voice Recording Waveform Indicator */}
+            {isRecording && (
+              <div className="w-full sm:w-[90%] md:w-[70%] max-w-3xl mx-auto mb-3 sm:mb-4 flex items-center justify-center gap-0.5 sm:gap-1 px-4">
+                {[...Array(15)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-0.5 sm:w-1 bg-cyan-500 rounded-full"
+                    style={{
+                      height: `${Math.random() * 20 + 8}px`,
+                      animation: `wave ${0.5 + Math.random() * 0.5}s ease-in-out infinite`,
+                      animationDelay: `${i * 0.05}s`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Input Box - Responsive width, centered */}
+            <div className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-3xl mx-auto">
+              <div className="relative rounded-xl sm:rounded-2xl shadow-sm" style={{ 
+                backgroundColor: '#F7F7F7',
+                border: '1px solid #E5E7EB',
+                minHeight: '60px',
+                height: 'auto'
+              }}>
+                <div className="flex flex-col">
+                  {/* Input Field Row */}
+                  <div className="flex items-center h-[60px] sm:h-[70px] px-2 sm:px-3 md:px-4">
+                    {/* Left Icon - uit3.gif */}
+                    <div className="flex items-center flex-shrink-0">
+                      <img 
+                        src="/uit3.GIF" 
+                        alt="Input" 
+                        className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10"
+                        style={{ objectFit: 'contain' }}
+                      />
+                    </div>
+
+                    {/* Input Field */}
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask anything About Legal Matters."
+                      className="flex-1 h-full px-2 sm:px-3 md:px-4 bg-transparent border-none outline-none text-xs sm:text-sm md:text-base placeholder-gray-500"
+                      style={{ 
+                        fontFamily: "'Roboto', sans-serif",
+                        color: '#1F2937'
+                      }}
+                      disabled={loading || isProcessingVoice}
+                    />
+
+                    {/* Right Icons */}
+                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                      <button 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-1 sm:p-1.5 hover:bg-gray-200 rounded-lg transition-colors" 
+                        title="Attachment"
+                        disabled={loading || isProcessingVoice}
+                      >
+                        <Paperclip className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: '#6B7280' }} />
+                      </button>
+                      <button
+                        onClick={isRecording ? stopRecording : startRecording}
+                        disabled={loading || isProcessingVoice}
+                        className="p-1 sm:p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                        title={isRecording ? "Stop recording" : "Voice input"}
+                      >
+                        {isRecording ? (
+                          <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: '#EF4444' }} />
+                        ) : (
+                          <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: '#6B7280' }} />
+                        )}
+                      </button>
+                      <button
+                        onClick={handleSendMessage}
+                        disabled={loading || isProcessingVoice || !inputMessage.trim()}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ 
+                          backgroundColor: loading || isProcessingVoice || !inputMessage.trim() ? '#E5E7EB' : '#06B6D4',
+                          color: 'white'
+                        }}
+                        title="Send"
+                      >
+                        {(loading || isProcessingVoice) ? (
+                          <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hidden File Input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="audio-file-input"
+                  disabled={loading || isProcessingVoice}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Chat Interface After First Message */
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="flex-1 flex flex-col w-full"
+            className="flex-1 flex flex-col w-full"
           style={{ 
-            height: 'calc(100vh - 56px)'
-          }}
-        >
-                {/* Chat Header with Gradient */}
-                <div className="p-3 sm:p-4 md:p-5 lg:p-6 border-b shadow-lg w-full overflow-x-hidden" style={{ 
-                  background: 'linear-gradient(135deg, #1E65AD 0%, #2563eb 50%, #1E65AD 100%)',
-                  borderColor: '#1E65AD'
-                }}>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 md:gap-4">
-                    <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0 w-full sm:w-auto">
-                      <div className="relative flex-shrink-0">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center shadow-xl" style={{ 
-                          background: 'linear-gradient(135deg, #CF9B63 0%, #d4a574 100%)'
-                        }}>
-                          <Bot className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
-                        </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 sm:border-3 border-white shadow-lg">
-                          <div className="w-full h-full bg-green-500 rounded-full animate-pulse"></div>
-                        </div>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-base sm:text-lg md:text-xl font-bold truncate text-white" style={{ 
-                          fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
-                          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                        }}>
-                          Kiki AI Assistant
-                        </h3>
-                        <p className="text-xs sm:text-sm md:text-base flex items-center gap-1.5 sm:gap-2 truncate text-white/90" style={{ fontFamily: "'Roboto', sans-serif" }}>
-                          <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse flex-shrink-0 shadow-sm"></span>
-                          <span className="truncate">Online • Ready to help</span>
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={clearChat}
-                      className="px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-white border border-white/30 rounded-lg hover:bg-white/20 transition-all duration-200 font-medium flex items-center gap-1.5 sm:gap-2 flex-shrink-0 shadow-md hover:shadow-lg backdrop-blur-sm"
-                      style={{ fontFamily: "'Roboto', sans-serif" }}
-                      title="Clear Chat"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                      <span className="hidden sm:inline">Clear</span>
-                    </button>
-                  </div>
-                </div>
+              height: 'calc(100vh - 56px)'
+            }}
+          >
 
                 {/* Messages Container */}
                 <div 
                   ref={messagesContainerRef}
-                  className="flex-1 overflow-y-auto overflow-x-hidden p-2 sm:p-3 md:p-4 lg:p-5 xl:p-6 space-y-3 sm:space-y-4 md:space-y-5 w-full"
+              className="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 sm:py-6 md:py-8 lg:py-12 space-y-4 sm:space-y-6 md:space-y-8 w-full scrollbar-hide"
                   style={{ 
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: '#CBD5E0 #F7FAFC',
-                    background: 'linear-gradient(to bottom, #F9FAFC 0%, #ffffff 100%)'
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                backgroundColor: '#FFFFFF'
                   }}
                 >
                   <AnimatePresence>
@@ -408,96 +552,94 @@ export default function LegalChatbot() {
                         transition={{ duration: 0.3, delay: index * 0.05 }}
                       className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <div className={`flex items-start gap-2 sm:gap-3 max-w-[95%] sm:max-w-[90%] md:max-w-[85%] lg:max-w-[75%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                          {/* Avatar */}
-                          <div className={`flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md ${
-                            message.sender === 'user' 
-                              ? '' 
-                              : ''
-                          }`} style={message.sender === 'user' ? {
-                            background: 'linear-gradient(135deg, #1E65AD 0%, #2563eb 100%)'
-                          } : {
-                            background: 'linear-gradient(135deg, #CF9B63 0%, #d4a574 100%)'
-                          }}>
-                            {message.sender === 'user' ? (
-                              <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                            ) : (
-                              <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                            )}
+                {message.sender === 'user' ? (
+                  /* User Message Bubble - Right Side, Light Gray Background */
+                  <div className="max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[60%] ml-auto">
+                    <div className="rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-sm" style={{ 
+                      backgroundColor: '#F3F4F6',
+                      border: '1px solid #E5E7EB'
+                    }}>
+                      <p className="text-xs sm:text-sm md:text-base leading-relaxed break-words" style={{ 
+                        fontFamily: "'Roboto', sans-serif",
+                        color: '#1F2937'
+                      }}>
+                        {message.text}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  /* AI Response Box */
+                  <div className="max-w-[95%] sm:max-w-[90%] md:max-w-[85%] lg:max-w-[80%] w-full">
+                    <div className="rounded-xl sm:rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                      {/* Answer Section Header */}
+                      <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 border-b border-gray-100">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xs sm:text-sm font-semibold" style={{ color: '#1F2937' }}>
+                            Answer
+                          </h3>
+                        </div>
+                        <p className="text-[10px] sm:text-xs mt-1 sm:mt-2" style={{ color: '#9CA3AF' }}>
+                          With the help of Kiki AI
+                        </p>
                           </div>
                           
-                          {/* Message Bubble */}
-                          <div className={`rounded-xl sm:rounded-2xl px-3 py-2.5 sm:px-4 sm:py-3 md:px-5 md:py-4 shadow-lg ${
-                            message.sender === 'user'
-                              ? 'rounded-tr-sm'
-                              : 'rounded-tl-sm'
-                          }`} style={message.sender === 'user' ? {
-                            background: 'linear-gradient(135deg, #1E65AD 0%, #2563eb 100%)',
-                            color: 'white'
-                          } : {
-                            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                            color: '#1E65AD',
-                            border: '1px solid #E5E7EB'
-                          }}>
-                            {message.isVoice && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <Mic className="w-4 h-4" style={{ color: message.sender === 'user' ? 'rgba(255,255,255,0.8)' : '#CF9B63' }} />
-                                <span className="text-xs italic" style={{ color: message.sender === 'user' ? 'rgba(255,255,255,0.8)' : '#CF9B63' }}>Voice input</span>
-                              </div>
-                            )}
-                            {message.sender === 'bot' ? (
-                              <div 
-                                className="text-sm sm:text-base leading-relaxed break-words chatbot-markdown" 
-                                style={{ fontFamily: "'Roboto', sans-serif", color: '#1E65AD' }}
+                      {/* AI Response Content */}
+                      <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-5">
+                        <div 
+                          className="text-xs sm:text-sm md:text-base leading-relaxed break-words" 
+                          style={{ 
+                            fontFamily: "'Roboto', sans-serif", 
+                            color: '#1F2937'
+                          }}
                               >
                                 <ReactMarkdown
                                   components={{
-                                    p: ({ children }) => <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>{children}</p>,
-                                    h1: ({ children }) => <h1 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '0.75rem', color: '#1E65AD', fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif" }}>{children}</h1>,
-                                    h2: ({ children }) => <h2 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '0.75rem', color: '#1E65AD', fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif" }}>{children}</h2>,
-                                    h3: ({ children }) => <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '0.5rem', marginTop: '0.75rem', color: '#1E65AD', fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif" }}>{children}</h3>,
-                                    ul: ({ children }) => <ul style={{ marginLeft: '1rem', marginBottom: '0.5rem', marginTop: '0.5rem', listStyleType: 'disc' }}>{children}</ul>,
-                                    ol: ({ children }) => <ol style={{ marginLeft: '1rem', marginBottom: '0.5rem', marginTop: '0.5rem', listStyleType: 'decimal' }}>{children}</ol>,
-                                    li: ({ children }) => <li style={{ marginBottom: '0.25rem' }}>{children}</li>,
+                              p: ({ children }) => <p style={{ marginBottom: '0.75rem', marginTop: '0.75rem' }}>{children}</p>,
+                              h1: ({ children }) => <h1 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem', marginTop: '0.75rem', color: '#1F2937' }}>{children}</h1>,
+                              h2: ({ children }) => <h2 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', marginTop: '0.75rem', color: '#1F2937' }}>{children}</h2>,
+                              h3: ({ children }) => <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem', marginTop: '0.5rem', color: '#1F2937' }}>{children}</h3>,
+                              ul: ({ children }) => <ul style={{ marginLeft: '1rem', marginBottom: '0.75rem', marginTop: '0.75rem', listStyleType: 'disc' }}>{children}</ul>,
+                              ol: ({ children }) => <ol style={{ marginLeft: '1rem', marginBottom: '0.75rem', marginTop: '0.75rem', listStyleType: 'decimal' }}>{children}</ol>,
+                              li: ({ children }) => <li style={{ marginBottom: '0.375rem', color: '#1F2937' }}>{children}</li>,
                                     code: ({ children, className }) => {
                                       const isInline = !className;
                                       return isInline ? (
                                         <code style={{ 
-                                          backgroundColor: 'rgba(30, 101, 173, 0.1)', 
-                                          padding: '0.125rem 0.25rem', 
+                                    backgroundColor: '#F3F4F6', 
+                                    padding: '0.125rem 0.375rem', 
                                           borderRadius: '0.25rem',
                                           fontSize: '0.875em',
                                           fontFamily: 'monospace',
-                                          color: '#1E65AD'
+                                    color: '#1F2937'
                                         }}>{children}</code>
                                       ) : (
                                         <code style={{ 
                                           display: 'block',
-                                          background: 'linear-gradient(135deg, rgba(30, 101, 173, 0.05) 0%, rgba(30, 101, 173, 0.1) 100%)', 
-                                          padding: '0.5rem', 
-                                          borderRadius: '0.25rem',
-                                          fontSize: '0.875em',
+                                    backgroundColor: '#F9FAFB', 
+                                    padding: '0.75rem', 
+                                    borderRadius: '0.375rem',
+                                          fontSize: '0.8125em',
                                           fontFamily: 'monospace',
                                           overflowX: 'auto',
-                                          marginTop: '0.5rem',
-                                          marginBottom: '0.5rem',
-                                          color: '#1E65AD',
-                                          border: '1px solid rgba(30, 101, 173, 0.2)'
+                                    marginTop: '0.75rem',
+                                    marginBottom: '0.75rem',
+                                    color: '#1F2937',
+                                    border: '1px solid #E5E7EB'
                                         }}>{children}</code>
                                       );
                                     },
                                     blockquote: ({ children }) => (
                                       <blockquote style={{ 
-                                        borderLeft: '4px solid #CF9B63', 
-                                        paddingLeft: '0.75rem', 
+                                  borderLeft: '3px solid #E5E7EB', 
+                                  paddingLeft: '0.75rem', 
                                         marginLeft: '0',
-                                        marginTop: '0.5rem',
-                                        marginBottom: '0.5rem',
-                                        fontStyle: 'italic',
-                                        color: '#1E65AD',
-                                        background: 'linear-gradient(90deg, rgba(207, 155, 99, 0.1) 0%, transparent 100%)',
-                                        padding: '0.5rem 0.75rem',
-                                        borderRadius: '0.25rem'
+                                  marginTop: '0.75rem',
+                                  marginBottom: '0.75rem',
+                                  color: '#6B7280',
+                                  backgroundColor: '#F9FAFB',
+                                  padding: '0.5rem 0.75rem',
+                                        borderRadius: '0.25rem',
+                                        fontSize: '0.875rem'
                                       }}>{children}</blockquote>
                                     ),
                                     a: ({ href, children }) => (
@@ -506,34 +648,25 @@ export default function LegalChatbot() {
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                         style={{ 
-                                          color: '#CF9B63', 
+                                    color: '#06B6D4', 
                                           textDecoration: 'underline',
-                                          wordBreak: 'break-all',
-                                          fontWeight: '500'
+                                    wordBreak: 'break-all'
                                         }}
                                       >
                                         {children}
                                       </a>
                                     ),
-                                    strong: ({ children }) => <strong style={{ fontWeight: 'bold' }}>{children}</strong>,
+                              strong: ({ children }) => <strong style={{ fontWeight: '600', color: '#1F2937' }}>{children}</strong>,
                                     em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
                                   }}
                                 >
                                   {message.text}
                                 </ReactMarkdown>
                               </div>
-                            ) : (
-                              <p className="text-sm sm:text-base leading-relaxed break-words" style={{ fontFamily: "'Roboto', sans-serif" }}>
-                                {message.text}
-                              </p>
-                            )}
-                            <p className={`text-xs mt-2 ${
-                          message.sender === 'user' ? 'text-white/80' : 'text-gray-500'
-                            }`} style={{ fontFamily: "'Roboto', sans-serif" }}>
-                          {formatTime(message.timestamp)}
-                        </p>
+                      </div>
                       </div>
                     </div>
+                )}
                       </motion.div>
                     ))}
                   </AnimatePresence>
@@ -545,20 +678,12 @@ export default function LegalChatbot() {
                       animate={{ opacity: 1, y: 0 }}
                       className="flex justify-start"
                     >
-                      <div className="flex items-start gap-2 sm:gap-3 max-w-[95%] sm:max-w-[90%] md:max-w-[85%] lg:max-w-[75%]">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style={{ 
-                          background: 'linear-gradient(135deg, #CF9B63 0%, #d4a574 100%)'
-                        }}>
-                          <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                        </div>
-                        <div className="rounded-xl sm:rounded-2xl rounded-tl-sm px-3 py-2.5 sm:px-4 sm:py-3 shadow-lg" style={{
-                          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                          border: '1px solid #E5E7EB'
-                        }}>
-                          <div className="flex space-x-1 sm:space-x-1.5">
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce" style={{ backgroundColor: '#1E65AD', animationDelay: '0s' }}></div>
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce" style={{ backgroundColor: '#1E65AD', animationDelay: '0.2s' }}></div>
-                            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce" style={{ backgroundColor: '#1E65AD', animationDelay: '0.4s' }}></div>
+                  <div className="max-w-[95%] sm:max-w-[90%] md:max-w-[85%] lg:max-w-[80%] w-full">
+                    <div className="rounded-xl sm:rounded-2xl border border-gray-200 bg-white shadow-sm px-4 sm:px-6 py-3 sm:py-4">
+                      <div className="flex space-x-1.5 sm:space-x-2">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce bg-gray-400" style={{ animationDelay: '0s' }}></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce bg-gray-400" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-bounce bg-gray-400" style={{ animationDelay: '0.4s' }}></div>
                           </div>
                         </div>
                       </div>
@@ -568,75 +693,104 @@ export default function LegalChatbot() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input Area */}
-                <div className="p-2 sm:p-3 md:p-4 lg:p-5 xl:p-6 border-t bg-white shadow-lg w-full overflow-x-hidden" style={{ 
-                  borderColor: '#E5E7EB',
-                  background: 'linear-gradient(to top, #ffffff 0%, #f8f9fa 100%)'
+            {/* Input Area - Bottom Fixed */}
+            <div className="border-t bg-white px-3 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-6 pb-6 sm:pb-8 md:pb-10 lg:pb-12" style={{ 
+              borderColor: '#E5E7EB'
+            }}>
+              {/* Voice Recording Waveform Indicator */}
+              {isRecording && (
+                <div className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-3xl mx-auto mb-3 sm:mb-4 flex items-center justify-center gap-0.5 sm:gap-1 px-4">
+                  {[...Array(15)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-0.5 sm:w-1 bg-cyan-500 rounded-full"
+                      style={{
+                        height: `${Math.random() * 20 + 8}px`,
+                        animation: `wave ${0.5 + Math.random() * 0.5}s ease-in-out infinite`,
+                        animationDelay: `${i * 0.05}s`
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              {/* Input Box - Same as initial state */}
+              <div className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-3xl mx-auto">
+                <div className="relative rounded-xl sm:rounded-2xl shadow-sm" style={{ 
+                  backgroundColor: '#F7F7F7',
+                  border: '1px solid #E5E7EB',
+                  minHeight: '60px',
+                  height: 'auto'
                 }}>
-                  {/* Voice Recording Animation Overlay */}
-                  <AnimatePresence>
-                    {isRecording && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="mb-2 sm:mb-3 md:mb-4 p-2 sm:p-3 md:p-4 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-lg sm:rounded-xl flex items-center gap-2 sm:gap-3 md:gap-4"
-                      >
-                        <div className="flex-shrink-0">
-                          <div className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12">
-                            <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
-                            <div className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-red-600 rounded-full flex items-center justify-center">
-                              <Mic className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
-                            </div>
-                          </div>
+                  <div className="flex items-center h-[60px] sm:h-[70px] px-2 sm:px-3 md:px-4">
+                     {/* Left Icon - uit3.gif */}
+                     <div className="flex items-center flex-shrink-0">
+                       <img 
+                         src="/uit3.GIF" 
+                         alt="Input" 
+                         className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10"
+                         style={{ objectFit: 'contain' }}
+                       />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs sm:text-sm md:text-base font-semibold text-red-700 mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                            Recording...
-                          </p>
-                          <div className="flex items-center gap-1">
-                            <div className="flex items-end gap-0.5 sm:gap-1" style={{ height: '20px' }}>
-                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0s', height: '8px' }}></div>
-                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.1s', height: '12px' }}></div>
-                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.2s', height: '16px' }}></div>
-                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.3s', height: '20px' }}></div>
-                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.4s', height: '16px' }}></div>
-                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.5s', height: '12px' }}></div>
-                              <div className="w-0.5 sm:w-1 bg-red-500 rounded-full animate-voice-bar" style={{ animationDelay: '0.6s', height: '8px' }}></div>
-                            </div>
-                            <p className="text-xs sm:text-sm text-red-600 ml-1 sm:ml-2 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                              Click mic to stop
-                            </p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
 
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    {/* Voice Recording Button */}
-                    <button
-                      onClick={startRecording}
+                    {/* Input Field */}
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask anything About Legal Matters."
+                      className="flex-1 h-full px-2 sm:px-3 md:px-4 bg-transparent border-none outline-none text-xs sm:text-sm md:text-base"
+                      style={{ 
+                        fontFamily: "'Roboto', sans-serif",
+                        color: '#1F2937'
+                      }}
                       disabled={loading || isProcessingVoice}
-                      className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center flex-shrink-0 ${
-                        isRecording 
-                          ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse' 
-                          : 'disabled:opacity-50 disabled:cursor-not-allowed'
-                      }`}
-                      style={!isRecording ? {
-                        background: 'linear-gradient(135deg, #CF9B63 0%, #d4a574 100%)',
-                        color: 'white'
-                      } : {}}
-                      title={isRecording ? "Click to stop recording" : "Click to start recording"}
+                    />
+
+                    {/* Right Icons */}
+                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                      <button 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-1 sm:p-1.5 hover:bg-gray-200 rounded-lg transition-colors" 
+                        title="Attachment"
+                        disabled={loading || isProcessingVoice}
+                      >
+                        <Paperclip className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: '#6B7280' }} />
+                      </button>
+                      <button
+                        onClick={isRecording ? stopRecording : startRecording}
+                        disabled={loading || isProcessingVoice}
+                        className="p-1 sm:p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                        title={isRecording ? "Stop recording" : "Voice input"}
                     >
                       {isRecording ? (
-                        <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                      ) : (
-                        <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <MicOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: '#EF4444' }} />
+                        ) : (
+                          <Mic className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: '#6B7280' }} />
+                        )}
+                      </button>
+                      <button
+                        onClick={handleSendMessage}
+                        disabled={loading || isProcessingVoice || !inputMessage.trim()}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ 
+                          backgroundColor: loading || isProcessingVoice || !inputMessage.trim() ? '#E5E7EB' : '#06B6D4',
+                          color: 'white'
+                        }}
+                        title="Send"
+                      >
+                        {(loading || isProcessingVoice) ? (
+                          <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       )}
                     </button>
+                    </div>
+                  </div>
 
-                    {/* File Upload Button */}
+                  {/* Hidden File Input */}
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -646,106 +800,35 @@ export default function LegalChatbot() {
                       id="audio-file-input"
                       disabled={loading || isProcessingVoice}
                     />
-                    <label
-                      htmlFor="audio-file-input"
-                      className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center flex-shrink-0 cursor-pointer ${
-                        loading || isProcessingVoice
-                          ? 'opacity-50 cursor-not-allowed'
-                          : ''
-                      }`}
-                      style={{
-                        background: 'linear-gradient(135deg, #CF9B63 0%, #d4a574 100%)',
-                        color: 'white'
-                      }}
-                      title="Upload audio file"
-                    >
-                      <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </label>
-
-                    <div className="flex-1 relative min-w-0">
-                      <div className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 z-10">
-                        <img 
-                          src="/uit3.GIF" 
-                          alt="Message" 
-                          className="w-8 h-12 sm:w-10 sm:h-15"
-                          style={{ objectFit: 'contain' }}
-                        />
-                      </div>
-                      <textarea
-                        ref={inputRef}
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Ask your legal question..."
-                        rows={1}
-                        className="w-full pr-9 sm:pr-11 py-2.5 sm:py-3 md:py-3.5 text-sm sm:text-base border-2 rounded-lg sm:rounded-xl focus:ring-2 transition-all resize-none overflow-hidden"
-                        style={{ 
-                          fontFamily: "'Roboto', sans-serif",
-                          minHeight: '40px',
-                          maxHeight: '120px',
-                          borderColor: '#E5E7EB',
-                          backgroundColor: '#F9FAFC',
-                          paddingLeft: '48px'
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = '#1E65AD';
-                          e.target.style.backgroundColor = 'white';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = '#E5E7EB';
-                          e.target.style.backgroundColor = '#F9FAFC';
-                        }}
-                        disabled={loading || isProcessingVoice}
-                        onInput={(e) => {
-                          e.target.style.height = 'auto';
-                          e.target.style.height = e.target.scrollHeight + 'px';
-                        }}
-                      />
-                      {inputMessage && (
-                        <button
-                          onClick={() => setInputMessage("")}
-                          className="absolute right-2 sm:right-3 md:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10"
-                        >
-                          <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                        </button>
-                      )}
                     </div>
-                    <button
-                      onClick={handleSendMessage}
-                      disabled={loading || isProcessingVoice || !inputMessage.trim()}
-                      className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-lg sm:rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center flex-shrink-0"
-                      style={{ 
-                        fontFamily: "'Roboto', sans-serif",
-                        background: 'linear-gradient(135deg, #1E65AD 0%, #2563eb 100%)'
-                      }}
-                    >
-                      {(loading || isProcessingVoice) ? (
-                        <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                      )}
-                    </button>
                   </div>
-                 
                 </div>
         </motion.div>
+        )}
       </div>
 
       {/* Custom Scrollbar Styles */}
       <style>{`
-        .overflow-y-auto::-webkit-scrollbar {
-          width: 6px;
+        /* Hide scrollbar for messages container */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* Internet Explorer 10+ */
+          scrollbar-width: none;  /* Firefox */
         }
-        .overflow-y-auto::-webkit-scrollbar-track {
-          background: #F7FAFC;
-          border-radius: 10px;
+        
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;  /* Chrome, Safari, Opera */
         }
-        .overflow-y-auto::-webkit-scrollbar-thumb {
-          background: #CBD5E0;
-          border-radius: 10px;
-        }
-        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-          background: #A0AEC0;
+        
+        /* Voice Recording Waveform Animation */
+        @keyframes wave {
+          0%, 100% {
+            transform: scaleY(0.3);
+            opacity: 0.7;
+          }
+          50% {
+            transform: scaleY(1);
+            opacity: 1;
+          }
         }
         
         /* Voice Recording Animation */

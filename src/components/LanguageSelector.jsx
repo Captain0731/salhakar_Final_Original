@@ -20,7 +20,7 @@ const LanguageSelector = () => {
   const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [rowHeight, setRowHeight] = useState(24);
+  const [rowHeight, setRowHeight] = useState(14); // Smaller initial height for mobile
   const dropdownRef = useRef(null);
   const intervalRef = useRef(null);
   const measureRef = useRef(null);
@@ -261,7 +261,7 @@ const LanguageSelector = () => {
                 setShowTooltip(false);
                 setIsHovered(false);
               }}
-              className="flex items-center justify-between gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[32px] sm:min-h-[38px] notranslate"
+              className="flex items-center justify-between gap-1 sm:gap-2 px-1 sm:px-1.5 md:px-3 py-0.5 sm:py-1 md:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[28px] sm:min-h-[32px] md:min-h-[38px] notranslate"
               style={{ 
                 color: '#1E65AD',
                 fontFamily: 'Roboto, sans-serif',
@@ -273,10 +273,10 @@ const LanguageSelector = () => {
               aria-haspopup="listbox"
               title="Select your language"
             >
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2">
                 {/* Globe Icon */}
                 <svg 
-                  className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 transition-colors duration-500"
+                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 md:w-4 md:h-4 flex-shrink-0 transition-colors duration-500"
                   style={{ color: '#1E65AD' }}
                   fill="none" 
                   stroke="currentColor" 
@@ -287,7 +287,7 @@ const LanguageSelector = () => {
                 </svg>
                 
                 {/* Auto-scrolling language display */}
-                <div className="h-4 sm:h-5 md:h-6 w-auto min-w-[45px] sm:min-w-[60px] overflow-hidden relative language-carousel select-none">
+                <div className="h-3.5 sm:h-4 md:h-5 lg:h-6 w-auto min-w-[40px] sm:min-w-[45px] md:min-w-[60px] overflow-hidden relative language-carousel select-none">
                   {/* ticker content */}
                   <div
                     className="will-change-transform"
@@ -302,12 +302,12 @@ const LanguageSelector = () => {
                       <div
                         key={`${language.code}-${index}`}
                         ref={index === 0 ? measureRef : null}
-                        className="h-4 sm:h-5 md:h-6 flex items-center gap-1 sm:gap-1.5"
+                        className="h-3.5 sm:h-4 md:h-5 lg:h-6 flex items-center gap-0.5 sm:gap-1 md:gap-1.5"
                       >
-                        <span className="text-[10px] sm:text-xs font-bold notranslate" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                        <span className="text-[9px] sm:text-[10px] md:text-xs font-bold notranslate" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                           {language.langCode}
                         </span>
-                        <span className="text-[10px] sm:text-xs font-medium hidden sm:inline notranslate" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
+                        <span className="text-[9px] sm:text-[10px] md:text-xs font-medium hidden sm:inline notranslate" style={{ color: '#1E65AD', fontFamily: 'Roboto, sans-serif' }}>
                           {language.name}
                         </span>
                       </div>
@@ -318,7 +318,7 @@ const LanguageSelector = () => {
               
               {/* Chevron Icon */}
               <svg 
-                className={`w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 transition-all duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${isHovered ? 'translate-y-0.5' : ''}`}
+                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3.5 md:h-3.5 transition-all duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${isHovered ? 'translate-y-0.5' : ''}`}
                 style={{ color: '#1E65AD' }}
                 fill="none" 
                 stroke="currentColor" 
@@ -362,23 +362,32 @@ const LanguageSelector = () => {
       {/* Dropdown Menu */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ 
-              duration: 0.2,
-              ease: [0.4, 0, 0.2, 1]
-            }}
-            className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl overflow-hidden z-50 flex notranslate"
-            style={{ 
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-              maxHeight: '400px',
-            }}
-            role="listbox"
-            aria-label="Language selection"
-          >
+          <>
+            {/* Backdrop for mobile */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/20 z-40 md:hidden"
+              onClick={() => setIsOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ 
+                duration: 0.2,
+                ease: [0.4, 0, 0.2, 1]
+              }}
+              className="fixed md:absolute right-2 sm:right-4 md:right-0 top-[60px] sm:top-[65px] md:top-full md:mt-2 w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] md:w-64 max-w-[300px] sm:max-w-[320px] md:max-w-none bg-white rounded-xl shadow-2xl overflow-hidden z-50 flex notranslate"
+              style={{ 
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+                maxHeight: 'calc(100vh - 80px)',
+              }}
+              role="listbox"
+              aria-label="Language selection"
+            >
           {/* Gradient Left Border */}
           <div 
             className="w-1 flex-shrink-0"
@@ -388,7 +397,7 @@ const LanguageSelector = () => {
           />
           
           {/* Language List */}
-          <div className="flex-1 py-2 overflow-y-auto">
+          <div className="flex-1 py-2 sm:py-2 md:py-2 overflow-y-auto max-h-[calc(100vh-120px)] md:max-h-[400px]">
             {languages.map((language, index) => {
               const isSelected = currentLang.toLowerCase() === language.code.toLowerCase();
               return (
@@ -405,24 +414,24 @@ const LanguageSelector = () => {
                       setIsOpen(false);
                     }
                   }}
-                  className={`w-full text-left px-4 py-3 transition-all duration-150 flex items-center justify-between gap-3 focus:outline-none ${
+                  className={`w-full text-left px-4 sm:px-4 md:px-4 py-3 sm:py-2.5 md:py-3 transition-all duration-150 flex items-center justify-between gap-2 sm:gap-3 focus:outline-none active:bg-gray-100 ${
                     isSelected 
-                      ? 'bg-gray-50' 
+                      ? 'bg-blue-50' 
                       : 'hover:bg-gray-50'
                   }`}
                   style={{ 
                     fontFamily: 'Roboto, sans-serif',
-                    backgroundColor: isSelected ? '#F9FAFB' : 'transparent',
+                    backgroundColor: isSelected ? '#EFF6FF' : 'transparent',
                   }}
                   role="option"
                   aria-selected={isSelected}
                 >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-sm font-bold notranslate" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                  <div className="flex items-center gap-3 sm:gap-3 flex-1 min-w-0">
+                    <span className="text-sm sm:text-sm md:text-sm font-bold notranslate flex-shrink-0" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif', minWidth: '32px' }}>
                       {language.langCode}
                     </span>
                     <span 
-                      className="text-sm font-medium truncate notranslate"
+                      className="text-sm sm:text-sm md:text-sm font-medium notranslate break-words"
                       style={{ 
                         color: '#1E65AD',
                         fontFamily: 'Roboto, sans-serif',
@@ -433,7 +442,7 @@ const LanguageSelector = () => {
                   </div>
                   {isSelected && (
                     <div 
-                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      className="w-2 h-2 sm:w-2 sm:h-2 rounded-full flex-shrink-0"
                       style={{ backgroundColor: '#ff6b9d' }}
                       aria-hidden="true"
                     />
@@ -443,6 +452,7 @@ const LanguageSelector = () => {
             })}
           </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
       </div>
