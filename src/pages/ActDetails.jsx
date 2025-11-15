@@ -7,7 +7,6 @@ import apiService from "../services/api";
 import BookmarkButton from "../components/BookmarkButton";
 import SummaryPopup from "../components/SummaryPopup";
 import { useAuth } from "../contexts/AuthContext";
-import { marked } from "marked";
 import jsPDF from "jspdf";
 import { FileText, StickyNote, Share2, Download } from "lucide-react";
 
@@ -360,7 +359,7 @@ export default function ActDetails() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       <div className="pt-16 sm:pt-20">
-
+      
       {/* Responsive Layout: Stacked on mobile, side-by-side on desktop */}
       <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)', height: isMobile ? 'auto' : 'calc(100vh - 80px)', overflow: isMobile ? 'visible' : 'hidden' }}>
         <div className="max-w-7xl mx-auto" style={{ height: isMobile ? 'auto' : '100%' }}>
