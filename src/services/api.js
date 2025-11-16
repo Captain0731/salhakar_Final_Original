@@ -1,7 +1,17 @@
 // API Service for Legal Platform - Complete Integration
-const API_BASE_URL = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
+// Primary server (pr) - First priority
+const API_BASE_URL_PR = 'https://operantly-unchattering-ernie.ngrok-free.dev';
 
-// Fallback URLs in case the primary one fails
+// Alternative server (ad) - Fallback
+const API_BASE_URL_AD = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
+
+// Server configuration with identifiers
+const API_SERVERS = [
+  { url: API_BASE_URL_PR, id: 'pr', name: 'Primary Server' },
+  { url: API_BASE_URL_AD, id: 'ad', name: 'Alternative Server' }
+];
+
+// Additional fallback URLs in case both primary servers fail
 const FALLBACK_URLS = [
   'https://752ce8b44879.ngrok-free.app',
   'http://localhost:8000', // Local development fallback
@@ -10,7 +20,9 @@ const FALLBACK_URLS = [
 
 class ApiService {
   constructor() {
-    this.baseURL = API_BASE_URL;
+    // Start with primary server (pr)
+    this.baseURL = API_BASE_URL_PR;
+    this.currentServerId = 'pr'; // Track which server is currently active
     this.currentUrlIndex = 0;
     this.accessToken = localStorage.getItem('access_token');
     this.refreshToken = localStorage.getItem('refresh_token');
@@ -18,54 +30,70 @@ class ApiService {
 
   // Method to test API connectivity and switch URLs if needed
   async testConnectivity() {
-    try {
-      console.log('🔧 Testing API connectivity...');
-      const response = await fetch(`${this.baseURL}/api/health`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        },
-        signal: AbortSignal.timeout(5000) // 5 second timeout
-      });
-      
-      if (response.ok) {
-        console.log('✅ API connectivity successful');
-        return true;
-      } else {
-        console.log('❌ API connectivity failed:', response.status);
-        return false;
-      }
-    } catch (error) {
-      console.log('❌ API connectivity error:', error.message);
-      
-      // Try fallback URLs
-      for (let i = 0; i < FALLBACK_URLS.length; i++) {
-        try {
-          console.log(`🔄 Trying fallback URL ${i + 1}: ${FALLBACK_URLS[i]}`);
-          const fallbackResponse = await fetch(`${FALLBACK_URLS[i]}/api/health`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'ngrok-skip-browser-warning': 'true'
-            },
-            signal: AbortSignal.timeout(3000) // 3 second timeout for fallbacks
-          });
-          
-          if (fallbackResponse.ok) {
-            console.log(`✅ Fallback URL ${i + 1} successful`);
-            this.baseURL = FALLBACK_URLS[i];
-            this.currentUrlIndex = i;
-            return true;
-          }
-        } catch (fallbackError) {
-          console.log(`❌ Fallback URL ${i + 1} failed:`, fallbackError.message);
+    console.log('🔧 Testing API connectivity...');
+    
+    // Try primary servers first (pr, then ad)
+    for (const server of API_SERVERS) {
+      try {
+        console.log(`🔄 Testing ${server.id} (${server.name}): ${server.url}`);
+        const response = await fetch(`${server.url}/health`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+          },
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+        
+        if (response.ok) {
+          console.log(`✅ ${server.id} server connectivity successful`);
+          this.baseURL = server.url;
+          this.currentServerId = server.id;
+          return { success: true, serverId: server.id, serverName: server.name };
+        } else {
+          console.log(`⚠️ ${server.id} server returned status ${response.status}`);
         }
+      } catch (error) {
+        console.log(`❌ ${server.id} server connectivity error:`, error.message);
       }
-      
-      console.log('❌ All API endpoints failed, using mock data');
-      return false;
     }
+    
+    // Try additional fallback URLs
+    for (let i = 0; i < FALLBACK_URLS.length; i++) {
+      try {
+        console.log(`🔄 Trying fallback URL ${i + 1}: ${FALLBACK_URLS[i]}`);
+        const fallbackResponse = await fetch(`${FALLBACK_URLS[i]}/health`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+          },
+          signal: AbortSignal.timeout(3000) // 3 second timeout for fallbacks
+        });
+        
+        if (fallbackResponse.ok) {
+          console.log(`✅ Fallback URL ${i + 1} successful`);
+          this.baseURL = FALLBACK_URLS[i];
+          this.currentServerId = 'fallback';
+          this.currentUrlIndex = i;
+          return { success: true, serverId: 'fallback', serverName: FALLBACK_URLS[i] };
+        }
+      } catch (fallbackError) {
+        console.log(`❌ Fallback URL ${i + 1} failed:`, fallbackError.message);
+      }
+    }
+    
+    console.log('❌ All API endpoints failed');
+    return { success: false, serverId: null, serverName: null };
+  }
+
+  // Get current server information
+  getCurrentServerInfo() {
+    return {
+      url: this.baseURL,
+      serverId: this.currentServerId,
+      serverName: API_SERVERS.find(s => s.id === this.currentServerId)?.name || 'Fallback Server'
+    };
   }
 
   // Helper method to format phone number for Twilio
@@ -128,10 +156,123 @@ class ApiService {
     };
   }
 
+  // Generic fetch method with automatic fallback between pr and ad servers
+  async fetchWithFallback(url, options = {}) {
+    const endpoint = url.startsWith('http') ? url : `${this.baseURL}${url}`;
+    const isFullUrl = url.startsWith('http');
+    
+    // Try primary server (pr) first
+    for (const server of API_SERVERS) {
+      try {
+        const fullUrl = isFullUrl ? url : `${server.url}${url}`;
+        console.log(`🔄 Attempting request to ${server.id} (${server.name}): ${fullUrl}`);
+        
+        const response = await fetch(fullUrl, {
+          ...options,
+          headers: {
+            ...options.headers,
+            'ngrok-skip-browser-warning': 'true'
+          },
+          signal: options.signal || AbortSignal.timeout(10000) // 10 second timeout
+        });
+        
+        if (response.ok) {
+          // Update current server if successful
+          this.baseURL = server.url;
+          this.currentServerId = server.id;
+          console.log(`✅ Request successful from ${server.id} (${server.name})`);
+          
+          // Add server source to response
+          let data;
+          try {
+            data = await response.json();
+          } catch (e) {
+            // If response is not JSON, return as text
+            data = await response.text();
+          }
+          
+          if (data && typeof data === 'object') {
+            data.db_source = server.id;
+            data.server_source = server.id;
+            data.server_name = server.name;
+          }
+          
+          return { response, data, serverId: server.id };
+        } else {
+          console.log(`⚠️ ${server.id} server returned status ${response.status}, trying next server...`);
+          // If it's a 401, don't try other servers (auth issue)
+          if (response.status === 401) {
+            let errorData = {};
+            try {
+              errorData = await response.json();
+            } catch (e) {
+              errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
+            }
+            return { response, data: errorData, serverId: server.id, error: true };
+          }
+          // For other errors, continue to next server
+        }
+      } catch (error) {
+        console.log(`❌ ${server.id} server failed: ${error.message}, trying next server...`);
+        // Continue to next server
+        continue;
+      }
+    }
+    
+    // If both primary servers failed, try additional fallbacks
+    for (const fallbackUrl of FALLBACK_URLS) {
+      try {
+        const fullUrl = isFullUrl ? url : `${fallbackUrl}${url}`;
+        console.log(`🔄 Trying fallback URL: ${fullUrl}`);
+        
+        const response = await fetch(fullUrl, {
+          ...options,
+          headers: {
+            ...options.headers,
+            'ngrok-skip-browser-warning': 'true'
+          },
+          signal: options.signal || AbortSignal.timeout(5000)
+        });
+        
+        if (response.ok) {
+          this.baseURL = fallbackUrl;
+          this.currentServerId = 'fallback';
+          console.log(`✅ Fallback URL successful: ${fallbackUrl}`);
+          
+          let data;
+          try {
+            data = await response.json();
+          } catch (e) {
+            data = await response.text();
+          }
+          
+          if (data && typeof data === 'object') {
+            data.db_source = 'fallback';
+            data.server_source = 'fallback';
+          }
+          
+          return { response, data, serverId: 'fallback' };
+        }
+      } catch (error) {
+        console.log(`❌ Fallback URL failed: ${error.message}`);
+        continue;
+      }
+    }
+    
+    // All servers failed
+    throw new Error('All API servers are unavailable');
+  }
+
   // Helper method to handle API responses with token refresh
-  async handleResponse(response) {
+  async handleResponse(response, serverId = null) {
     if (response.ok) {
-      return await response.json();
+      const data = await response.json();
+      // Add server source information if available
+      if (data && typeof data === 'object' && serverId) {
+        data.db_source = serverId;
+        data.server_source = serverId;
+      }
+      return data;
     } else if (response.status === 401) {
       // Check if we have a refresh token and try to refresh
       const refreshToken = localStorage.getItem('refresh_token');
@@ -231,40 +372,48 @@ class ApiService {
       mobile: this.formatPhoneNumber(userData.mobile)
     };
     
-    const response = await fetch(`${this.baseURL}/auth/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
-      },
-      body: JSON.stringify(formattedUserData)
-    });
+    try {
+      const { data, serverId } = await this.fetchWithFallback('/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formattedUserData)
+      });
 
-    return await this.handleResponse(response);
+      console.log(`✅ Signup successful from ${serverId} server`);
+      return data;
+    } catch (error) {
+      console.error('❌ Signup failed on all servers:', error);
+      throw error;
+    }
   }
 
   async login(email, password) {
     console.log('🔐 Login attempt for:', email);
-    const response = await fetch(`${this.baseURL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
-      },
-      body: JSON.stringify({ email, password })
-    });
+    
+    try {
+      const { response, data: result, serverId } = await this.fetchWithFallback('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-    const result = await this.handleResponse(response);
-    
-    if (result.access_token) {
-      this.accessToken = result.access_token;
-      this.refreshToken = result.refresh_token;
-      localStorage.setItem('access_token', result.access_token);
-      localStorage.setItem('refresh_token', result.refresh_token);
-      console.log('✅ Login successful, tokens stored');
+      if (result.access_token) {
+        this.accessToken = result.access_token;
+        this.refreshToken = result.refresh_token;
+        localStorage.setItem('access_token', result.access_token);
+        localStorage.setItem('refresh_token', result.refresh_token);
+        console.log(`✅ Login successful from ${serverId} server, tokens stored`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Login failed on all servers:', error);
+      throw error;
     }
-    
-    return result;
   }
 
   async logout() {
@@ -432,16 +581,15 @@ class ApiService {
       }
       
       // Note: Using /api/judgements endpoint for High Court judgments as per API documentation
-      const url = `${this.baseURL}/api/judgements?${queryParams.toString()}`;
-      console.log('🌐 API URL:', url);
+      const endpoint = `/api/judgements?${queryParams.toString()}`;
+      console.log('🌐 API endpoint:', endpoint);
       
       // Check authentication token
       const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
       console.log('🌐 Auth token available:', !!token);
       
       const headers = {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
+        'Content-Type': 'application/json'
       };
       
       if (token) {
@@ -450,22 +598,13 @@ class ApiService {
       
       console.log('🌐 Request headers:', headers);
       
-      const response = await fetch(url, {
+      // Use fetchWithFallback for automatic server switching
+      const { data, serverId } = await this.fetchWithFallback(endpoint, {
         method: 'GET',
         headers: headers
       });
       
-      console.log('🌐 Response status:', response.status);
-      console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('🌐 API Error Response:', errorText);
-        throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-      
-      const data = await response.json();
-      console.log('🌐 Real API response:', data);
+      console.log(`🌐 Response received from ${serverId} server:`, data);
       
       // Map API field names to frontend expected field names
       if (data.data && Array.isArray(data.data)) {
@@ -479,7 +618,7 @@ class ApiService {
       return data;
       
     } catch (error) {
-      console.error('🌐 API call failed:', error);
+      console.error('🌐 API call failed on all servers:', error);
       console.error('🌐 Error details:', {
         message: error.message,
         stack: error.stack,
@@ -674,16 +813,15 @@ class ApiService {
         queryParams.append('decision_date_from', dateValue);
       }
       
-      const url = `${this.baseURL}/api/supreme-court-judgements?${queryParams.toString()}`;
-      console.log('🌐 Supreme Court API URL:', url);
+      const endpoint = `/api/supreme-court-judgements?${queryParams.toString()}`;
+      console.log('🌐 Supreme Court API endpoint:', endpoint);
       
       // Check authentication token
       const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
       console.log('🌐 Auth token available:', !!token);
       
       const headers = {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
+        'Content-Type': 'application/json'
       };
       
       if (token) {
@@ -692,22 +830,13 @@ class ApiService {
       
       console.log('🌐 Request headers:', headers);
       
-      const response = await fetch(url, {
+      // Use fetchWithFallback for automatic server switching
+      const { data, serverId } = await this.fetchWithFallback(endpoint, {
         method: 'GET',
         headers: headers
       });
       
-      console.log('🌐 Response status:', response.status);
-      console.log('🌐 Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('🌐 Supreme Court API Error Response:', errorText);
-        throw new Error(`Supreme Court API request failed: ${response.status} ${response.statusText} - ${errorText}`);
-      }
-      
-      const data = await response.json();
-      console.log('🌐 Real Supreme Court API response:', data);
+      console.log(`🌐 Supreme Court response received from ${serverId} server:`, data);
       
       // Map API field names to frontend expected field names
       if (data.data && Array.isArray(data.data)) {
@@ -721,7 +850,7 @@ class ApiService {
       return data;
       
     } catch (error) {
-      console.error('🌐 Supreme Court API call failed:', error);
+      console.error('🌐 Supreme Court API call failed on all servers:', error);
       console.error('🌐 Error details:', {
         message: error.message,
         stack: error.stack,
