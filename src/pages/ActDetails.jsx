@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import Navbar from "../components/landing/Navbar";
@@ -12,6 +12,7 @@ import { FileText, StickyNote, Share2, Download } from "lucide-react";
 export default function ActDetails() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams();
   const { isAuthenticated } = useAuth();
   
   // Additional check to ensure token exists - memoized to update when token changes
@@ -208,37 +209,86 @@ export default function ActDetails() {
   }, [markdownContent, showMarkdown]);
 
   useEffect(() => {
-    // Get act data from location state or fetch from API
-    try {
-      if (location.state?.act) {
-        const actData = location.state.act;
-        // Ensure act has numeric id field - backend requires numeric item.id
-        if (actData && !actData.id && actData.act_id) {
-          // If id is missing but act_id exists, use act_id as id (shouldn't happen, but just in case)
-          console.warn('⚠️ ActDetails: act.id missing, using act_id fallback:', actData);
-          actData.id = parseInt(actData.act_id);
-        }
-        // Ensure id is numeric
-        if (actData && actData.id) {
-          actData.id = parseInt(actData.id);
-        }
-        console.log('📄 ActDetails: Received act data:', actData);
-        setAct(actData);
+    // Fetch act data from API using ID from URL params
+    const fetchActData = async () => {
+      if (!id) {
+        setError("No act ID provided");
         setLoading(false);
-        setError(""); // Clear any previous errors
-      } else {
-        // If no act data, redirect back
-        setError("No act data provided");
+        setTimeout(() => {
+          navigate(-1);
+        }, 2000);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError("");
+        
+        // Try to get act data from location state first (for backward compatibility)
+        if (location.state?.act) {
+          const actData = location.state.act;
+          // Ensure act has numeric id field
+          if (actData && !actData.id && actData.act_id) {
+            actData.id = parseInt(actData.act_id);
+          }
+          if (actData && actData.id) {
+            actData.id = parseInt(actData.id);
+          }
+          console.log('📄 ActDetails: Received act data from state:', actData);
+          setAct(actData);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch from API using the ID from URL
+        const actId = parseInt(id);
+        if (isNaN(actId)) {
+          throw new Error('Invalid act ID');
+        }
+
+        console.log('📄 ActDetails: Fetching act with ID:', actId);
+        
+        // Try to determine if it's a central or state act
+        // First try central act
+        let actData = null;
+        try {
+          actData = await apiService.getCentralActById(actId);
+          console.log('✅ Fetched central act:', actData);
+        } catch (centralError) {
+          console.log('⚠️ Not a central act, trying state act...');
+          // If central act fails, try state act
+          try {
+            actData = await apiService.getStateActById(actId);
+            console.log('✅ Fetched state act:', actData);
+          } catch (stateError) {
+            throw new Error('Act not found');
+          }
+        }
+
+        if (actData) {
+          // Ensure id is numeric
+          if (actData.id) {
+            actData.id = parseInt(actData.id);
+          } else if (actData.act_id) {
+            actData.id = parseInt(actData.act_id);
+          }
+          setAct(actData);
+          setLoading(false);
+        } else {
+          throw new Error('Act data not found');
+        }
+      } catch (err) {
+        console.error('Error in ActDetails useEffect:', err);
+        setError(err.message || 'Failed to load act details');
+        setLoading(false);
         setTimeout(() => {
           navigate(-1);
         }, 2000);
       }
-    } catch (err) {
-      console.error('Error in ActDetails useEffect:', err);
-      setError(err.message || 'Failed to load act details');
-      setLoading(false);
-    }
-  }, [location.state, navigate]);
+    };
+
+    fetchActData();
+  }, [id, location.state, navigate]);
 
   // Load saved notes from localStorage when act changes
   useEffect(() => {

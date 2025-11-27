@@ -374,7 +374,15 @@ export default function LawLibrary() {
   };
 
   const viewActDetails = (act) => {
-    navigate('/act-details', { state: { act } });
+    const actId = act.id || act.act_id;
+    if (actId) {
+      navigate(`/acts/${actId}`);
+    } else {
+      // If no ID, try to extract from act data or show error
+      console.error('No act ID available for navigation');
+      // Still navigate but it will show error on the page
+      navigate('/acts/0');
+    }
   };
 
   // Scroll to top button - always visible

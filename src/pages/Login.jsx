@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
 import { Lock, Eye, EyeOff, ArrowLeft, Mail } from "lucide-react";
@@ -7,11 +7,7 @@ import { motion } from "framer-motion";
 
 export default function Login() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { login } = useAuth();
-  
-  // Get the intended destination from location state
-  const from = location.state?.from?.pathname || "/";
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -169,7 +165,8 @@ export default function Login() {
       
       setMessage("Login successful! Redirecting...");
       setTimeout(() => {
-        navigate(from, { replace: true });
+        // Navigate back to the previous page
+        navigate(-1);
       }, 1500);
     } catch (err) {
       setError(err.message || "Login failed. Please check your credentials.");

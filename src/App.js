@@ -46,7 +46,7 @@ function AppLayout() {
   const hideChatbotPaths = [
     '/login',
     '/judgment',
-    '/act-details',
+    '/acts',
     '/mapping-details',
     '/law-library',
     '/legal-chatbot',
@@ -60,7 +60,7 @@ function AppLayout() {
     '/profile',
     '/judgment-access',
     '/judgment',
-    '/act-details',
+    '/acts',
     '/mapping-details',
     '/law-library',
     '/legal-chatbot',
@@ -104,7 +104,7 @@ function AppLayout() {
         <Route path="/judgment/:id?" element={<ViewPDF />} />
         <Route path="/law-library" element={<LawLibrary />} />
         <Route path="/browse-acts" element={<BrowseActs />} />
-        <Route path="/act-details" element={<ActDetails />} />
+        <Route path="/acts/:id" element={<ActDetails />} />
         <Route path="/mapping-details" element={<MappingDetails />} />
         <Route path="/law-mapping" element={<LawMapping />} />
         {/* <Route path="/legal-template" element={<LegalTemplate />} /> */}

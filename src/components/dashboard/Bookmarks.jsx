@@ -235,15 +235,17 @@ const Bookmarks = () => {
           break;
         
         case 'central_act':
-          // Fetch full central act details and navigate to act details page
+          // Navigate to act details page using ID
           try {
             const actData = await apiService.getCentralActById(itemId);
-            navigate('/act-details', { state: { act: actData } });
+            const actId = actData.id || actData.act_id || itemId;
+            navigate(`/acts/${actId}`);
           } catch (err) {
             console.error('Error fetching central act:', err);
-            // Fallback: use item data if available
-            if (item.short_title || item.long_title) {
-              navigate('/act-details', { state: { act: item } });
+            // Fallback: use item ID if available
+            const fallbackId = item.id || item.act_id || itemId;
+            if (fallbackId) {
+              navigate(`/acts/${fallbackId}`);
             } else {
               throw new Error('Failed to load central act details');
             }
@@ -251,22 +253,20 @@ const Bookmarks = () => {
           break;
         
         case 'state_act':
-          // Fetch full state act details and navigate to act details page
+          // Navigate to act details page using ID
           try {
             console.log('🔍 Navigating to state act:', itemId, 'Item data:', item);
             const actData = await apiService.getStateActById(itemId);
             console.log('✅ State act fetched successfully:', actData);
-            // Ensure the act has location field to identify it as state act
-            const actWithLocation = { ...actData, location: actData.location || item.location || 'state' };
-            navigate('/act-details', { state: { act: actWithLocation } });
+            const actId = actData.id || actData.act_id || itemId;
+            navigate(`/acts/${actId}`);
           } catch (err) {
             console.error('❌ Error fetching state act:', err);
             console.error('❌ Error details:', err.message, err.stack);
-            // Fallback: use item data if available
-            if (item.short_title || item.long_title || item.title) {
-              console.log('⚠️ Using fallback item data for state act');
-              const fallbackAct = { ...item, location: item.location || 'state' };
-              navigate('/act-details', { state: { act: fallbackAct } });
+            // Fallback: use item ID if available
+            const fallbackId = item.id || item.act_id || itemId;
+            if (fallbackId) {
+              navigate(`/acts/${fallbackId}`);
             } else {
               throw new Error(`Failed to load state act details: ${err.message}`);
             }
