@@ -22,12 +22,13 @@ import {
   StarOff,
   Loader2,
   AlertCircle,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react';
 import apiService from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 
-const Bookmarks = () => {
+const Bookmarks = ({ onBack }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [bookmarks, setBookmarks] = useState([]);
@@ -690,16 +691,28 @@ const Bookmarks = () => {
       {/* Perfect Header */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>My Bookmarks</h1>
-            <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
-              {sortedBookmarks.length} bookmarks • {folders.length} folders
+          <div className="flex items-center gap-2 sm:gap-0">
+            {/* Mobile Back Button */}
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors mr-2"
+                aria-label="Back to Dashboard"
+              >
+                <ArrowLeft className="h-5 w-5 text-gray-700" />
+              </button>
+            )}
+            <div>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>My Bookmarks</h1>
+              <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                {sortedBookmarks.length} bookmarks • {folders.length} folders
               {(filterType !== 'all' || searchQuery || Object.values(advancedFilters).some(v => 
                 v !== null && v !== '' && (typeof v !== 'object' || Object.values(v).some(subV => subV !== ''))
               )) && (
                 <span className="ml-2 text-blue-600 font-medium">• Filtered</span>
               )}
             </p>
+            </div>
           </div>
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 sm:gap-0">

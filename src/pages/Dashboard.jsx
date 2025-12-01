@@ -6,7 +6,6 @@ import {
   Calendar as CalendarIcon, 
   Bookmark, 
   FileText as Note,
-  Menu, 
   X, 
   ChevronRight,
   FileText,
@@ -171,6 +170,48 @@ const Dashboard = () => {
                   <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
                     Legal research overview
                   </p>
+                </div>
+                
+                {/* Mobile Quick Access Buttons */}
+                <div className="lg:hidden grid grid-cols-3 gap-2 sm:gap-3 mt-2">
+                  <button
+                    onClick={() => {
+                      setActiveTab('notes');
+                      setSidebarOpen(false);
+                    }}
+                    className="flex flex-col items-center justify-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 group"
+                  >
+                    <div className="p-2 rounded-lg mb-2" style={{ backgroundColor: '#1E65AD' }}>
+                      <Note className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 group-hover:text-blue-600" style={{ fontFamily: 'Roboto, sans-serif' }}>Notes</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setActiveTab('calendar');
+                      setSidebarOpen(false);
+                    }}
+                    className="flex flex-col items-center justify-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 group"
+                  >
+                    <div className="p-2 rounded-lg mb-2" style={{ backgroundColor: '#8C969F' }}>
+                      <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 group-hover:text-blue-600" style={{ fontFamily: 'Roboto, sans-serif' }}>Calendar</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setActiveTab('bookmarks');
+                      setSidebarOpen(false);
+                    }}
+                    className="flex flex-col items-center justify-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all duration-200 group"
+                  >
+                    <div className="p-2 rounded-lg mb-2" style={{ backgroundColor: '#CF9B63' }}>
+                      <Bookmark className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-700 group-hover:text-blue-600" style={{ fontFamily: 'Roboto, sans-serif' }}>Bookmarks</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -346,11 +387,11 @@ const Dashboard = () => {
           </div>
         );
       case 'calendar':
-        return <Calendar />;
+        return <Calendar onBack={() => setActiveTab('home')} />;
       case 'bookmarks':
-        return <Bookmarks />;
+        return <Bookmarks onBack={() => setActiveTab('home')} />;
       case 'notes':
-        return <Notes />;
+        return <Notes onBack={() => setActiveTab('home')} />;
       default:
         return null;
     }
@@ -461,14 +502,6 @@ const Dashboard = () => {
         />
       )}
 
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className="fixed top-20 right-4 lg:hidden z-50 p-3 sm:p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-        aria-label="Open menu"
-      >
-        <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
-      </button>
     </div>
   );
 };

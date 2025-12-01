@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
+import Footer from "../components/landing/Footer";
 import { useAuth } from "../contexts/AuthContext";
+import { motion } from "framer-motion";
+import { Copy, Share2, Users, CheckCircle, DollarSign, Clock, Gift, ArrowRight } from "lucide-react";
 
 export default function Referral() {
   const navigate = useNavigate();
@@ -92,102 +95,159 @@ export default function Referral() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 md:py-8 pt-14 sm:pt-16 md:pt-20">
-        {/* Header */}
-        <div className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12 pt-10">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-            Referral Program
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-2 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-            Invite friends to सलहाकार and earn rewards for every successful referral. 
-            Help others access legal services while earning money for yourself.
-          </p>
+      {/* Hero Section */}
+      <div 
+        className="pt-24 sm:pt-32 md:pt-36 lg:pt-40 pb-12 sm:pb-16 md:pb-20 lg:pb-24 relative overflow-hidden min-h-[300px] sm:min-h-[400px] md:h-96"
+        style={{
+          background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
+        }}
+      >
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 sm:top-20 left-5 sm:left-10 w-48 h-48 sm:w-96 sm:h-96 rounded-full"
+            style={{ backgroundColor: '#1E65AD', filter: 'blur(100px)' }}
+          ></div>
+          <div className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-48 h-48 sm:w-96 sm:h-96 rounded-full"
+            style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
+          ></div>
         </div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 mb-4 sm:mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
+          >
+            <h1 
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 sm:mb-3"
+              style={{ 
+                fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                lineHeight: '1.2'
+              }}
+            >
+              Referral Program
+            </h1>
+            <div className="w-16 sm:w-24 md:w-32 lg:w-40 h-1 sm:h-1.5 md:h-2 mx-auto rounded-full mb-2 sm:mb-3"
+              style={{ backgroundColor: '#FFFFFF', opacity: 0.9 }}
+            ></div>
+            <p 
+              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white max-w-3xl mx-auto mb-2 px-2 sm:px-0"
+              style={{ 
+                fontFamily: "'Roboto', sans-serif",
+                opacity: 0.95,
+                lineHeight: '1.6'
+              }}
+            >
+              Invite friends to सलहाकार and earn rewards for every successful referral. Help others access legal services while earning money for yourself.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24 -mt-6 sm:-mt-8 md:-mt-12">
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 mb-6 sm:mb-8 md:mb-10 lg:mb-12">
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-10 md:mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300"
+          >
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Total Referrals
                 </p>
                 <p className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {referralStats.totalReferrals}
                 </p>
               </div>
-              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-blue-600" />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300"
+          >
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Successful Referrals
                 </p>
                 <p className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: '#10B981', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {referralStats.successfulReferrals}
                 </p>
               </div>
-              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-green-600" />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300"
+          >
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Total Earnings
                 </p>
                 <p className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: '#CF9B63', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   ₹{referralStats.totalEarnings}
                 </p>
               </div>
-              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                </svg>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-yellow-100 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-yellow-600" />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300"
+          >
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   Pending Rewards
                 </p>
                 <p className="text-xl sm:text-2xl md:text-3xl font-bold" style={{ color: '#F59E0B', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   ₹{referralStats.pendingRewards}
                 </p>
               </div>
-              <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0 ml-2">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-orange-600" />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Referral Code Section */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 lg:p-8 mb-4 sm:mb-6 md:mb-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 md:mb-6 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 lg:p-8 mb-6 sm:mb-8 md:mb-10"
+        >
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
             {isAuthenticated ? 'Your Referral Code' : 'Get Your Referral Code'}
           </h2>
           
           {!isAuthenticated && (
             <div className="mb-4 sm:mb-5 md:mb-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-xs sm:text-sm text-blue-800 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <p className="text-xs sm:text-sm text-blue-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 <strong>Sign up</strong> to get your personalized referral code and start earning rewards! 
                 <button
                   onClick={() => navigate('/login')}
@@ -199,16 +259,16 @@ export default function Referral() {
             </div>
           )}
           
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center mb-4 sm:mb-5 md:mb-6">
             <div className="flex-1 bg-gray-50 rounded-lg p-3 sm:p-4 border-2 border-dashed border-gray-300">
-              <p className="text-xs sm:text-sm text-gray-600 mb-2 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              <p className="text-xs sm:text-sm text-gray-600 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                 {isAuthenticated ? 'Share this code with your friends:' : 'Sign up to get your personalized referral code:'}
               </p>
-              <p className="text-lg sm:text-xl md:text-2xl font-mono font-bold break-all" style={{ color: '#1E65AD' }}>
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-mono font-bold break-all" style={{ color: '#1E65AD' }}>
                 {referralCode}
               </p>
               {!isAuthenticated && (
-                <p className="text-xs text-gray-500 mt-2 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                <p className="text-xs text-gray-500 mt-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                   This is a sample code. Sign up to get your unique code.
                 </p>
               )}
@@ -216,15 +276,19 @@ export default function Referral() {
             
             <button
               onClick={copyReferralCode}
-              className="w-full sm:w-auto px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
-              style={{ fontFamily: 'Roboto, sans-serif' }}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-medium text-sm sm:text-base"
+              style={{ 
+                fontFamily: 'Roboto, sans-serif',
+                background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
+              }}
             >
+              <Copy className="w-4 h-4" />
               Copy Code
             </button>
           </div>
 
-          <div className="mt-4 sm:mt-5 md:mt-6">
-            <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
               Or share your referral link:
             </h3>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
@@ -236,114 +300,167 @@ export default function Referral() {
               
               <button
                 onClick={shareReferralLink}
-                className="w-full sm:w-auto px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm sm:text-base"
-                style={{ fontFamily: 'Roboto, sans-serif' }}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-5 md:px-6 py-2.5 sm:py-3 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-medium text-sm sm:text-base"
+                style={{ 
+                  fontFamily: 'Roboto, sans-serif',
+                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
+                }}
               >
+                <Share2 className="w-4 h-4" />
                 Copy Link
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-          <button
-            onClick={() => navigate('/referral/invite')}
-            className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300 text-left group"
-          >
-            <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3 sm:mb-3.5 md:mb-4 group-hover:scale-110 transition-transform">
-              <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-              </svg>
-            </div>
-            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1.5 sm:mb-2 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-              Invite Friends
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-              Send personalized invitations to your friends and family
-            </p>
-          </button>
-
-          <button
-            onClick={() => navigate('/referral/rewards')}
-            className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300 text-left group"
-          >
-            <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-3 sm:mb-3.5 md:mb-4 group-hover:scale-110 transition-transform">
-              <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-              </svg>
-            </div>
-            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1.5 sm:mb-2 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-              Earn Rewards
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-              Learn about our reward structure and earning potential
-            </p>
-          </button>
-
-          <button
-            onClick={() => navigate('/referral/track')}
-            className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 hover:shadow-xl transition-all duration-300 text-left group"
-          >
-            <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center mb-3 sm:mb-3.5 md:mb-4 group-hover:scale-110 transition-transform">
-              <svg className="w-5 h-5 sm:w-5.5 sm:h-5.5 md:w-6 md:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1.5 sm:mb-2 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-              Track Referrals
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-              Monitor your referral activity and earnings in real-time
-            </p>
-          </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10 md:mb-12">
+          {[
+            {
+              icon: <Users className="w-full h-full" />,
+              title: "Invite Friends",
+              description: "Send personalized invitations to your friends and family",
+              bgColor: "#1E65AD",
+              path: "/referral/invite"
+            },
+            {
+              icon: <Gift className="w-full h-full" />,
+              title: "Earn Rewards",
+              description: "Learn about our reward structure and earning potential",
+              bgColor: "#CF9B63",
+              path: "/referral/rewards"
+            },
+            {
+              icon: <CheckCircle className="w-full h-full" />,
+              title: "Track Referrals",
+              description: "Monitor your referral activity and earnings in real-time",
+              bgColor: "#10B981",
+              path: "/referral/track"
+            }
+          ].map((action, index) => (
+            <motion.button
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+              onClick={() => navigate(action.path)}
+              className="group relative bg-white rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl text-left"
+              style={{
+                border: '1px solid rgba(30, 101, 173, 0.1)',
+                boxShadow: '0 4px 20px rgba(30, 101, 173, 0.08)'
+              }}
+            >
+              <div 
+                className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300"
+                style={{
+                  background: `linear-gradient(135deg, ${action.bgColor} 0%, ${action.bgColor === '#1E65AD' ? '#CF9B63' : '#1E65AD'} 100%)`
+                }}
+              ></div>
+              
+              <div className="relative p-4 sm:p-5 md:p-6">
+                <div className="flex items-start gap-4 sm:gap-6">
+                  <div 
+                    className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl flex items-center justify-center text-white transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                    style={{ backgroundColor: action.bgColor }}
+                  >
+                    <div className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8">
+                      {action.icon}
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h3 
+                      className="text-lg sm:text-xl font-bold mb-2 sm:mb-3"
+                      style={{ 
+                        color: '#1E65AD', 
+                        fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                        fontWeight: 700
+                      }}
+                    >
+                      {action.title}
+                    </h3>
+                    <p 
+                      className="text-sm sm:text-base text-gray-600"
+                      style={{ 
+                        fontFamily: "'Roboto', sans-serif",
+                        lineHeight: '1.7'
+                      }}
+                    >
+                      {action.description}
+                    </p>
+                    <div className="mt-3 sm:mt-4 inline-flex items-center gap-2 text-sm sm:text-base font-medium transition-colors"
+                      style={{ color: action.bgColor }}
+                    >
+                      Learn more
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.button>
+          ))}
         </div>
 
         {/* How It Works */}
-        <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-12 bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 lg:p-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6 lg:p-8"
+        >
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 sm:mb-8 text-center" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
             How It Works
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-3.5 md:mb-4">
-                <span className="text-xl sm:text-2xl font-bold text-blue-600">1</span>
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-1.5 sm:mb-2 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                Share Your Code
-              </h3>
-              <p className="text-xs sm:text-sm md:text-base text-gray-600 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                Share your unique referral code or link with friends and family
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-3.5 md:mb-4">
-                <span className="text-xl sm:text-2xl font-bold text-green-600">2</span>
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-1.5 sm:mb-2 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                They Sign Up
-              </h3>
-              <p className="text-xs sm:text-sm md:text-base text-gray-600 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                Your friends sign up using your referral code and become active users
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-3.5 md:mb-4">
-                <span className="text-xl sm:text-2xl font-bold text-yellow-600">3</span>
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold mb-1.5 sm:mb-2 break-words" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-                You Earn Rewards
-              </h3>
-              <p className="text-xs sm:text-sm md:text-base text-gray-600 break-words" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                Earn ₹200 for each successful referral and ₹50 for each transaction they make
-              </p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {[
+              {
+                number: "1",
+                title: "Share Your Code",
+                description: "Share your unique referral code or link with friends and family",
+                bgColor: "bg-blue-100",
+                textColor: "text-blue-600"
+              },
+              {
+                number: "2",
+                title: "They Sign Up",
+                description: "Your friends sign up using your referral code and become active users",
+                bgColor: "bg-green-100",
+                textColor: "text-green-600"
+              },
+              {
+                number: "3",
+                title: "You Earn Rewards",
+                description: "Earn ₹200 for each successful referral and ₹50 for each transaction they make",
+                bgColor: "bg-yellow-100",
+                textColor: "text-yellow-600"
+              }
+            ].map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className={`w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 ${step.bgColor} rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-5 md:mb-6 transition-transform duration-300 hover:scale-110`}>
+                  <span className={`text-2xl sm:text-3xl md:text-4xl font-bold ${step.textColor}`}>{step.number}</span>
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                  {step.title}
+                </h3>
+                <p className="text-sm sm:text-base text-gray-600" style={{ fontFamily: 'Roboto, sans-serif', lineHeight: '1.7' }}>
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
-        </div>
+        </motion.div>
       </div>
+      
+      {/* <Footer /> */}
     </div>
   );
 }

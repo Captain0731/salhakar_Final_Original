@@ -275,49 +275,61 @@ function PricingPage() {
 
       {/* Hero Section */}
       <section 
-        className="pt-14 sm:pt-16 md:pt-20 lg:pt-28 pb-6 sm:pb-8 md:pb-12 lg:pb-16 relative z-20 w-full border-2 border-gray-200 shadow-lg"
+        className="pt-24 sm:pt-32 md:pt-36 lg:pt-40 pb-12 sm:pb-16 md:pb-20 lg:pb-24 relative overflow-hidden min-h-[300px] sm:min-h-[400px] md:h-96"
         style={{
           background: 'linear-gradient(135deg, #1E65AD 0%, #1a5a9a 30%, #CF9B63 100%)'
         }}
       >
-        <div className="w-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 text-center pt-4 sm:pt-6 md:pt-7">
-          <h1
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight"
-            style={{
-              color: "#FFFFFF",
-              fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
-              fontWeight: 700
-            }}
-          >
-            Pricing Plans
-          </h1>
-          <div className="w-16 sm:w-18 md:w-20 h-0.5 sm:h-1 bg-white mx-auto rounded-full mb-2 sm:mb-3 md:mb-4"></div>
-          <p
-            className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-white max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-2 sm:pt-3 md:pt-4 px-2"
-            style={{
-              fontFamily: "'Roboto', sans-serif",
-              fontWeight: 400
-            }}
-          >
-            Discover India's most user-friendly AI legal research tool with straightforward pricing and no hidden fees.
-          </p>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 sm:top-20 left-5 sm:left-10 w-48 h-48 sm:w-96 sm:h-96 rounded-full"
+            style={{ backgroundColor: '#1E65AD', filter: 'blur(100px)' }}
+          ></div>
+          <div className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-48 h-48 sm:w-96 sm:h-96 rounded-full"
+            style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
+          ></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 mb-4 sm:mb-6">
+          <div className="text-center">
+            <h1
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 sm:mb-3"
+              style={{
+                fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                lineHeight: '1.2'
+              }}
+            >
+              Pricing Plans
+            </h1>
+            <div className="w-16 sm:w-24 md:w-32 lg:w-40 h-1 sm:h-1.5 md:h-2 bg-white mx-auto rounded-full mb-2 sm:mb-3"></div>
+            <p
+              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white max-w-3xl mx-auto mb-2 px-2 sm:px-0"
+              style={{
+                fontFamily: "'Roboto', sans-serif",
+                opacity: 0.95,
+                lineHeight: '1.6'
+              }}
+            >
+              Discover India's most user-friendly AI legal research tool with straightforward pricing and no hidden fees.
+            </p>
+          </div>
         </div>
       </section>
 
 
 
       {/* Pricing Plans Section with Tab Switcher */}
-      <section className="py-4 sm:py-6 md:py-8 lg:py-10 xl:py-12 bg-[#F9FAFC]">
-        <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 -mt-6 sm:-mt-8 md:-mt-12 bg-[#F9FAFC]">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
 
           {/* Category Segment Control */}
-          <div className="flex justify-center mb-6 sm:mb-8 md:mb-10">
+          <div className="flex justify-center mb-6 sm:mb-8 md:mb-10 overflow-x-auto pb-2">
             <div className="inline-flex bg-gray-100 rounded-lg p-1 sm:p-1.5" style={{ backgroundColor: '#F3F4F6' }}>
               {['student', 'professional', 'corporate'].map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs sm:text-sm md:text-base transition-all duration-200 ${
+                  className={`px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs sm:text-sm md:text-base transition-all duration-200 whitespace-nowrap ${
                     selectedCategory === category
                       ? 'bg-[#1E65AD] text-white shadow-md'
                       : 'text-gray-600 hover:text-gray-900'
@@ -335,25 +347,23 @@ function PricingPage() {
           </div>
 
           {/* Dynamic Description */}
-          <div className="flex justify-center items-center gap-2 sm:gap-4 mb-2 sm:mb-3 md:mb-4 px-2">
-            <span className="text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 text-[#8C969F] text-center">
-              <p
-                className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#8C969F] max-w-2xl mx-auto mb-3 sm:mb-4 md:mb-6 leading-relaxed pt-1 break-words"
-                style={{
-                  fontFamily: "'Roboto', sans-serif",
-                  fontWeight: 400
-                }}
-              >
-                {selectedCategory === 'student' && 'Premium tools and unlimited legal research for students and academic learners who want to ace their law studies.'}
-                {selectedCategory === 'professional' && 'Comprehensive legal research tools designed for practicing lawyers, legal professionals, and law firms.'}
-                {selectedCategory === 'corporate' && 'Enterprise solutions tailored for law firms, corporate legal departments, and large organizations.'}
-              </p>
-            </span>
+          <div className="flex justify-center items-center mb-4 sm:mb-6 md:mb-8 px-2 sm:px-0">
+            <p
+              className="text-sm sm:text-base md:text-lg text-[#8C969F] max-w-2xl mx-auto text-center leading-relaxed"
+              style={{
+                fontFamily: "'Roboto', sans-serif",
+                fontWeight: 400
+              }}
+            >
+              {selectedCategory === 'student' && 'Premium tools and unlimited legal research for students and academic learners who want to ace their law studies.'}
+              {selectedCategory === 'professional' && 'Comprehensive legal research tools designed for practicing lawyers, legal professionals, and law firms.'}
+              {selectedCategory === 'corporate' && 'Enterprise solutions tailored for law firms, corporate legal departments, and large organizations.'}
+            </p>
           </div>
 
           {/* Billing Cycle Toggle Switch - Only show for Student and Professional */}
           {(selectedCategory === 'student' || selectedCategory === 'professional') && (
-            <div className="flex justify-center items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8 px-2">
+            <div className="flex justify-center items-center gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-10 px-2">
               <span
                 className={`text-xs sm:text-sm md:text-base font-semibold transition-colors duration-300 ${billingCycle === "monthly" ? "text-[#1E65AD]" : "text-[#8C969F]"
                   }`}
@@ -371,10 +381,10 @@ function PricingPage() {
                 <div
                   className="relative overflow-hidden transition-all duration-300 ease-in-out"
                   style={{
-                    width: "56px",
-                    height: "32px",
+                    width: "48px",
+                    height: "28px",
                     backgroundColor: billingCycle === "yearly" ? "#1E65AD" : "#E5E7EB",
-                    borderRadius: "16px",
+                    borderRadius: "14px",
                     boxShadow: billingCycle === "yearly" 
                       ? "inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(30, 101, 173, 0.2)"
                       : "inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)",
@@ -393,11 +403,11 @@ function PricingPage() {
                     className="absolute rounded-full transition-all duration-300 ease-in-out flex items-center justify-center"
                     style={{
                       backgroundColor: "#FFFFFF",
-                      transform: billingCycle === "yearly" ? "translateX(24px)" : "translateX(2px)",
+                      transform: billingCycle === "yearly" ? "translateX(20px)" : "translateX(2px)",
                       borderRadius: "50%",
                       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.1)",
-                      width: "28px",
-                      height: "28px",
+                      width: "24px",
+                      height: "24px",
                       top: "2px",
                       left: "2px"
                     }}
@@ -438,20 +448,17 @@ function PricingPage() {
             const gridCols = planCount === 2 ? "md:grid-cols-2" : planCount === 1 ? "md:grid-cols-1" : "md:grid-cols-3";
             
             return (
-              <div className={useFlex 
-                ? `flex flex-col md:flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16 lg:mb-20 px-2 sm:px-0` 
-                : `grid grid-cols-1 ${gridCols} gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16 lg:mb-20 px-2 sm:px-0`
-              }>
+              <div className={`grid grid-cols-1 ${gridCols} gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16`}>
                 {filteredPlans.map((plan, index) => (
               <div
                 key={plan.title}
-                className={`bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 lg:p-8 relative hover:shadow-xl transition-shadow duration-300 w-full${plan.popular ? "border-2 border-[#1E65AD]" : "border border-gray-200"
+                className={`bg-white rounded-xl shadow-lg p-4 sm:p-5 md:p-6 lg:p-8 relative hover:shadow-xl transition-shadow duration-300 w-full${plan.popular ? "border-2 border-[#1E65AD]" : "border border-gray-200"
                   }`}
               >
                 {/* Most Popular Badge */}
                 {plan.popular && (
                   <div
-                    className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-[#1E65AD] text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold"
+                    className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-[#1E65AD] text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs font-semibold whitespace-nowrap"
                     style={{ fontFamily: "'Roboto', sans-serif" }}
                   >
                     Most Popular
@@ -463,7 +470,7 @@ function PricingPage() {
                   const isFree = !plan.price || plan.price === "₹/mo" || plan.price === "₹0/mo" || plan.title.toLowerCase().includes("free");
                   return isFree && (
                     <div
-                      className="absolute -top-3 sm:-top-4 md:-top-5 left-2 sm:left-8 md:left-10 lg:left-1 bg-[#1E65AD] text-white px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-full text-xs sm:text-sm md:text-base font-bold shadow-lg z-10 transform -rotate-5 hover:rotate-0 hover:scale-105 transition-all duration-300"
+                      className="absolute -top-3 sm:-top-4 left-1/2 sm:left-auto sm:right-2 md:right-4 transform sm:transform-none -translate-x-1/2 sm:translate-x-0 bg-[#1E65AD] text-white px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs md:text-sm font-bold shadow-lg z-10"
                       style={{ 
                         fontFamily: "'Roboto', sans-serif",
                         fontWeight: 700,
@@ -471,14 +478,14 @@ function PricingPage() {
                         letterSpacing: '0.02em'
                       }}
                     >
-                      <span className="whitespace-nowrap">No Autopay Required</span>
+                      <span className="whitespace-nowrap">No Autopay</span>
                     </div>
                   );
                 })()}
 
-                <div className="mb-4 sm:mb-6 md:mb-8 text-center" style={{ marginTop: plan.popular ? "0.5rem sm:1rem" : "0" }}>
+                <div className="mb-4 sm:mb-6 md:mb-8 text-center" style={{ marginTop: plan.popular ? "1rem sm:1.5rem" : "0.5rem sm:1rem" }}>
                   <h3
-                    className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3"
+                    className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3"
                     style={{
                       color: "#1E65AD",
                       fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -489,7 +496,7 @@ function PricingPage() {
                     {plan.title}
                   </h3>
                   <p
-                    className="text-xs sm:text-sm md:text-base text-[#8C969F] mb-3 sm:mb-4 md:mb-6 leading-relaxed break-words"
+                    className="text-xs sm:text-sm md:text-base text-[#8C969F] mb-3 sm:mb-4 md:mb-6 leading-relaxed"
                     style={{
                       fontFamily: "'Roboto', sans-serif",
                       fontWeight: 400
@@ -497,7 +504,7 @@ function PricingPage() {
                   >
                     {plan.subtitle}
                   </p>
-                  <div className="flex items-baseline justify-center gap-1 mb-4 sm:mb-5 md:mb-6">
+                  <div className="flex items-baseline justify-center gap-1 mb-4 sm:mb-5 md:mb-6 flex-wrap">
                     {(() => {
                       const isFree = !plan.price || plan.price === "₹/mo" || plan.price === "₹0/mo" || plan.price.toLowerCase().includes("free");
                       const isCustom = plan.price === "Custom";
@@ -518,7 +525,7 @@ function PricingPage() {
                           </span>
                           {!isFree && !isCustom && (
                             <span
-                              className="text-sm sm:text-base md:text-lg lg:text-xl font-normal text-[#1E65AD]"
+                              className="text-sm sm:text-base md:text-lg font-normal text-[#1E65AD]"
                               style={{
                                 fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
                                 fontWeight: 400
@@ -529,7 +536,7 @@ function PricingPage() {
                           )}
                           {!isFree && !isCustom && billingCycle === "yearly" && (
                             <span
-                              className="ml-1 sm:ml-2 text-xs text-red-500 font-semibold"
+                              className="ml-1 sm:ml-2 text-[10px] sm:text-xs text-red-500 font-semibold"
                               style={{ fontFamily: "'Roboto', sans-serif" }}
                             >
                               (Save 20%)
@@ -588,7 +595,7 @@ function PricingPage() {
                         </svg>
                       )}
                       <span
-                        className={`text-xs sm:text-sm md:text-base leading-relaxed break-words ${feature.included ? "text-[#8C969F]" : "text-[#8C969F] line-through opacity-40"
+                        className={`text-xs sm:text-sm md:text-base leading-relaxed ${feature.included ? "text-[#8C969F]" : "text-[#8C969F] line-through opacity-40"
                           }`}
                         style={{
                           fontFamily: "'Roboto', sans-serif",
@@ -611,14 +618,14 @@ function PricingPage() {
       </section>
 
       {/* Let's Work Together Contact Form Section */}
-      <section className="py-6 sm:py-8 md:py-12 lg:py-16 bg-[#F9FAFC]">
-        <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[#F9FAFC]">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="bg-[#F9FAFC]">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12 lg:gap-16 p-4 sm:p-6 md:p-8 lg:p-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 lg:gap-16 p-4 sm:p-6 md:p-8 lg:p-12">
               {/* Left Side - Contact Info */}
               <div>
                 <h2
-                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6 md:mb-8 leading-tight"
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 md:mb-8 leading-tight"
               style={{ 
                     color: "#1E65AD",
                 fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -632,7 +639,7 @@ function PricingPage() {
                 <div className="space-y-4 sm:space-y-5 md:space-y-6 mb-4 sm:mb-6 md:mb-8">
                   <div>
             <p
-                      className="text-xs sm:text-sm md:text-base lg:text-lg text-[#8C969F] leading-relaxed break-words"
+                      className="text-sm sm:text-base md:text-lg text-[#8C969F] leading-relaxed"
               style={{ 
                 fontFamily: "'Roboto', sans-serif",
                 fontWeight: 400
@@ -644,10 +651,10 @@ function PricingPage() {
                   
                   <div>
                     <p
-                      className="text-xs sm:text-sm md:text-base lg:text-lg text-[#8C969F] leading-relaxed break-words"
+                      className="text-sm sm:text-base md:text-lg text-[#1E65AD] font-semibold leading-relaxed break-all"
                       style={{
                         fontFamily: "'Roboto', sans-serif",
-                        fontWeight: 400
+                        fontWeight: 600
                       }}
                     >
                       inquire@salhakar.com
@@ -656,10 +663,10 @@ function PricingPage() {
                   
                   <div>
                     <p
-                      className="text-xs sm:text-sm md:text-base lg:text-lg text-[#8C969F] leading-relaxed break-words"
+                      className="text-sm sm:text-base md:text-lg text-[#1E65AD] font-semibold leading-relaxed"
                       style={{
                         fontFamily: "'Roboto', sans-serif",
-                        fontWeight: 400
+                        fontWeight: 600
                       }}
                     >
                       Phone No:- +91 7069900088
@@ -719,7 +726,7 @@ function PricingPage() {
                     <div>
                       <label
                         htmlFor="firstName"
-                        className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
+                        className="block text-xs sm:text-sm font-semibold mb-2"
                         style={{
                           color: "#1E65AD",
                           fontFamily: "'Roboto', sans-serif",
@@ -733,7 +740,7 @@ function PricingPage() {
                         id="firstName"
                         name="firstName"
                         required
-                        className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
+                        className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-sm sm:text-base"
                         style={{
                           fontFamily: "'Roboto', sans-serif"
                         }}
@@ -743,7 +750,7 @@ function PricingPage() {
                     <div>
                       <label
                         htmlFor="lastName"
-                        className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
+                        className="block text-xs sm:text-sm font-semibold mb-2"
                         style={{
                           color: "#1E65AD",
                           fontFamily: "'Roboto', sans-serif",
@@ -757,7 +764,7 @@ function PricingPage() {
                         id="lastName"
                         name="lastName"
                         required
-                        className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
+                        className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-sm sm:text-base"
                         style={{
                           fontFamily: "'Roboto', sans-serif"
                         }}
@@ -769,7 +776,7 @@ function PricingPage() {
                   <div>
                     <label
                       htmlFor="phone"
-                      className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
+                      className="block text-xs sm:text-sm font-semibold mb-2"
                       style={{
                         color: "#1E65AD",
                         fontFamily: "'Roboto', sans-serif",
@@ -783,7 +790,7 @@ function PricingPage() {
                       id="phone"
                       name="phone"
                       required
-                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
+                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-sm sm:text-base"
                       style={{
                         fontFamily: "'Roboto', sans-serif"
                       }}
@@ -795,7 +802,7 @@ function PricingPage() {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
+                      className="block text-xs sm:text-sm font-semibold mb-2"
                       style={{
                         color: "#1E65AD",
                         fontFamily: "'Roboto', sans-serif",
@@ -809,7 +816,7 @@ function PricingPage() {
                       id="email"
                       name="email"
                       required
-                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-xs sm:text-sm md:text-base"
+                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 bg-transparent text-sm sm:text-base"
                       style={{
                         fontFamily: "'Roboto', sans-serif"
                       }}
@@ -820,7 +827,7 @@ function PricingPage() {
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-xs sm:text-sm font-semibold mb-2 sm:mb-2.5"
+                      className="block text-xs sm:text-sm font-semibold mb-2"
                       style={{
                         color: "#1E65AD",
                         fontFamily: "'Roboto', sans-serif",
@@ -833,7 +840,7 @@ function PricingPage() {
                       id="message"
                       name="message"
                       rows="4"
-                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 resize-none bg-transparent text-xs sm:text-sm md:text-base"
+                      className="w-full px-0 py-2 sm:py-2.5 md:py-3 border-0 border-b-2 border-gray-300 focus:border-[#1E65AD] focus:outline-none transition-colors duration-200 resize-none bg-transparent text-sm sm:text-base"
                       style={{
                         fontFamily: "'Roboto', sans-serif"
                       }}
@@ -844,7 +851,7 @@ function PricingPage() {
                   <div className="flex justify-end mt-4 sm:mt-5 md:mt-6">
             <button
                       type="submit"
-                      className="px-6 sm:px-7 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-lg font-semibold text-xs sm:text-sm md:text-base text-white transition-all duration-200 hover:shadow-md"
+                      className="px-6 sm:px-7 md:px-8 py-2.5 sm:py-3 md:py-3.5 rounded-lg font-semibold text-sm sm:text-base text-white transition-all duration-200 hover:shadow-md w-full sm:w-auto"
               style={{
                         background: 'linear-gradient(to right, #b794f6, #9775fa)',
                 fontFamily: "'Roboto', sans-serif",
@@ -869,10 +876,10 @@ function PricingPage() {
 
       
          {/* FAQ Section */}
-         <section className="py-6 sm:py-8 md:py-10 lg:py-16 xl:py-20 bg-[#F9FAFC]">
-        <div className="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:px-8 2xl:px-14">
+         <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-[#F9FAFC]">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
           <h2
-            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-8 sm:mb-10 md:mb-12"
             style={{
               color: "#1E65AD",
               fontFamily: "'Heebo', 'Helvetica Hebrew Bold', sans-serif",
@@ -883,18 +890,18 @@ function PricingPage() {
             FAQ
           </h2>
           
-          <div className="space-y-0 grid grid-cols-1 md:grid-cols-2 gap-x-4 sm:gap-x-6 md:gap-x-8 lg:gap-x-12 xl:gap-x-16 gap-y-3 sm:gap-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 sm:gap-x-6 md:gap-x-8 lg:gap-x-12 gap-y-3 sm:gap-y-4">
             {faqData.map((item, index) => (
               <div
                 key={item.id}
-                
+                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
               >
                 <button
                   onClick={() => toggleFaq(item.id)}
-                  className="w-full py-3 sm:py-4 md:py-5 lg:py-6 px-3 sm:px-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 group"
+                  className="w-full py-3 sm:py-4 md:py-5 px-3 sm:px-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 group"
                 >
                   <span
-                    className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold flex-1 pr-2 sm:pr-3 md:pr-4 break-words"
+                    className="text-sm sm:text-base md:text-lg font-semibold flex-1 pr-2 sm:pr-3 md:pr-4"
                     style={{
                       color: "#1E65AD",
                       fontFamily: "'Roboto', sans-serif",
@@ -905,7 +912,7 @@ function PricingPage() {
                   </span>
                   <div className="flex-shrink-0">
                     <svg
-                      className={`w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 transition-transform duration-300 ${
+                      className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 transition-transform duration-300 ${
                         openFaqs.includes(item.id) ? "rotate-180" : ""
                       }`}
                       style={{
@@ -939,9 +946,9 @@ function PricingPage() {
                     openFaqs.includes(item.id) ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
-                  <div className="px-3 sm:px-4 pb-3 sm:pb-4 md:pb-5 lg:pb-6">
+                  <div className="px-3 sm:px-4 pb-3 sm:pb-4 md:pb-5">
                     <p
-                      className="text-xs sm:text-sm md:text-base leading-relaxed break-words"
+                      className="text-sm sm:text-base leading-relaxed"
                       style={{
                         color: "#8C969F",
                         fontFamily: "'Roboto', sans-serif",

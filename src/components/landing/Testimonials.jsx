@@ -160,11 +160,11 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials Slider */}
-        <div className="relative w-full overflow-x-hidden">
+        <div className="relative w-full overflow-x-hidden px-8 sm:px-12 md:px-16">
           {/* Navigation Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute left-1 sm:left-0 md:left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 sm:-translate-x-2 md:-translate-x-4 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
             style={{ 
               backgroundColor: '#1E65AD',
               boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)'
@@ -189,7 +189,7 @@ const Testimonials = () => {
 
           <button
             onClick={nextSlide}
-            className="absolute right-1 sm:right-0 md:right-0 top-1/2 transform -translate-y-1/2 translate-x-1 sm:translate-x-2 md:translate-x-4 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
             style={{ 
               backgroundColor: '#1E65AD',
               boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)'

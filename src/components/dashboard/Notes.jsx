@@ -20,10 +20,11 @@ import {
   ExternalLink,
   X,
   Save,
-  Eye
+  Eye,
+  ArrowLeft
 } from 'lucide-react';
 
-const Notes = () => {
+const Notes = ({ onBack }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
@@ -308,13 +309,25 @@ const Notes = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-white to-gray-50 rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
-              Notes
-            </h1>
-            <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
-              Organize and manage your legal research notes
-            </p>
+          <div className="flex items-center gap-2 sm:gap-0">
+            {/* Mobile Back Button */}
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors mr-2"
+                aria-label="Back to Dashboard"
+              >
+                <ArrowLeft className="h-5 w-5 text-gray-700" />
+              </button>
+            )}
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
+                Notes
+              </h1>
+              <p className="text-gray-600 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                Organize and manage your legal research notes
+              </p>
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 sm:gap-0">
             <button 

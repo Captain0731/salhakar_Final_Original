@@ -11,10 +11,11 @@ import {
   Trash2,
   AlertCircle,
   CheckCircle,
-  Info
+  Info,
+  ArrowLeft
 } from 'lucide-react';
 
-const Calendar = () => {
+const Calendar = ({ onBack }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [showAddEvent, setShowAddEvent] = useState(false);
@@ -192,11 +193,23 @@ const Calendar = () => {
     <div className="space-y-4 sm:space-y-6 pt-4 sm:pt-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:gap-0 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Calendar</h1>
-          <p className="mt-1 text-xs sm:text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
-            Manage your legal events, deadlines, and reminders
-          </p>
+        <div className="flex items-center gap-2 sm:gap-0">
+          {/* Mobile Back Button */}
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors mr-2"
+              aria-label="Back to Dashboard"
+            >
+              <ArrowLeft className="h-5 w-5 text-gray-700" />
+            </button>
+          )}
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Calendar</h1>
+            <p className="mt-1 text-xs sm:text-sm" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif' }}>
+              Manage your legal events, deadlines, and reminders
+            </p>
+          </div>
         </div>
         
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 sm:gap-0">
