@@ -169,6 +169,12 @@ export default function LawLibrary() {
   const activeSectionData = librarySections.find(s => s.id === activeSection) || librarySections[0];
   const sectionLabel = activeSectionData.title;
 
+  // Store activeSection in ref to access latest value in callbacks
+  const activeSectionRef = useRef(activeSection);
+  useEffect(() => {
+    activeSectionRef.current = activeSection;
+  }, [activeSection]);
+
   // Memoized filter change handler to prevent unnecessary re-renders
   const handleFilterChange = useCallback((key, value) => {
     setFilters(prev => {
@@ -181,7 +187,23 @@ export default function LawLibrary() {
     if (key === 'search') {
       setSearchQuery(value);
     }
-  }, []);
+    
+    // Ensure section parameter is preserved in URL after filter update
+    // Use setTimeout to run after useURLFilters updates the URL
+    setTimeout(() => {
+      const currentPath = window.location.pathname;
+      const currentSearch = window.location.search;
+      const searchParams = new URLSearchParams(currentSearch);
+      const sectionFromUrl = searchParams.get('section');
+      const currentSection = activeSectionRef.current;
+      
+      if (!sectionFromUrl || (sectionFromUrl !== 'state' && sectionFromUrl !== 'central')) {
+        searchParams.set('section', currentSection);
+        const newSearch = searchParams.toString();
+        navigate(`${currentPath}?${newSearch}`, { replace: true });
+      }
+    }, 50);
+  }, [setFilters, navigate]);
   
   // Update searchQuery when filters.search changes (e.g., from URL)
   useEffect(() => {
@@ -470,14 +492,28 @@ export default function LawLibrary() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on mount
 
-  // Sync activeSection with URL on mount and when URL changes
+  // Ensure section parameter is always in URL and sync activeSection
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const sectionFromUrl = searchParams.get('section');
-    const newSection = (sectionFromUrl === 'state' || sectionFromUrl === 'central') ? sectionFromUrl : 'central';
     
-    if (newSection !== activeSection) {
-      setActiveSection(newSection);
+    // If section is missing or invalid from URL, add it based on current activeSection
+    if (!sectionFromUrl || (sectionFromUrl !== 'state' && sectionFromUrl !== 'central')) {
+      // Only update URL if section is truly missing (to avoid infinite loops)
+      if (!sectionFromUrl) {
+        searchParams.set('section', activeSection);
+        const newSearch = searchParams.toString();
+        navigate(`${location.pathname}?${newSearch}`, { replace: true });
+      }
+      // Keep current activeSection, don't change it
+      return;
+    }
+    
+    // Only update activeSection if URL has a valid section that's different from current
+    if (sectionFromUrl === 'state' || sectionFromUrl === 'central') {
+      if (sectionFromUrl !== activeSection) {
+        setActiveSection(sectionFromUrl);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);

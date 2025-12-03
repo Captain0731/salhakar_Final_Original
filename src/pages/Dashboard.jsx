@@ -283,9 +283,9 @@ const Dashboard = () => {
             </div>
 
             {/* Professional Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 sm:gap-4 ">
               {/* Recent Activity */}
-              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm">
+              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm  ">
                 <div className="p-4 sm:p-5 border-b border-gray-200">
                   <div className="flex items-center justify-between">
                     <h2 className="text-base sm:text-lg font-semibold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Recent Activity</h2>

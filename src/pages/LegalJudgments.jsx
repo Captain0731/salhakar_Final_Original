@@ -96,11 +96,76 @@ export default function LegalJudgments() {
   const location = useLocation();
   const isMountedRef = useRef(true);
 
-  // Court type state - defaults to highcourt
-  const [courtType, setCourtType] = useState("highcourt");
+  // Court type state - check URL params, location state, localStorage, then default to highcourt
+  const [courtType, setCourtType] = useState(() => {
+    // Priority 1: Check URL query parameter (for browser back button support)
+    const urlParams = new URLSearchParams(location.search);
+    const urlCourtType = urlParams.get('court');
+    if (urlCourtType === 'supremecourt' || urlCourtType === 'highcourt') {
+      return urlCourtType;
+    }
+    
+    // Priority 2: Check navigation state
+    const stateCourtType = location.state?.courtType;
+    if (stateCourtType === 'supremecourt' || stateCourtType === 'highcourt') {
+      return stateCourtType;
+    }
+    
+    // Priority 3: Check localStorage (for browser back button support)
+    const storedCourtType = localStorage.getItem('lastCourtType');
+    if (storedCourtType === 'supremecourt' || storedCourtType === 'highcourt') {
+      return storedCourtType;
+    }
+    
+    return "highcourt";
+  });
 
   // Filter visibility state
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Update court type from URL params, location state, or localStorage
+  useEffect(() => {
+    // Check URL query parameter first
+    const urlParams = new URLSearchParams(location.search);
+    const urlCourtType = urlParams.get('court');
+    if (urlCourtType === 'supremecourt' || urlCourtType === 'highcourt') {
+      if (urlCourtType !== courtType) {
+        setCourtType(urlCourtType);
+        // Store in localStorage for future reference
+        localStorage.setItem('lastCourtType', urlCourtType);
+      }
+      // Clean up URL param after reading
+      if (urlParams.has('court')) {
+        urlParams.delete('court');
+        const newSearch = urlParams.toString();
+        navigate(`${location.pathname}${newSearch ? '?' + newSearch : ''}`, { replace: true, state: {} });
+      }
+      return;
+    }
+    
+    // Check navigation state
+    const stateCourtType = location.state?.courtType;
+    if (stateCourtType === 'supremecourt' || stateCourtType === 'highcourt') {
+      if (stateCourtType !== courtType) {
+        setCourtType(stateCourtType);
+        // Store in localStorage for browser back button support
+        localStorage.setItem('lastCourtType', stateCourtType);
+      }
+      // Clear the state to prevent it from persisting on subsequent navigations
+      if (location.state?.courtType) {
+        navigate(location.pathname, { replace: true, state: {} });
+      }
+      return;
+    }
+    
+    // Check localStorage as fallback (for browser back button)
+    const storedCourtType = localStorage.getItem('lastCourtType');
+    if (storedCourtType === 'supremecourt' || storedCourtType === 'highcourt') {
+      if (storedCourtType !== courtType) {
+        setCourtType(storedCourtType);
+      }
+    }
+  }, [location.search, location.state, courtType, navigate, location.pathname]);
 
   // Data states
   const [judgments, setJudgments] = useState([]);
@@ -537,7 +602,9 @@ export default function LegalJudgments() {
   const viewJudgment = (judgment) => {
     const judgmentId = judgment.id || judgment.cnr;
     const url = judgmentId ? `/judgment/${judgmentId}` : '/judgment';
-    navigate(url, { state: { judgment } });
+    // Store current court type in localStorage before navigating
+    localStorage.setItem('lastCourtType', courtType);
+    navigate(url, { state: { judgment, courtType } });
   };
 
   // Scroll to top button - always visible
@@ -642,7 +709,11 @@ export default function LegalJudgments() {
                 />
                 
                 <motion.button
-                  onClick={() => setCourtType('highcourt')}
+                  onClick={() => {
+                    setCourtType('highcourt');
+                    // Store in localStorage for browser back button support
+                    localStorage.setItem('lastCourtType', 'highcourt');
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className={`flex-1 sm:flex-none px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-300 relative z-10 text-xs sm:text-sm md:text-base ${
@@ -657,7 +728,11 @@ export default function LegalJudgments() {
                   High Court
                 </motion.button>
                 <motion.button
-                  onClick={() => setCourtType('supremecourt')}
+                  onClick={() => {
+                    setCourtType('supremecourt');
+                    // Store in localStorage for browser back button support
+                    localStorage.setItem('lastCourtType', 'supremecourt');
+                  }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className={`flex-1 sm:flex-none px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-300 relative z-10 text-xs sm:text-sm md:text-base ${

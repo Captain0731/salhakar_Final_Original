@@ -52,7 +52,22 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
             // If still no summary, try to fetch markdown and extract summary
             if (!summaryText) {
               try {
-                const markdown = await apiService.getJudgementByIdMarkdown(item.id);
+                // Determine if it's a Supreme Court judgment
+                const courtName = item?.court_name || item?.court || '';
+                const isSupremeCourt = courtName && (
+                  courtName.toLowerCase().includes('supreme') || 
+                  courtName.toLowerCase().includes('sc') ||
+                  courtName.toLowerCase() === 'supreme court of india'
+                );
+                
+                // Use appropriate endpoint based on court type
+                let markdown;
+                if (isSupremeCourt) {
+                  markdown = await apiService.getSupremeCourtJudgementByIdMarkdown(item.id);
+                } else {
+                  markdown = await apiService.getJudgementByIdMarkdown(item.id);
+                }
+                
                 // Extract first few paragraphs as summary
                 const paragraphs = markdown.split("\n\n").filter(p => p.trim().length > 50);
                 summaryText = paragraphs.slice(0, 3).join("\n\n");

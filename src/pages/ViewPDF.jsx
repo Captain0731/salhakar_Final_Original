@@ -441,7 +441,21 @@ export default function ViewPDF() {
         try {
           const judgmentId = judgmentInfo.id || judgmentInfo.act_id;
           if (judgmentId) {
-            const markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
+            // Determine if it's a Supreme Court judgment
+            const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
+            const isSupremeCourt = courtName && (
+              courtName.toLowerCase().includes('supreme') || 
+              courtName.toLowerCase().includes('sc') ||
+              courtName.toLowerCase() === 'supreme court of india'
+            );
+            
+            // Use appropriate endpoint based on court type
+            let markdown;
+            if (isSupremeCourt) {
+              markdown = await apiService.getSupremeCourtJudgementByIdMarkdown(judgmentId);
+            } else {
+              markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
+            }
             setMarkdownContent(markdown);
     } else {
             setMarkdownError("No judgment ID available");
@@ -506,7 +520,27 @@ export default function ViewPDF() {
             <div className="text-red-600 text-base sm:text-lg mb-3 sm:mb-4 font-semibold">Error loading PDF</div>
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">{error}</p>
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => {
+                // Determine court type from judgment info if available
+                const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
+                const isSupremeCourt = courtName && (
+                  courtName.toLowerCase().includes('supreme') || 
+                  courtName.toLowerCase().includes('sc') ||
+                  courtName.toLowerCase() === 'supreme court of india'
+                );
+                
+                const courtType = isSupremeCourt ? 'supremecourt' : 'highcourt';
+                
+                // Store court type in localStorage for browser back button support
+                localStorage.setItem('lastCourtType', courtType);
+                
+                // Navigate to judgment access page with court type preserved
+                navigate(`/judgment-access?court=${courtType}`, { 
+                  state: { 
+                    courtType: courtType
+                  } 
+                });
+              }}
               className="px-5 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base font-medium"
               style={{ fontFamily: 'Roboto, sans-serif' }}
             >
@@ -677,7 +711,20 @@ export default function ViewPDF() {
                                       // Fetch markdown content from backend
                                       let markdownContent = '';
                                       try {
-                                        markdownContent = await apiService.getJudgementByIdMarkdown(judgmentId);
+                                        // Determine if it's a Supreme Court judgment
+                                        const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
+                                        const isSupremeCourt = courtName && (
+                                          courtName.toLowerCase().includes('supreme') || 
+                                          courtName.toLowerCase().includes('sc') ||
+                                          courtName.toLowerCase() === 'supreme court of india'
+                                        );
+                                        
+                                        // Use appropriate endpoint based on court type
+                                        if (isSupremeCourt) {
+                                          markdownContent = await apiService.getSupremeCourtJudgementByIdMarkdown(judgmentId);
+                                        } else {
+                                          markdownContent = await apiService.getJudgementByIdMarkdown(judgmentId);
+                                        }
                                         
                                         if (!markdownContent || markdownContent.trim() === '') {
                                           throw new Error('Markdown content is empty');
@@ -1322,7 +1369,27 @@ export default function ViewPDF() {
                 <div className="mt-3 sm:mt-4 md:mt-6 lg:mt-8 pt-2.5 sm:pt-3 md:pt-4 lg:pt-6 border-t border-gray-200">
                   <div className="space-y-2">
                     <button
-                      onClick={() => navigate(-1)}
+                      onClick={() => {
+                        // Determine court type from judgment info
+                        const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
+                        const isSupremeCourt = courtName && (
+                          courtName.toLowerCase().includes('supreme') || 
+                          courtName.toLowerCase().includes('sc') ||
+                          courtName.toLowerCase() === 'supreme court of india'
+                        );
+                        
+                        const courtType = isSupremeCourt ? 'supremecourt' : 'highcourt';
+                        
+                        // Store court type in localStorage for browser back button support
+                        localStorage.setItem('lastCourtType', courtType);
+                        
+                        // Navigate to judgment access page with court type preserved
+                        navigate(`/judgment-access?court=${courtType}`, { 
+                          state: { 
+                            courtType: courtType
+                          } 
+                        });
+                      }}
                       className="w-full px-3 sm:px-4 py-2 sm:py-2.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center justify-center gap-2 text-xs sm:text-sm"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     >
@@ -1352,7 +1419,7 @@ export default function ViewPDF() {
                     
                     <input
                       type="text"
-                      placeholder="Search..."
+                      placeholder="Search With Kiki AI..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-6 sm:pl-9 md:pl-10 pr-1.5 sm:pr-3 py-1 sm:py-1.5 md:py-2.5 border border-gray-300 rounded-md sm:rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-[10px] sm:text-xs md:text-base"

@@ -1055,7 +1055,7 @@ export default function ActDetails() {
                     
                     <input
                       type="text"
-                      placeholder="Search..."
+                      placeholder="Search With Kiki AI..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full pl-6 sm:pl-9 md:pl-10 pr-1.5 sm:pr-3 py-1 sm:py-1.5 md:py-2.5 border border-gray-300 rounded-md sm:rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-[10px] sm:text-xs md:text-base"

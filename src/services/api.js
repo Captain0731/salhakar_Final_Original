@@ -2122,6 +2122,27 @@ class ApiService {
     return await response.text(); // Return Markdown as text
   }
 
+  // Get Supreme Court judgment markdown by ID (uses Supreme Court specific endpoint)
+  async getSupremeCourtJudgementByIdMarkdown(judgementId) {
+    const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
+    const headers = {
+      'Accept': 'text/markdown',
+      'ngrok-skip-browser-warning': 'true',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+    
+    const response = await fetch(`${this.baseURL}/api/supreme-court-judgements/${judgementId}?format=markdown`, {
+      method: 'GET',
+      headers: headers
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Supreme Court judgment Markdown: ${response.statusText}`);
+    }
+    
+    return await response.text(); // Return Markdown as text
+  }
+
   // Get central act markdown by ID
   async getCentralActByIdMarkdown(actId) {
     const token = localStorage.getItem('access_token') || localStorage.getItem('accessToken') || localStorage.getItem('token');
