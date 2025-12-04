@@ -38,8 +38,8 @@ export default function MappingDetails() {
   const [isResizing, setIsResizing] = useState(false);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
-  const [saveButtonText, setSaveButtonText] = useState('Save Notes');
-  const [saveButtonColor, setSaveButtonColor] = useState('');
+  const [saveMessage, setSaveMessage] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Summary popup state
   const [summaryPopupOpen, setSummaryPopupOpen] = useState(false);
@@ -79,32 +79,76 @@ export default function MappingDetails() {
     return lines[0]?.trim() || '';
   };
 
-  // Load saved notes from localStorage when mapping changes
+  // Determine reference type from mapping
+  const getReferenceType = () => {
+    if (!mapping) return 'bns_ipc_mapping';
+    if (mapping.mapping_type) {
+      if (mapping.mapping_type === 'bns_ipc') return 'bns_ipc_mapping';
+      if (mapping.mapping_type === 'bsa_iea') return 'bsa_iea_mapping';
+      if (mapping.mapping_type === 'bnss_crpc') return 'bnss_crpc_mapping';
+    }
+    // Fallback logic
+    if (mapping.ipc_section || mapping.bns_section) return 'bns_ipc_mapping';
+    if (mapping.iea_section || mapping.bsa_section) return 'bsa_iea_mapping';
+    if (mapping.crpc_section || mapping.bnss_section) return 'bnss_crpc_mapping';
+    return 'bns_ipc_mapping';
+  };
+
+  // Load saved notes from API when mapping changes
   useEffect(() => {
-    if (mapping && mapping.id) {
-      const notesKey = `notes_mapping_${mapping.id}`;
-      const savedNotes = localStorage.getItem(notesKey);
-      if (savedNotes) {
-        try {
-          const parsedFolders = JSON.parse(savedNotes);
-          if (parsedFolders && Array.isArray(parsedFolders) && parsedFolders.length > 0) {
-            // Clean up existing notes to only show title
-            const cleanedFolders = parsedFolders.map(folder => ({
-              ...folder,
-              content: extractTitleOnly(folder.content)
+    const loadNotes = async () => {
+      if (!mapping || !mapping.id || !isUserAuthenticated) return;
+
+      try {
+        const referenceType = getReferenceType();
+        
+        // Fetch notes from API
+        const response = await apiService.getNotesByReference(referenceType, mapping.id);
+        
+        if (response.success && response.data && response.data.notes) {
+          const notes = response.data.notes;
+          if (notes.length > 0) {
+            // Convert API notes to folder format
+            const folders = notes.map((note, index) => ({
+              id: note.id || `note-${index}`,
+              name: note.title || `Note ${index + 1}`,
+              content: note.content || '',
+              noteId: note.id // Store note ID for updates
             }));
-            setNotesFolders(cleanedFolders);
-            setActiveFolderId(cleanedFolders[0].id);
-            setNotesContent(cleanedFolders[0].content || '');
-            // Update localStorage with cleaned content
-            localStorage.setItem(notesKey, JSON.stringify(cleanedFolders));
+            
+            setNotesFolders(folders);
+            setActiveFolderId(folders[0].id);
+            setNotesContent(folders[0].content || '');
+          } else {
+            // No notes found, initialize with default folder using mapping title
+            const defaultName = mapping?.subject || mapping?.title || 'Untitled Note';
+            setNotesFolders([{ id: 'default', name: defaultName, content: '' }]);
+            setActiveFolderId('default');
+            setNotesContent('');
           }
-        } catch (error) {
-          console.error('Error loading saved notes:', error);
+        }
+      } catch (error) {
+        console.error('Error loading notes from API:', error);
+        // Fallback to localStorage if API fails
+        const notesKey = `notes_mapping_${mapping.id}`;
+        const savedNotes = localStorage.getItem(notesKey);
+        if (savedNotes) {
+          try {
+            const parsedFolders = JSON.parse(savedNotes);
+            if (parsedFolders && Array.isArray(parsedFolders) && parsedFolders.length > 0) {
+              setNotesFolders(parsedFolders);
+              setActiveFolderId(parsedFolders[0].id);
+              setNotesContent(parsedFolders[0].content || '');
+            }
+          } catch (parseError) {
+            console.error('Error parsing saved notes:', parseError);
+          }
         }
       }
-    }
-  }, [mapping?.id]);
+    };
+
+    loadNotes();
+  }, [mapping?.id, isUserAuthenticated]);
 
   // Handle window resize to keep popup within bounds
   useEffect(() => {
@@ -130,7 +174,7 @@ export default function MappingDetails() {
     return () => window.removeEventListener('resize', handleResize);
   }, [showNotesPopup, popupSize]);
 
-  // Determine mapping type from the mapping data
+  // Determine mapping type from the mapping data (for display purposes)
   const getMappingType = () => {
     if (!mapping) return 'bns_ipc'; // default if mapping not loaded yet
     if (mapping.mapping_type) {
@@ -413,12 +457,12 @@ export default function MappingDetails() {
                           const notesKey = `notes_mapping_${mapping?.id || 'default'}`;
                           const savedNotes = localStorage.getItem(notesKey);
                           if (!savedNotes) {
-                            // Remove title, start with empty content
-                            const initialContent = '';
-                            if (notesFolders.length === 0 || (notesFolders.length === 1 && notesFolders[0].content === '')) {
-                              setNotesFolders([{ id: 'default', name: 'Default', content: initialContent }]);
+                            // Initialize with mapping title as folder name if no folders exist
+                            if (notesFolders.length === 0 || (notesFolders.length === 1 && notesFolders[0].id === 'default' && notesFolders[0].content === '')) {
+                              const defaultName = mapping?.subject || mapping?.title || 'Untitled Note';
+                              setNotesFolders([{ id: 'default', name: defaultName, content: '' }]);
                               setActiveFolderId('default');
-                              setNotesContent(initialContent);
+                              setNotesContent('');
                             }
                           } else {
                             const currentFolder = notesFolders.find(f => f.id === activeFolderId);
@@ -1148,7 +1192,32 @@ export default function MappingDetails() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+            <div className="flex flex-col gap-2">
+              {/* Save Message */}
+              {saveMessage && (
+                <div className={`px-4 py-2 mx-4 rounded-lg ${
+                  saveMessage.type === 'success' 
+                    ? 'bg-green-50 border border-green-200 text-green-800' 
+                    : 'bg-red-50 border border-red-200 text-red-800'
+                }`}>
+                  <div className="flex items-center">
+                    {saveMessage.type === 'success' ? (
+                      <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-red-500 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <span className="text-sm font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {saveMessage.text}
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
                   // Save current folder content before closing
@@ -1163,36 +1232,124 @@ export default function MappingDetails() {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  // Save notes logic here - save all folders
-                  setNotesFolders(prev => prev.map(f => 
-                    f.id === activeFolderId ? { ...f, content: notesContent } : f
-                  ));
-                  console.log('Saving notes folders:', notesFolders);
-                  // You can implement save functionality here (localStorage, API, etc.)
-                  // Save to localStorage for persistence
-                  const notesKey = `notes_mapping_${mapping?.id || 'default'}`;
-                  const updatedFolders = notesFolders.map(f => 
-                    f.id === activeFolderId ? { ...f, content: notesContent } : f
-                  );
-                  localStorage.setItem(notesKey, JSON.stringify(updatedFolders));
-                  setShowNotesPopup(false);
+                onClick={async () => {
+                  if (!isUserAuthenticated) {
+                    navigate('/login');
+                    return;
+                  }
+
+                  if (!notesContent.trim()) {
+                    setSaveMessage({ type: 'error', text: 'Please enter some notes before saving.' });
+                    setTimeout(() => setSaveMessage(null), 3000);
+                    return;
+                  }
+
+                  setIsSaving(true);
+                  setSaveMessage(null);
+
+                  try {
+                    const referenceType = getReferenceType();
+                    
+                    // Extract title from content (first line starting with #) or use mapping title
+                    const titleMatch = notesContent.match(/^#\s+(.+)$/m);
+                    const title = titleMatch ? titleMatch[1] : (mapping?.subject || mapping?.title || 'Untitled Note');
+                    
+                    // Get current folder to check if it has a noteId (existing note)
+                    const currentFolder = notesFolders.find(f => f.id === activeFolderId);
+                    const noteId = currentFolder?.noteId;
+
+                    if (noteId) {
+                      // Update existing note
+                      const updateData = {
+                        title: title,
+                        content: notesContent
+                      };
+                      const response = await apiService.updateNote(noteId, updateData);
+                      
+                      if (response.success) {
+                        // Update local state
+                        setNotesFolders(prev => prev.map(f => 
+                          f.id === activeFolderId ? { ...f, content: notesContent, name: title } : f
+                        ));
+                        setSaveMessage({ type: 'success', text: 'Note updated successfully!' });
+                        setTimeout(() => {
+                          setSaveMessage(null);
+                          setShowNotesPopup(false);
+                        }, 1500);
+                      } else {
+                        setSaveMessage({ type: 'error', text: 'Failed to update note. Please try again.' });
+                        setTimeout(() => setSaveMessage(null), 3000);
+                      }
+                    } else {
+                      // Create new note
+                      const noteData = {
+                        title: title,
+                        content: notesContent,
+                        referenceType: referenceType,
+                        referenceId: mapping.id,
+                        referenceData: {
+                          mapping_type: mapping.mapping_type,
+                          subject: mapping.subject,
+                          title: mapping.title,
+                          ipc_section: mapping.ipc_section,
+                          bns_section: mapping.bns_section,
+                          iea_section: mapping.iea_section,
+                          bsa_section: mapping.bsa_section,
+                          crpc_section: mapping.crpc_section,
+                          bnss_section: mapping.bnss_section
+                        }
+                      };
+
+                      const response = await apiService.createNoteFromDocument(noteData);
+                      
+                      if (response.success && response.data && response.data.note) {
+                        // Update local state with new note ID
+                        const newNoteId = response.data.note.id;
+                        setNotesFolders(prev => prev.map(f => 
+                          f.id === activeFolderId 
+                            ? { ...f, content: notesContent, name: title, noteId: newNoteId, id: newNoteId } 
+                            : f
+                        ));
+                        setSaveMessage({ type: 'success', text: 'Note saved successfully!' });
+                        setTimeout(() => {
+                          setSaveMessage(null);
+                          setShowNotesPopup(false);
+                        }, 1500);
+                      } else {
+                        setSaveMessage({ type: 'error', text: 'Failed to save note. Please try again.' });
+                        setTimeout(() => setSaveMessage(null), 3000);
+                      }
+                    }
+                  } catch (error) {
+                    console.error('Error saving note:', error);
+                    setSaveMessage({ type: 'error', text: 'An error occurred while saving the note. Please try again.' });
+                    setTimeout(() => setSaveMessage(null), 3000);
+                  } finally {
+                    setIsSaving(false);
+                  }
                 }}
-                className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md"
+                disabled={isSaving}
+                className={`px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md ${
+                  isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                }`}
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
                   background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)',
-                  cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                  if (!isSaving) {
+                    e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                  if (!isSaving) {
+                    e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                  }
                 }}
               >
-                Save Notes
+                {isSaving ? 'Saving...' : 'Save Notes'}
               </button>
+              </div>
             </div>
           </div>
         </>

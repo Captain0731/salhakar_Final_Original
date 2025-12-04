@@ -41,6 +41,8 @@ export default function ActDetails() {
   const [isResizing, setIsResizing] = useState(false);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [saveMessage, setSaveMessage] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   // Download dropdown state
   const [showDownloadDropdown, setShowDownloadDropdown] = useState(false);
@@ -303,32 +305,64 @@ export default function ActDetails() {
     return lines[0]?.trim() || '';
   };
 
-  // Load saved notes from localStorage when act changes
+  // Load saved notes from API when act changes
   useEffect(() => {
-    if (act && act.id) {
-      const notesKey = `notes_act_${act.id}`;
-      const savedNotes = localStorage.getItem(notesKey);
-      if (savedNotes) {
-        try {
-          const parsedFolders = JSON.parse(savedNotes);
-          if (parsedFolders && Array.isArray(parsedFolders) && parsedFolders.length > 0) {
-            // Clean up existing notes to only show title
-            const cleanedFolders = parsedFolders.map(folder => ({
-              ...folder,
-              content: extractTitleOnly(folder.content)
+    const loadNotes = async () => {
+      if (!act || !act.id || !isUserAuthenticated) return;
+
+      try {
+        // Determine reference type
+        const referenceType = act.location || act.state || 
+                             (act.source && act.source.toLowerCase().includes('state')) 
+                             ? 'state_act' : 'central_act';
+        
+        // Fetch notes from API
+        const response = await apiService.getNotesByReference(referenceType, act.id);
+        
+        if (response.success && response.data && response.data.notes) {
+          const notes = response.data.notes;
+          if (notes.length > 0) {
+            // Convert API notes to folder format
+            const folders = notes.map((note, index) => ({
+              id: note.id || `note-${index}`,
+              name: note.title || `Note ${index + 1}`,
+              content: note.content || '',
+              noteId: note.id // Store note ID for updates
             }));
-            setNotesFolders(cleanedFolders);
-            setActiveFolderId(cleanedFolders[0].id);
-            setNotesContent(cleanedFolders[0].content || '');
-            // Update localStorage with cleaned content
-            localStorage.setItem(notesKey, JSON.stringify(cleanedFolders));
+            
+            setNotesFolders(folders);
+            setActiveFolderId(folders[0].id);
+            setNotesContent(folders[0].content || '');
+          } else {
+            // No notes found, initialize with default folder using act title
+            const defaultName = act?.short_title || act?.long_title || 'Untitled Note';
+            setNotesFolders([{ id: 'default', name: defaultName, content: '' }]);
+            setActiveFolderId('default');
+            setNotesContent('');
           }
-        } catch (error) {
-          console.error('Error loading saved notes:', error);
+        }
+      } catch (error) {
+        console.error('Error loading notes from API:', error);
+        // Fallback to localStorage if API fails
+        const notesKey = `notes_act_${act.id}`;
+        const savedNotes = localStorage.getItem(notesKey);
+        if (savedNotes) {
+          try {
+            const parsedFolders = JSON.parse(savedNotes);
+            if (parsedFolders && Array.isArray(parsedFolders) && parsedFolders.length > 0) {
+              setNotesFolders(parsedFolders);
+              setActiveFolderId(parsedFolders[0].id);
+              setNotesContent(parsedFolders[0].content || '');
+            }
+          } catch (parseError) {
+            console.error('Error parsing saved notes:', parseError);
+          }
         }
       }
-    }
-  }, [act?.id]);
+    };
+
+    loadNotes();
+  }, [act?.id, isUserAuthenticated]);
 
 
   // Fetch markdown content when markdown view is selected
@@ -1085,10 +1119,12 @@ export default function ActDetails() {
                           const notesKey = `notes_act_${act?.id || 'default'}`;
                           const savedNotes = localStorage.getItem(notesKey);
                           if (!savedNotes) {
-                            // Remove title, start with empty content
-                            const initialContent = '';
-                            if (notesFolders.length === 0 || (notesFolders.length === 1 && notesFolders[0].content === '')) {
-                              setNotesContent(initialContent);
+                            // Initialize with act title as folder name if no folders exist
+                            if (notesFolders.length === 0 || (notesFolders.length === 1 && notesFolders[0].id === 'default' && notesFolders[0].content === '')) {
+                              const defaultName = act?.short_title || act?.long_title || 'Untitled Note';
+                              setNotesFolders([{ id: 'default', name: defaultName, content: '' }]);
+                              setActiveFolderId('default');
+                              setNotesContent('');
                             }
                           } else {
                             const currentFolder = notesFolders.find(f => f.id === activeFolderId);
@@ -1684,7 +1720,32 @@ export default function ActDetails() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+            <div className="flex flex-col gap-2">
+              {/* Save Message */}
+              {saveMessage && (
+                <div className={`px-4 py-2 mx-4 rounded-lg ${
+                  saveMessage.type === 'success' 
+                    ? 'bg-green-50 border border-green-200 text-green-800' 
+                    : 'bg-red-50 border border-red-200 text-red-800'
+                }`}>
+                  <div className="flex items-center">
+                    {saveMessage.type === 'success' ? (
+                      <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-red-500 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <span className="text-sm font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {saveMessage.text}
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
                   // Save current folder content before closing
@@ -1699,36 +1760,125 @@ export default function ActDetails() {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  // Save notes logic here - save all folders
-                  setNotesFolders(prev => prev.map(f => 
-                    f.id === activeFolderId ? { ...f, content: notesContent } : f
-                  ));
-                  console.log('Saving notes folders:', notesFolders);
-                  // You can implement save functionality here (localStorage, API, etc.)
-                  // Save to localStorage for persistence
-                  const notesKey = `notes_act_${act?.id || 'default'}`;
-                  const updatedFolders = notesFolders.map(f => 
-                    f.id === activeFolderId ? { ...f, content: notesContent } : f
-                  );
-                  localStorage.setItem(notesKey, JSON.stringify(updatedFolders));
-                  setShowNotesPopup(false);
+                onClick={async () => {
+                  if (!isUserAuthenticated) {
+                    navigate('/login');
+                    return;
+                  }
+
+                  if (!notesContent.trim()) {
+                    setSaveMessage({ type: 'error', text: 'Please enter some notes before saving.' });
+                    setTimeout(() => setSaveMessage(null), 3000);
+                    return;
+                  }
+
+                  setIsSaving(true);
+                  setSaveMessage(null);
+
+                  try {
+                    // Determine reference type
+                    const referenceType = act.location || act.state || 
+                                         (act.source && act.source.toLowerCase().includes('state')) 
+                                         ? 'state_act' : 'central_act';
+                    
+                    // Extract title from content (first line starting with #) or use act title
+                    const titleMatch = notesContent.match(/^#\s+(.+)$/m);
+                    const title = titleMatch ? titleMatch[1] : (act?.short_title || act?.long_title || 'Untitled Note');
+                    
+                    // Get current folder to check if it has a noteId (existing note)
+                    const currentFolder = notesFolders.find(f => f.id === activeFolderId);
+                    const noteId = currentFolder?.noteId;
+
+                    if (noteId) {
+                      // Update existing note
+                      const updateData = {
+                        title: title,
+                        content: notesContent
+                      };
+                      const response = await apiService.updateNote(noteId, updateData);
+                      
+                      if (response.success) {
+                        // Update local state
+                        setNotesFolders(prev => prev.map(f => 
+                          f.id === activeFolderId ? { ...f, content: notesContent, name: title } : f
+                        ));
+                        setSaveMessage({ type: 'success', text: 'Note updated successfully!' });
+                        setTimeout(() => {
+                          setSaveMessage(null);
+                          setShowNotesPopup(false);
+                        }, 1500);
+                      } else {
+                        setSaveMessage({ type: 'error', text: 'Failed to update note. Please try again.' });
+                        setTimeout(() => setSaveMessage(null), 3000);
+                      }
+                    } else {
+                      // Create new note
+                      const noteData = {
+                        title: title,
+                        content: notesContent,
+                        referenceType: referenceType,
+                        referenceId: act.id,
+                        referenceData: {
+                          short_title: act?.short_title,
+                          long_title: act?.long_title,
+                          ministry: act?.ministry,
+                          year: act?.year,
+                          act_id: act?.act_id,
+                          location: act?.location,
+                          state: act?.state
+                        }
+                      };
+
+                      const response = await apiService.createNoteFromDocument(noteData);
+                      
+                      if (response.success && response.data && response.data.note) {
+                        // Update local state with new note ID
+                        const newNoteId = response.data.note.id;
+                        setNotesFolders(prev => prev.map(f => 
+                          f.id === activeFolderId 
+                            ? { ...f, content: notesContent, name: title, noteId: newNoteId, id: newNoteId } 
+                            : f
+                        ));
+                        setSaveMessage({ type: 'success', text: 'Note saved successfully!' });
+                        setTimeout(() => {
+                          setSaveMessage(null);
+                          setShowNotesPopup(false);
+                        }, 1500);
+                      } else {
+                        setSaveMessage({ type: 'error', text: 'Failed to save note. Please try again.' });
+                        setTimeout(() => setSaveMessage(null), 3000);
+                      }
+                    }
+                  } catch (error) {
+                    console.error('Error saving note:', error);
+                    setSaveMessage({ type: 'error', text: 'An error occurred while saving the note. Please try again.' });
+                    setTimeout(() => setSaveMessage(null), 3000);
+                  } finally {
+                    setIsSaving(false);
+                  }
                 }}
-                className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md"
+                disabled={isSaving}
+                className={`px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md ${
+                  isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                }`}
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
                   background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)',
-                  cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                  if (!isSaving) {
+                    e.target.style.background = 'linear-gradient(90deg, #1a5a9a 0%, #b88a56 100%)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                  if (!isSaving) {
+                    e.target.style.background = 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)';
+                  }
                 }}
               >
-                Save Notes
+                {isSaving ? 'Saving...' : 'Save Notes'}
               </button>
+              </div>
             </div>
           </div>
         </>

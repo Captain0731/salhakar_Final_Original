@@ -1783,11 +1783,11 @@ class ApiService {
 
   // Bookmark a judgement
   async bookmarkJudgement(judgementId, folderId = null) {
-    const payload = folderId ? { folder_id: folderId } : {};
+    const payload = { folder_id: folderId };
     const response = await fetch(`${this.baseURL}/api/bookmarks/judgements/${judgementId}`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
-      body: Object.keys(payload).length > 0 ? JSON.stringify(payload) : undefined
+      body: JSON.stringify(payload)
     });
     return await this.handleResponse(response);
   }
@@ -2242,7 +2242,7 @@ class ApiService {
     
     const url = `${this.baseURL}/api/bookmarks/acts/${validActType}/${numericId}`;
     const headers = this.getAuthHeaders();
-    const payload = folderId ? { folder_id: folderId } : {};
+    const payload = { folder_id: folderId };
     
     console.log('🔖 Bookmarking act:', { actType, validActType, actId, numericId, folderId, url });
     console.log('🔖 Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'None' });
@@ -2250,7 +2250,7 @@ class ApiService {
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
-      body: Object.keys(payload).length > 0 ? JSON.stringify(payload) : undefined
+      body: JSON.stringify(payload)
     });
     
     console.log('🔖 Response status:', response.status, response.statusText);
@@ -2311,20 +2311,32 @@ class ApiService {
     return await this.handleResponse(response);
   }
 
-  // Bookmark a mapping (BSA-IEA or BNS-IPC)
+  // Bookmark a mapping (BSA-IEA, BNS-IPC, or BNSS-CrPC)
   async bookmarkMapping(mappingType, mappingId, folderId = null) {
-    const payload = folderId ? { folder_id: folderId } : {};
-    const response = await fetch(`${this.baseURL}/api/bookmarks/mappings/${mappingType}/${mappingId}`, {
+    // Normalize mapping type: convert 'bsa_iea_mapping' to 'bsa_iea', etc.
+    let normalizedType = mappingType;
+    if (mappingType === 'bsa_iea_mapping') normalizedType = 'bsa_iea';
+    else if (mappingType === 'bns_ipc_mapping') normalizedType = 'bns_ipc';
+    else if (mappingType === 'bnss_crpc_mapping') normalizedType = 'bnss_crpc';
+    
+    const payload = { folder_id: folderId };
+    const response = await fetch(`${this.baseURL}/api/bookmarks/mappings/${normalizedType}/${mappingId}`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
-      body: Object.keys(payload).length > 0 ? JSON.stringify(payload) : undefined
+      body: JSON.stringify(payload)
     });
     return await this.handleResponse(response);
   }
 
   // Remove mapping bookmark
   async removeMappingBookmark(mappingType, mappingId) {
-    const response = await fetch(`${this.baseURL}/api/bookmarks/mappings/${mappingType}/${mappingId}`, {
+    // Normalize mapping type: convert 'bsa_iea_mapping' to 'bsa_iea', etc.
+    let normalizedType = mappingType;
+    if (mappingType === 'bsa_iea_mapping') normalizedType = 'bsa_iea';
+    else if (mappingType === 'bns_ipc_mapping') normalizedType = 'bns_ipc';
+    else if (mappingType === 'bnss_crpc_mapping') normalizedType = 'bnss_crpc';
+    
+    const response = await fetch(`${this.baseURL}/api/bookmarks/mappings/${normalizedType}/${mappingId}`, {
       method: 'DELETE',
       headers: this.getAuthHeaders()
     });
@@ -2352,6 +2364,9 @@ class ApiService {
         break;
       case 'bns_ipc_mapping':
         url = `/api/bookmarks/mappings/bns_ipc/${id}`;
+        break;
+      case 'bnss_crpc_mapping':
+        url = `/api/bookmarks/mappings/bnss_crpc/${id}`;
         break;
       default:
         throw new Error(`Unsupported bookmark type: ${type}`);
@@ -2652,6 +2667,20 @@ class ApiService {
       body: JSON.stringify(noteData)
     });
     return await this.handleResponse(response);
+  }
+
+  // Create note from document (helper method with proper field mapping)
+  async createNoteFromDocument(noteData) {
+    const payload = {
+      title: noteData.title,
+      content: noteData.content,
+      reference_type: noteData.referenceType,
+      reference_id: noteData.referenceId,
+      reference_data: noteData.referenceData || null,
+      folder_id: noteData.folderId || null,
+      tags: noteData.tags || []
+    };
+    return this.createNote(payload);
   }
 
   // Get notes by reference (judgment, act, or mapping)
