@@ -729,7 +729,13 @@ class ApiService {
       if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
       
       // Add search and filter parameters
-      if (params.search) queryParams.append('search', params.search);
+      if (params.search) {
+        queryParams.append('search', params.search);
+        // Enable highlights when search is used (Elasticsearch feature)
+        if (params.highlight !== false) {
+          queryParams.append('highlight', 'true');
+        }
+      }
       if (params.title) queryParams.append('title', params.title);
       if (params.cnr) queryParams.append('cnr', params.cnr);
       // Support both highCourt (for backward compatibility) and court_name (preferred)
@@ -743,6 +749,12 @@ class ApiService {
         // Keep date in YYYY-MM-DD format as per API documentation
         const dateValue = params.decisionDateFrom || params.decision_date_from;
         queryParams.append('decision_date_from', dateValue);
+      }
+      if (params.decision_date_to) {
+        queryParams.append('decision_date_to', params.decision_date_to);
+      }
+      if (params.year) {
+        queryParams.append('year', params.year);
       }
       
       // Note: Using /api/judgements endpoint for High Court judgments as per API documentation

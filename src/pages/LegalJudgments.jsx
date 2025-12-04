@@ -10,6 +10,8 @@ import {
   SkeletonGrid,
   SmoothTransitionWrapper 
 } from "../components/EnhancedLoadingComponents";
+import { AutoComplete } from "primereact/autocomplete";
+import "primereact/resources/themes/lara-light-cyan/theme.css";
 
 // Add custom CSS animations
 const customStyles = `
@@ -81,6 +83,28 @@ const customStyles = `
   
   .animate-slide-in-right {
     animation: slideInFromRight 0.6s ease-out forwards;
+  }
+  
+  /* PrimeReact AutoComplete styling to match original design */
+  .p-autocomplete {
+    width: 100%;
+  }
+  
+  .p-autocomplete .p-inputtext {
+    width: 100% !important;
+  }
+  
+  .p-autocomplete-panel {
+    display: none !important;
+  }
+  
+  /* Elasticsearch highlight styling */
+  mark {
+    background-color: #fef08a;
+    color: #1f2937;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
   }
 `;
 
@@ -176,6 +200,7 @@ export default function LegalJudgments() {
   const [hasMore, setHasMore] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [nextCursor, setNextCursor] = useState(null);
+  const [searchInfo, setSearchInfo] = useState(null); // Elasticsearch search metadata
   const nextCursorRef = useRef(null);
   const fetchJudgmentsRef = useRef(null);
   const isInitialMountRef = useRef(true);
@@ -229,6 +254,7 @@ export default function LegalJudgments() {
     setNextCursor(null);
     setHasMore(true);
     setError(null);
+    setSearchInfo(null); // Reset search info when court type changes
     // Reset fetching state when court type changes
     isFetchingRef.current = false;
     setLoading(false);
@@ -290,8 +316,11 @@ export default function LegalJudgments() {
         } else if (key === 'decisionDateFrom') {
           params.decision_date_from = value;
         } else if (key === 'search') {
-          // Search parameter
+          // Search parameter - enable highlights for Elasticsearch (only for High Court)
           params.search = value;
+          if (courtType === "highcourt") {
+            params.highlight = true; // Enable highlights for full-text search
+          }
         } else {
           // Direct mapping for: title, cnr, judge, petitioner, respondent
           params[key] = value;
@@ -396,8 +425,27 @@ export default function LegalJudgments() {
       nextCursorRef.current = newCursor;
       setHasMore(paginationInfo.has_more !== false);
       
-      if (!isLoadMore) {
-        setTotalCount(judgmentsArray.length + (paginationInfo.has_more ? 1 : 0));
+      // Handle Elasticsearch search metadata (only for High Court)
+      if (data.search_info && courtType === "highcourt") {
+        setSearchInfo(data.search_info);
+        // Update total count from search results if available
+        if (data.search_info.total_matches !== undefined) {
+          setTotalCount(data.search_info.total_matches);
+        }
+      } else {
+        setSearchInfo(null);
+        if (!isLoadMore) {
+          setTotalCount(judgmentsArray.length + (paginationInfo.has_more ? 1 : 0));
+        }
+      }
+      
+      // If no search info and not loading more, set total count from pagination
+      if (!data.search_info && !isLoadMore) {
+        if (paginationInfo.total_count !== undefined) {
+          setTotalCount(paginationInfo.total_count);
+        } else {
+          setTotalCount(judgmentsArray.length + (paginationInfo.has_more ? 1 : 0));
+        }
       }
       
     } catch (error) {
@@ -496,6 +544,7 @@ export default function LegalJudgments() {
     setHasMore(true);
     setNextCursor(null);
     setError(null);
+    setSearchInfo(null); // Reset search info when applying new filters
     
     // Use setTimeout to ensure filters state is updated, then fetch with explicit filters
     setTimeout(() => {
@@ -772,13 +821,30 @@ export default function LegalJudgments() {
                 Search Judgments
               </label>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-                <div className="relative flex-1 w-full">
-                  <input
-                    type="text"
-                    ref={(el) => { if (el) inputElementsRef.current['search'] = el; }}
+                <div className="relative flex-1 w-full p-autocomplete">
+                  <AutoComplete
+                    inputRef={(el) => { 
+                      if (el) {
+                        // PrimeReact AutoComplete exposes input via el.input or el.getInput()
+                        const inputElement = el.input || el.getInput?.() || el;
+                        if (inputElement && inputElement.tagName === 'INPUT') {
+                          inputElementsRef.current['search'] = inputElement;
+                        }
+                      }
+                    }}
                     value={filters.search || ''}
-                    onChange={(e) => handleFilterChange('search', e.target.value, e)}
-                    onFocus={() => {
+                    onChange={(e) => {
+                      const value = e.value || '';
+                      // Create a synthetic event for handleFilterChange
+                      const syntheticEvent = {
+                        target: {
+                          value: value,
+                          type: 'text'
+                        }
+                      };
+                      handleFilterChange('search', value, syntheticEvent);
+                    }}
+                    onFocus={(e) => {
                       isUserTypingRef.current['search'] = true;
                     }}
                     onBlur={() => {
@@ -793,17 +859,23 @@ export default function LegalJudgments() {
                         applyFilters();
                       }
                     }}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                    suggestions={[]}
+                    completeMethod={() => {}}
+                    className="w-full"
+                    inputClassName="w-full px-3 sm:px-4 py-2.5 sm:py-3 pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                    inputStyle={{ fontFamily: 'Roboto, sans-serif' }}
+                    panelClassName="hidden"
+                    dropdown={false}
                   />
-                  <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 flex items-center pointer-events-none z-10">
                     <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
                   <button
-                    className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors z-10"
                     title="Voice Search"
+                    type="button"
                   >
                     <svg 
                       className="w-4 h-4 sm:w-5 sm:h-5"
@@ -1081,6 +1153,36 @@ export default function LegalJudgments() {
           >
             <div className="flex flex-col gap-3 sm:gap-0 mb-4 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex-1">
+                {/* Search Info Display (Elasticsearch) - Only for High Court */}
+                {searchInfo && courtType === "highcourt" && (
+                  <div className="mb-3 sm:mb-4 p-2 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <span className="text-xs sm:text-sm font-semibold text-blue-800">
+                          {searchInfo.total_matches?.toLocaleString() || 0} {searchInfo.total_matches === 1 ? 'match' : 'matches'} found
+                        </span>
+                        {searchInfo.search_engine && (
+                          <span className="text-xs text-blue-600">
+                            ({searchInfo.search_engine})
+                          </span>
+                        )}
+                      </div>
+                      {searchInfo.took_ms && (
+                        <span className="text-xs text-blue-600">
+                          Search completed in {searchInfo.took_ms}ms
+                        </span>
+                      )}
+                    </div>
+                    {searchInfo.query && (
+                      <div className="mt-2 text-xs text-blue-700">
+                        Search query: <span className="font-semibold">"{searchInfo.query}"</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
                   {Object.values(filters).some(val => val && val.trim() !== '') 
                     ? `Search Results - ${courtTypeLabel} Judgments` 
@@ -1223,9 +1325,18 @@ export default function LegalJudgments() {
                                   fontFamily: 'Helvetica Hebrew Bold, sans-serif',
                                   lineHeight: '1.4'
                                 }}
-                              >
-                                {judgment.title || judgment.case_info || judgment.case_title || judgment.case_number || 'Untitled Judgment'}
-                              </h3>
+                                dangerouslySetInnerHTML={{
+                                  __html: (() => {
+                                    // Display highlights if available (Elasticsearch search results)
+                                    if (judgment.highlights?.title && Array.isArray(judgment.highlights.title)) {
+                                      return judgment.highlights.title[0]; // Use first highlight fragment
+                                    }
+                                    // Fallback to regular title
+                                    const title = judgment.title || judgment.case_info || judgment.case_title || judgment.case_number || 'Untitled Judgment';
+                                    return title.replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
+                                  })()
+                                }}
+                              />
                               {index === 0 && judgments.length > 0 && !loading && (
                                 <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 bg-green-100 text-green-700 rounded-md text-xs font-semibold">
                                   Latest
@@ -1288,6 +1399,21 @@ export default function LegalJudgments() {
                                     </div>
                                   </div>
                                 )}
+                                
+                                {/* Relevance Score (Elasticsearch) - Only for High Court */}
+                                {judgment.relevance_score && courtType === "highcourt" && (
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 flex-shrink-0" style={{ color: '#10b981' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Relevance</p>
+                                      <p className="text-sm font-medium text-gray-900" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                        {judgment.relevance_score.toFixed(2)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
 
                                 {judgment.petitioner && (
                                   <div className="flex items-center gap-2">
@@ -1336,6 +1462,27 @@ export default function LegalJudgments() {
                               </button>
                             </div>
                           </div>
+                          
+                          {/* PDF Text Highlights (Elasticsearch) - Only for High Court */}
+                          {judgment.highlights?.pdf_text && Array.isArray(judgment.highlights.pdf_text) && courtType === "highcourt" && (
+                            <div className="px-3 sm:px-4 md:px-5 lg:px-6 pb-3 sm:pb-4 md:pb-5">
+                              <div className="p-2 sm:p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <p className="text-xs font-semibold text-yellow-800 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                  Search Matches in PDF:
+                                </p>
+                                <div className="space-y-1.5">
+                                  {judgment.highlights.pdf_text.slice(0, 2).map((fragment, idx) => (
+                                    <p 
+                                      key={idx}
+                                      className="text-xs text-gray-700 leading-relaxed line-clamp-2" 
+                                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                                      dangerouslySetInnerHTML={{ __html: fragment }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
