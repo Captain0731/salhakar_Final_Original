@@ -278,6 +278,7 @@
         });
       };
     }, []);
+
     
     // Update searchQuery when filters.search changes (e.g., from URL)
     useEffect(() => {
@@ -416,6 +417,37 @@
     useEffect(() => {
       fetchActsRef.current = fetchActs;
     }, [fetchActs]);
+
+    // Handle select/dropdown filter change - auto-apply immediately (no debounce needed)
+    const handleSelectFilterChange = (key, value) => {
+      // Update filters immediately
+      const newFilters = { ...filters, [key]: value };
+      setFilters(newFilters);
+      
+      // Also update local inputs to keep them in sync
+      setLocalInputs(prev => ({
+        ...prev,
+        [key]: value
+      }));
+      
+      // Fetch with new filters immediately
+      setPagination(null);
+      setError(null);
+      
+      // Use setTimeout to ensure state is updated before fetch
+      setTimeout(() => {
+        // Merge local inputs with new filters for the fetch
+        const mergedFilters = { ...newFilters };
+        Object.keys(localInputs).forEach(k => {
+          if (k !== key && localInputs[k] !== undefined) {
+            mergedFilters[k] = localInputs[k];
+          }
+        });
+        if (fetchActsRef.current) {
+          fetchActsRef.current(false, mergedFilters);
+        }
+      }, 50);
+    };
 
     const loadMoreData = useCallback(() => {
       if (fetchActsRef.current && pagination?.has_more && !loading && !isSearching) {
@@ -811,7 +843,7 @@
                         </label>
                         <select
                           value={filters.ministry || ''}
-                          onChange={(e) => handleFilterChange('ministry', e.target.value)}
+                          onChange={(e) => handleSelectFilterChange('ministry', e.target.value)}
                           className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           style={{ fontFamily: 'Roboto, sans-serif' }}
                         >
@@ -848,7 +880,7 @@
                         </label>
                         <select
                           value={filters.year || ''}
-                          onChange={(e) => handleFilterChange('year', e.target.value)}
+                          onChange={(e) => handleSelectFilterChange('year', e.target.value)}
                           className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           style={{ fontFamily: 'Roboto, sans-serif' }}
                         >
@@ -866,7 +898,7 @@
                         </label>
                         <select
                           value={filters.type || ''}
-                          onChange={(e) => handleFilterChange('type', e.target.value)}
+                          onChange={(e) => handleSelectFilterChange('type', e.target.value)}
                           className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           style={{ fontFamily: 'Roboto, sans-serif' }}
                         >
@@ -889,7 +921,7 @@
                         </label>
                         <select
                           value={filters.state || ''}
-                          onChange={(e) => handleFilterChange('state', e.target.value)}
+                          onChange={(e) => handleSelectFilterChange('state', e.target.value)}
                           className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           style={{ fontFamily: 'Roboto, sans-serif' }}
                         >
@@ -943,7 +975,7 @@
                         </label>
                         <select
                           value={filters.year || ''}
-                          onChange={(e) => handleFilterChange('year', e.target.value)}
+                          onChange={(e) => handleSelectFilterChange('year', e.target.value)}
                           className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           style={{ fontFamily: 'Roboto, sans-serif' }}
                         >

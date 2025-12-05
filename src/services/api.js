@@ -1852,7 +1852,8 @@ class ApiService {
 
   // Bookmark a judgement
   async bookmarkJudgement(judgementId, folderId = null) {
-    const payload = { folder_id: folderId };
+    // Only include folder_id if it's not null (backend may reject null values)
+    const payload = folderId !== null ? { folder_id: folderId } : {};
     const response = await fetch(`${this.baseURL}/api/bookmarks/judgements/${judgementId}`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
@@ -2311,7 +2312,8 @@ class ApiService {
     
     const url = `${this.baseURL}/api/bookmarks/acts/${validActType}/${numericId}`;
     const headers = this.getAuthHeaders();
-    const payload = { folder_id: folderId };
+    // Only include folder_id if it's not null (backend may reject null values)
+    const payload = folderId !== null ? { folder_id: folderId } : {};
     
     console.log('🔖 Bookmarking act:', { actType, validActType, actId, numericId, folderId, url });
     console.log('🔖 Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'None' });
@@ -2388,7 +2390,8 @@ class ApiService {
     else if (mappingType === 'bns_ipc_mapping') normalizedType = 'bns_ipc';
     else if (mappingType === 'bnss_crpc_mapping') normalizedType = 'bnss_crpc';
     
-    const payload = { folder_id: folderId };
+    // Only include folder_id if it's not null (backend may reject null values)
+    const payload = folderId !== null ? { folder_id: folderId } : {};
     const response = await fetch(`${this.baseURL}/api/bookmarks/mappings/${normalizedType}/${mappingId}`, {
       method: 'POST',
       headers: this.getAuthHeaders(),
