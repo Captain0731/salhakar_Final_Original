@@ -416,7 +416,7 @@ const Navbar = () => {
                           }}
                           onMouseLeave={(e) => {
                             if (window.innerWidth >= 768) {
-                              e.currentTarget.style.color = '#8C969F';
+                              e.currentTarget.style.color = '#1f2937';
                               e.currentTarget.style.backgroundColor = 'transparent';
                               e.currentTarget.style.transform = 'translateX(0)';
                               e.currentTarget.style.boxShadow = 'none';
@@ -498,7 +498,7 @@ const Navbar = () => {
                                 }}
                                 onMouseLeave={(e) => {
                                   if (window.innerWidth >= 768) {
-                                    e.currentTarget.style.color = '#8C969F';
+                                    e.currentTarget.style.color = '#1f2937';
                                     e.currentTarget.style.backgroundColor = 'transparent';
                                     e.currentTarget.style.transform = 'translateX(0)';
                                     e.currentTarget.style.boxShadow = 'none';

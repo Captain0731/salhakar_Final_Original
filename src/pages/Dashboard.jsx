@@ -419,17 +419,9 @@ const Dashboard = () => {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`} style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
           <div className="h-full flex flex-col border-r border-gray-200">
-            {/* Logo and Dashboard Button */}
+            {/* Dashboard Button */}
             <div className="p-4 sm:p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <div className="flex items-center">
-                  <img 
-                    src="/logo7.svg" 
-                    alt="Salhakar Logo" 
-                    className="h-10 w-auto sm:h-12 object-contain mr-2 sm:mr-3"
-                  />
-                  {/* <span className="text-base sm:text-lg font-bold" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Salhakar</span> */}
-                </div>
+              <div className="flex items-center justify-end mb-3 sm:mb-4">
                 <button
                   onClick={() => setSidebarOpen(false)}
                   className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"

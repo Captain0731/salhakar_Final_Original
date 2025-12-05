@@ -338,20 +338,6 @@ const Notes = ({ onBack }) => {
               </p>
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 sm:gap-0">
-            <button 
-              onClick={() => setShowCreateFolderDialog(true)}
-              className="px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg flex items-center justify-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm w-full sm:w-auto"
-              style={{ 
-                backgroundColor: '#1E65AD', 
-                color: 'white',
-                fontFamily: 'Roboto, sans-serif'
-              }}
-            >
-              <FolderPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span>New Folder</span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -397,84 +383,61 @@ const Notes = ({ onBack }) => {
         <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4" style={{ color: '#1E65AD', fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>
           Folders
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* Unfiled folder */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {/* New Folder Card */}
           <div
-            onClick={() => {
-              setSelectedFolder(selectedFolder?.id === 'unfiled' ? null : { id: 'unfiled', name: 'Unfiled' });
-              setPagination(prev => ({ ...prev, page: 1 }));
-            }}
-            className={`p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg ${
-              selectedFolder?.id === 'unfiled' ? 'ring-2 ring-offset-2 ring-blue-500' : ''
-            }`}
-            style={{
-              borderColor: selectedFolder?.id === 'unfiled' ? '#1E65AD' : '#E5E7EB',
-              backgroundColor: selectedFolder?.id === 'unfiled' ? '#E3F2FD' : 'white'
-            }}
+            onClick={() => setShowCreateFolderDialog(true)}
+            className="relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group hover:shadow-md cursor-pointer"
           >
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                <div 
-                  className="p-1.5 sm:p-2 rounded-lg flex-shrink-0"
-                  style={{ backgroundColor: '#E3F2FD' }}
-                >
-                  <Folder className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#1E65AD' }} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    Unfiled
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    {notes.filter(note => !note.folder_id).length} notes
-                  </p>
-                </div>
-              </div>
+            <div 
+              className="p-2 sm:p-3 rounded-lg mb-1.5 sm:mb-2 transition-transform group-hover:scale-110"
+              style={{ backgroundColor: '#CF9B6320' }}
+            >
+              <FolderPlus 
+                className="h-6 w-6 sm:h-8 sm:w-8" 
+                style={{ color: '#CF9B63' }}
+              />
             </div>
+            <h3 className="font-medium text-gray-900 text-xs sm:text-sm text-center group-hover:text-blue-700 mb-0.5 sm:mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              New Folder
+            </h3>
+            <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+              Create new
+            </p>
           </div>
           
           {folders.map((folder) => (
             <div
               key={folder.id}
               onClick={() => handleFolderClick(folder)}
-              className={`p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-lg relative ${
-                selectedFolder?.id === folder.id ? 'ring-2 ring-offset-2 ring-blue-500' : ''
+              className={`relative flex flex-col items-center p-3 sm:p-4 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 hover:shadow-md group ${
+                selectedFolder?.id === folder.id ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
               }`}
-              style={{
-                borderColor: selectedFolder?.id === folder.id ? '#1E65AD' : '#E5E7EB',
-                backgroundColor: selectedFolder?.id === folder.id ? '#E3F2FD' : 'white'
-              }}
             >
-              <div className="flex items-center justify-between mb-2 sm:mb-3">
-                <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
-                  <div 
-                    className="p-1.5 sm:p-2 rounded-lg flex-shrink-0"
-                    style={{ backgroundColor: '#E3F2FD' }}
-                  >
-                    <Folder className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#1E65AD' }} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {folder.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {getFolderNotes(folder.id).length} notes
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    handleDeleteFolder(folder.id, e);
-                  }}
-                  className="p-1.5 sm:p-2 rounded-lg hover:bg-red-100 active:bg-red-200 flex-shrink-0 transition-colors z-10 relative"
-                  title="Delete folder"
-                  style={{ marginLeft: '0.5rem' }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                >
-                  <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 text-red-500" />
-                </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleDeleteFolder(folder.id, e);
+                }}
+                className="absolute top-2 right-2 p-1.5 rounded hover:bg-red-100 flex-shrink-0 transition-colors"
+                title="Delete folder"
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500" />
+              </button>
+              <div 
+                className="p-2 sm:p-3 rounded-lg mb-1.5 sm:mb-2 transition-transform group-hover:scale-110"
+                style={{ backgroundColor: '#1E65AD20' }}
+              >
+                <Folder className="h-6 w-6 sm:h-8 sm:w-8" style={{ color: '#1E65AD' }} />
               </div>
+              <h3 className="font-medium text-gray-900 text-xs sm:text-sm text-center group-hover:text-blue-700 mb-0.5 sm:mb-1 truncate w-full px-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                {folder.name}
+              </h3>
+              <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                {getFolderNotes(folder.id).length} notes
+              </p>
             </div>
           ))}
         </div>

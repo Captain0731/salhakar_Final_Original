@@ -738,17 +738,6 @@ const Bookmarks = ({ onBack }) => {
             </p>
             </div>
           </div>
-          
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:space-x-3 sm:gap-0">
-            <button
-              onClick={() => setShowCreateFolder(true)}
-              className="flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 text-white rounded-lg transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 font-medium text-xs sm:text-sm w-full sm:w-auto"
-              style={{ backgroundColor: '#CF9B63', fontFamily: 'Roboto, sans-serif' }}
-            >
-              <FolderPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-              New Folder
-            </button>
-          </div>
         </div>
       </div>
 
@@ -1055,20 +1044,34 @@ const Bookmarks = ({ onBack }) => {
       )}
 
       {/* Folders */}
-      {!currentFolder && folders.length > 0 && (
+      {!currentFolder && (
         <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-4 sm:mb-5">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900" style={{ fontFamily: 'Helvetica Hebrew Bold, sans-serif' }}>Folders</h2>
-            <button
-              onClick={() => setShowCreateFolder(true)}
-              className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
-              style={{ fontFamily: 'Roboto, sans-serif' }}
-            >
-              <FolderPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1" />
-              <span className="hidden sm:inline">New Folder</span>
-            </button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {/* New Folder Card */}
+            <div
+              onClick={() => setShowCreateFolder(true)}
+              className="relative flex flex-col items-center justify-center p-3 sm:p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group hover:shadow-md cursor-pointer"
+            >
+              <div 
+                className="p-2 sm:p-3 rounded-lg mb-1.5 sm:mb-2 transition-transform group-hover:scale-110"
+                style={{ backgroundColor: '#CF9B6320' }}
+              >
+                <FolderPlus 
+                  className="h-6 w-6 sm:h-8 sm:w-8" 
+                  style={{ color: '#CF9B63' }}
+                />
+              </div>
+              <h3 className="font-medium text-gray-900 text-xs sm:text-sm text-center group-hover:text-blue-700 mb-0.5 sm:mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                New Folder
+              </h3>
+              <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                Create new
+              </p>
+            </div>
+            
             {folders.map((folder) => (
               <div
                 key={folder.id}
