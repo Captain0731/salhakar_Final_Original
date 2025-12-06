@@ -12,6 +12,7 @@ import {
 } from "../components/EnhancedLoadingComponents";
 import { useAuth } from "../contexts/AuthContext";
 import ScrollToTopButton from "../components/ScrollToTopButton";
+import { Mic } from "lucide-react";
 
 // Add custom CSS animations
 const customStyles = `
@@ -116,8 +117,11 @@ export default function LawMapping() {
 
   // Filter states
   const [filters, setFilters] = useState({
-    search: '',
+    word_search: '', // Full-text search for searchable text
+    source_section_search: '', // Source section specific search (BNS/BNSS/BSA)
+    target_section_search: '', // Target section specific search (IPC/CrPC/IEA)
     subject: '',
+    section: '',
     source_section: '',
     target_section: ''
   });
@@ -143,8 +147,11 @@ export default function LawMapping() {
   // Reset filters when mapping type changes
   useEffect(() => {
     setFilters({
-      search: '',
+      word_search: '',
+      source_section_search: '',
+      target_section_search: '',
       subject: '',
+      section: '',
       source_section: '',
       target_section: ''
     });
@@ -192,7 +199,33 @@ export default function LawMapping() {
         mapping_type: mappingType  // Always include mapping_type
       };
 
-      // Add filters - remove empty ones
+      // First pass: collect search values for combining
+      let searchTerms = [];
+      let hasWordSearch = false;
+      let hasSourceSectionSearch = false;
+      let hasTargetSectionSearch = false;
+      
+      // Check what search types are active
+      if (activeFilters.word_search && activeFilters.word_search.trim() !== '') {
+        hasWordSearch = true;
+        searchTerms.push(activeFilters.word_search.trim());
+      }
+      if (activeFilters.source_section_search && activeFilters.source_section_search.trim() !== '') {
+        hasSourceSectionSearch = true;
+        searchTerms.push(activeFilters.source_section_search.trim());
+      }
+      if (activeFilters.target_section_search && activeFilters.target_section_search.trim() !== '') {
+        hasTargetSectionSearch = true;
+        searchTerms.push(activeFilters.target_section_search.trim());
+      }
+      
+      // If any search is used, combine them and enable highlights
+      if (searchTerms.length > 0) {
+        params.search = searchTerms.join(' ');
+        params.highlight = true;
+      }
+      
+      // Add filters - map to API parameter names based on mapping type
       Object.keys(activeFilters).forEach(key => {
         const value = activeFilters[key];
         // Skip empty values
@@ -200,8 +233,31 @@ export default function LawMapping() {
           return;
         }
         
-        // Add non-empty filter values
-        params[key] = value;
+        // Map filter keys to API parameter names
+        if (key === 'word_search') {
+          // Already handled above in search parameter
+          // No additional action needed
+        } else if (key === 'source_section_search') {
+          // Source section search: use source_section for filtering
+          params.source_section = value;
+        } else if (key === 'target_section_search') {
+          // Target section search: use target_section for filtering
+          params.target_section = value;
+        } else if (key === 'subject') {
+          params.subject = value;
+        } else if (key === 'section') {
+          // Section searches in both source and target sections
+          params.section = value;
+        } else if (key === 'source_section') {
+          // source_section maps to bns_section/bsa_section/bnss_section based on mapping_type
+          params.source_section = value;
+        } else if (key === 'target_section') {
+          // target_section maps to ipc_section/iea_section/crpc_section based on mapping_type
+          params.target_section = value;
+        } else {
+          // Direct mapping for other filters
+          params[key] = value;
+        }
       });
 
       // Remove empty params (but keep mapping_type even if it's empty string - it shouldn't be)
@@ -225,7 +281,8 @@ export default function LawMapping() {
         console.log('Mappings API response:', { 
           mappingType, 
           dataCount: data?.data?.length,
-          paginationInfo: data?.pagination_info 
+          pagination: data?.pagination,
+          searchMetadata: data?.search_metadata
         });
       }
       
@@ -246,7 +303,8 @@ export default function LawMapping() {
       
       if (!isMountedRef.current) return;
       
-      const paginationInfo = data.pagination_info || {};
+      // Handle both pagination and pagination_info for backward compatibility
+      const paginationInfo = data.pagination || data.pagination_info || {};
       
       if (isLoadMore) {
         setMappings(prev => [...prev, ...mappingsArray]);
@@ -267,6 +325,11 @@ export default function LawMapping() {
       } else if (!isLoadMore) {
         // If no total count, estimate based on current data
         setTotalCount(mappingsArray.length + (paginationInfo.has_more ? pageSize : 0));
+      }
+      
+      // Log search metadata if Elasticsearch was used
+      if (data.search_metadata && process.env.NODE_ENV === 'development') {
+        console.log('Elasticsearch search metadata:', data.search_metadata);
       }
       
     } catch (error) {
@@ -319,8 +382,11 @@ export default function LawMapping() {
 
   const clearFilters = () => {
     setFilters({
-      search: '',
+      word_search: '',
+      source_section_search: '',
+      target_section_search: '',
       subject: '',
+      section: '',
       source_section: '',
       target_section: ''
     });
@@ -369,7 +435,11 @@ export default function LawMapping() {
     
     const timeoutId = setTimeout(() => {
       const hasActiveFilters = Object.entries(filters).some(([key, val]) => {
-        if (key === 'search') return false;
+        // Skip word_search, source_section_search, target_section_search from auto-apply
+        // They need explicit Apply button or Enter key
+        if (key === 'word_search' || key === 'source_section_search' || key === 'target_section_search') {
+          return false;
+        }
         return val && (typeof val === 'string' ? val.trim() !== '' : val !== '');
       });
       
@@ -385,7 +455,7 @@ export default function LawMapping() {
     }, 800);
 
     return () => clearTimeout(timeoutId);
-  }, [filters.subject, filters.source_section, filters.target_section]);
+  }, [filters.subject, filters.section, filters.source_section, filters.target_section, filters.word_search, filters.source_section_search, filters.target_section_search]);
 
   // Load initial data when mapping type changes
   useEffect(() => {
@@ -462,6 +532,7 @@ export default function LawMapping() {
       <div 
         id="main-scroll-area"
         className="h-screen overflow-y-auto"
+        style={{ scrollBehavior: 'smooth', scrollPaddingTop: '0' }}
       >
       
       {/* Enhanced Header Section */}
@@ -568,45 +639,104 @@ export default function LawMapping() {
                 </div>
             </div>
             
-            {/* Search Bar */}
+            {/* Three Search Fields: Source Section - Target Section - Word Search */}
             <div className="mb-3 sm:mb-4 md:mb-6">
-              {/* <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                Search Mappings
-              </label> */}
-              <div className="relative">
-                <input
-                  type="text"
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  placeholder="Search by subject, section number..."
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !loading && !isFetchingRef.current) {
-                      e.preventDefault();
-                      applyFilters();
-                    }
-                  }}
-                  className="w-full px-3 sm:px-4 md:px-4 py-2 sm:py-2.5 md:py-3 pl-9 sm:pl-10 md:pl-12 pr-9 sm:pr-10 md:pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base md:text-base lg:text-lg"
-                  style={{ fontFamily: 'Roboto, sans-serif' }}
-                />
-                <div className="absolute inset-y-0 left-0 pl-2.5 sm:pl-3 flex items-center pointer-events-none">
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                {/* Source Section Search (BNS/BNSS/BSA) */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    {mappingType === 'bns_ipc' ? 'IPC Section Search' : mappingType === 'bsa_iea' ? 'BSA Section Search' : 'BNSS Section Search'}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={filters.source_section_search}
+                      onChange={(e) => handleFilterChange('source_section_search', e.target.value)}
+                      placeholder={mappingType === 'bns_ipc' ? 'e.g., 300, 103' : mappingType === 'bsa_iea' ? 'e.g., 3, 5' : 'e.g., 154, 161'}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !loading && !isFetchingRef.current) {
+                          e.preventDefault();
+                          applyFilters();
+                        }
+                      }}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none">
+                      <Mic className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
                 </div>
-                <button
-                  className="absolute inset-y-0 right-0 pr-2.5 sm:pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
-                  title="Voice Search"
-                >
-                  <svg 
-                    className="w-4 h-4 sm:w-5 sm:h-5"
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                  </svg>
-                </button>
+
+                {/* Target Section Search (IPC/CrPC/IEA) */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    {mappingType === 'bns_ipc' ? 'BNS Section Search' : mappingType === 'bsa_iea' ? 'IEA Section Search' : 'CrPC Section Search'}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={filters.target_section_search}
+                      onChange={(e) => handleFilterChange('target_section_search', e.target.value)}
+                      placeholder={mappingType === 'bns_ipc' ? 'e.g., 300, 302' : mappingType === 'bsa_iea' ? 'e.g., 3, 5' : 'e.g., 154, 161'}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !loading && !isFetchingRef.current) {
+                          e.preventDefault();
+                          applyFilters();
+                        }
+                      }}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none">
+                      <Mic className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Word Search (Full-text search) */}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    Word Search
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={filters.word_search}
+                      onChange={(e) => handleFilterChange('word_search', e.target.value)}
+                      placeholder="e.g., murder, punishment"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !loading && !isFetchingRef.current) {
+                          e.preventDefault();
+                          applyFilters();
+                        }
+                      }}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none">
+                      <Mic className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* Clear Filters Button */}
+              {Object.values(filters).some(val => val && (typeof val === 'string' ? val.trim() !== '' : val !== '')) && (
+                <div className="mt-3 sm:mt-4">
+                  <button
+                    onClick={clearFilters}
+                    disabled={loading || isFetchingRef.current}
+                    className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-all font-medium shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap"
+                    style={{ fontFamily: 'Roboto, sans-serif' }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear Filters
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Dynamic Filters - Hidden by default, shown when showFilters is true */}
@@ -623,7 +753,7 @@ export default function LawMapping() {
                   Filter Options
                 </h3>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-6 mb-3 sm:mb-4 md:mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6 mb-3 sm:mb-4 md:mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Subject
@@ -640,16 +770,17 @@ export default function LawMapping() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {mappingType === 'bns_ipc' ? 'IPC Section' : mappingType === 'bsa_iea' ? 'IEA Section' : 'CrPC Section'}
+                      Section (Any)
                     </label>
                     <input
                       type="text"
-                      value={filters.source_section}
-                      onChange={(e) => handleFilterChange('source_section', e.target.value)}
-                      placeholder={mappingType === 'bns_ipc' ? 'e.g., 302, 304, 307' : mappingType === 'bsa_iea' ? 'e.g., 3, 5, 24' : 'e.g., 154, 161, 173'}
+                      value={filters.section}
+                      onChange={(e) => handleFilterChange('section', e.target.value)}
+                      placeholder="e.g., 302, 103, etc."
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     />
+                    <p className="text-xs text-gray-500 mt-1">Searches in both source and target sections</p>
                   </div>
 
                   <div>
@@ -658,9 +789,23 @@ export default function LawMapping() {
                     </label>
                     <input
                       type="text"
+                      value={filters.source_section}
+                      onChange={(e) => handleFilterChange('source_section', e.target.value)}
+                      placeholder={mappingType === 'bns_ipc' ? 'e.g., 101, 103, 106' : mappingType === 'bsa_iea' ? 'e.g., 3, 5, 24' : 'e.g., 154, 161, 173'}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      style={{ fontFamily: 'Roboto, sans-serif' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      {mappingType === 'bns_ipc' ? 'IPC Section' : mappingType === 'bsa_iea' ? 'IEA Section' : 'CrPC Section'}
+                    </label>
+                    <input
+                      type="text"
                       value={filters.target_section}
                       onChange={(e) => handleFilterChange('target_section', e.target.value)}
-                      placeholder={mappingType === 'bns_ipc' ? 'e.g., 101, 103, 106' : mappingType === 'bsa_iea' ? 'e.g., 3, 5, 24' : 'e.g., 154, 161, 173'}
+                      placeholder={mappingType === 'bns_ipc' ? 'e.g., 302, 304, 307' : mappingType === 'bsa_iea' ? 'e.g., 3, 5, 24' : 'e.g., 154, 161, 173'}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     />
@@ -938,7 +1083,15 @@ export default function LawMapping() {
                             <div className="text-center">
                               <div className="text-[9px] sm:text-xs md:text-sm font-medium text-gray-600 mb-0.5 sm:mb-1 md:mb-1.5 leading-tight">{getSourceLabel()}</div>
                               {sourceSection && (
-                                <div className={`text-sm sm:text-lg md:text-xl lg:text-2xl font-bold ${sourceColor.text} leading-tight`}>{sourceSection}</div>
+                                <div 
+                                  className={`text-sm sm:text-lg md:text-xl lg:text-2xl font-bold ${sourceColor.text} leading-tight`}
+                                  dangerouslySetInnerHTML={{
+                                    __html: mapping.highlights?.bns_section?.[0] || 
+                                            mapping.highlights?.bnss_section?.[0] || 
+                                            mapping.highlights?.bsa_section?.[0] || 
+                                            sourceSection
+                                  }}
+                                />
                               )}
                             </div>
                           </div>
@@ -956,7 +1109,15 @@ export default function LawMapping() {
                             <div className="text-center">
                               <div className="text-[9px] sm:text-xs md:text-sm font-medium text-gray-600 mb-0.5 sm:mb-1 md:mb-1.5 leading-tight">{getTargetLabel()}</div>
                               {targetSection && (
-                                <div className={`text-sm sm:text-lg md:text-xl lg:text-2xl font-bold ${targetColor.text} leading-tight`}>{targetSection}</div>
+                                <div 
+                                  className={`text-sm sm:text-lg md:text-xl lg:text-2xl font-bold ${targetColor.text} leading-tight`}
+                                  dangerouslySetInnerHTML={{
+                                    __html: mapping.highlights?.ipc_section?.[0] || 
+                                            mapping.highlights?.crpc_section?.[0] || 
+                                            mapping.highlights?.iea_section?.[0] || 
+                                            targetSection
+                                  }}
+                                />
                               )}
                             </div>
                           </div>
@@ -965,13 +1126,21 @@ export default function LawMapping() {
                         {/* Subject and Summary */}
                         <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 pt-2 sm:pt-3 border-t border-gray-100">
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold mb-1.5 sm:mb-2 md:mb-3 break-words leading-tight" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                              {subject}
-                            </h3>
+                            <h3 
+                              className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold mb-1.5 sm:mb-2 md:mb-3 break-words leading-tight" 
+                              style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}
+                              dangerouslySetInnerHTML={{
+                                __html: mapping.highlights?.subject?.[0] || subject
+                              }}
+                            />
                             {summary && (
-                              <p className="text-gray-600 text-xs sm:text-sm md:text-base leading-relaxed line-clamp-2 sm:line-clamp-3" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                                {summary}
-                              </p>
+                              <p 
+                                className="text-gray-600 text-xs sm:text-sm md:text-base leading-relaxed line-clamp-2 sm:line-clamp-3" 
+                                style={{ fontFamily: 'Roboto, sans-serif' }}
+                                dangerouslySetInnerHTML={{
+                                  __html: mapping.highlights?.summary?.[0] || summary
+                                }}
+                              />
                             )}
                           </div>
                           

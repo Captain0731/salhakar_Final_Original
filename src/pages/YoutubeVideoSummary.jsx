@@ -1,16 +1,24 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useLayoutEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import { motion } from "framer-motion";
 
 export default function YoutubeVideoSummary() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [summary, setSummary] = useState(null);
   const [videoInfo, setVideoInfo] = useState(null);
+
+  // Fast scroll to top on route change
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.pathname]);
 
 
   const extractVideoId = (url) => {
@@ -136,9 +144,9 @@ export default function YoutubeVideoSummary() {
 
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#F9FAFC', scrollBehavior: 'smooth' }}>
       <Navbar />
-      <div className="p-6 pt-24">
+      <div className="p-6 pt-24" style={{ scrollBehavior: 'smooth' }}>
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="mb-8">

@@ -219,20 +219,7 @@ const Dashboard = () => {
             </div>
 
             {/* Perfect Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>Downloads</p>
-                    <p className="text-2xl sm:text-3xl font-bold mb-0.5 sm:mb-1" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>0</p>
-                    <p className="text-xs sm:text-sm text-gray-500 font-medium truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>No downloads yet</p>
-                  </div>
-                  <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-sm flex-shrink-0 ml-2" style={{ backgroundColor: '#1E65AD' }}>
-                    <Download className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
-                  </div>
-                </div>
-              </div>
-
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
@@ -414,11 +401,11 @@ const Dashboard = () => {
       <Navbar />
       
       <div className="flex h-screen" style={{ paddingTop: '80px' }}>
-        {/* Perfect Sidebar */}
-        <div className={`fixed inset-y-0 left-0 z-50 w-56 sm:w-64 bg-white shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`} style={{ top: '80px', height: 'calc(100vh - 80px)' }}>
-          <div className="h-full flex flex-col border-r border-gray-200">
+        {/* Fixed Sidebar - Does not scroll with page */}
+        <div className={`fixed left-0 z-50 w-56 sm:w-64 bg-white shadow-lg transform transition-all duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`} style={{ top: '80px', height: 'calc(100vh - 80px)', position: 'fixed' }}>
+          <div className="h-full flex flex-col border-r border-gray-200 overflow-hidden">
             {/* Dashboard Button */}
             <div className="p-4 sm:p-6 border-b border-gray-200">
               <div className="flex items-center justify-end mb-3 sm:mb-4">
@@ -452,8 +439,8 @@ const Dashboard = () => {
             </div>
 
             {/* Navigation Menu */}
-            <nav className="flex-1 p-3 sm:p-4 overflow-y-auto flex flex-col">
-              <div className="space-y-1 flex-1">
+            <nav className="p-3 sm:p-4 flex flex-col justify-between flex-1 overflow-hidden">
+              <div className="space-y-1">
                 {sidebarItems.filter(item => item.id !== 'home' && item.id !== 'recently-deleted').map((item) => (
                   <button
                     key={item.id}
@@ -504,8 +491,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Main Content - Scrollable */}
+        <div className="flex-1 flex flex-col overflow-hidden lg:ml-64">
           {/* Content Area */}
           <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#F9FAFC' }}>
             <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6">

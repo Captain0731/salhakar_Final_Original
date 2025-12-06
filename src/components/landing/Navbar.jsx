@@ -73,7 +73,6 @@ const Navbar = () => {
   const [subDropdownOpen, setSubDropdownOpen] = useState({ main: null, sub: null });
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const navRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const subHoverTimeoutRef = useRef(null);
@@ -102,44 +101,86 @@ const Navbar = () => {
     }
   };
 
-  // Handle scroll effect and progress bar
-  // useEffect(() => {
-  //   let rafId = null;
+  // Handle scroll effect - works for both window scroll and container scroll
+  useEffect(() => {
+    let rafId = null;
+    let scrollContainer = null;
     
-  //   const updateScrollProgress = () => {
-  //     const scrollTop = window.scrollY;
-  //     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  //     const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    const findScrollContainer = () => {
+      // Check for different scroll containers used in different pages
+      return document.getElementById('main-scroll-area') || 
+             document.getElementById('chatbot-scroll-area');
+    };
+    
+    const updateScrollProgress = () => {
+      // Check for container scroll first (for pages like LegalJudgments, LegalChatbot)
+      if (!scrollContainer) {
+        scrollContainer = findScrollContainer();
+      }
       
-  //     setIsScrolled(scrollTop > 50);
-  //     setScrollProgress(Math.min(100, Math.max(0, scrollPercent)));
-  //   };
+      let scrollTop = 0;
+      
+      if (scrollContainer) {
+        // Use container scroll
+        scrollTop = scrollContainer.scrollTop;
+      } else {
+        // Use window scroll (for landing page and other pages)
+        scrollTop = window.scrollY || document.documentElement.scrollTop;
+      }
+      
+      setIsScrolled(scrollTop > 50);
+    };
 
-  //   const handleScroll = () => {
-  //     if (rafId) {
-  //       cancelAnimationFrame(rafId);
-  //     }
-  //     rafId = requestAnimationFrame(updateScrollProgress);
-  //   };
+    const handleScroll = () => {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+      rafId = requestAnimationFrame(updateScrollProgress);
+    };
 
-  //   const handleResize = () => {
-  //     updateScrollProgress();
-  //   };
+    const handleResize = () => {
+      // Re-check for scroll container on resize
+      scrollContainer = findScrollContainer();
+      updateScrollProgress();
+    };
 
-  //   // Initial calculation
-  //   updateScrollProgress();
+    // Initial calculation - check for container
+    scrollContainer = findScrollContainer();
+    updateScrollProgress();
 
-  //   window.addEventListener('scroll', handleScroll, { passive: true });
-  //   window.addEventListener('resize', handleResize, { passive: true });
+    // Listen to both window scroll and container scroll
+    if (scrollContainer) {
+      // Listen to container scroll
+      scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    }
     
-  //   return () => {
-  //     window.removeEventListener('scroll', handleScroll);
-  //     window.removeEventListener('resize', handleResize);
-  //     if (rafId) {
-  //       cancelAnimationFrame(rafId);
-  //     }
-  //   };
-  // }, []);
+    // Always listen to window scroll (for pages that use window scroll)
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleResize, { passive: true });
+    
+    // Also check periodically if container appears (for dynamic pages)
+    const checkInterval = setInterval(() => {
+      if (!scrollContainer) {
+        scrollContainer = findScrollContainer();
+        if (scrollContainer) {
+          scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+          updateScrollProgress();
+        }
+      }
+    }, 500);
+    
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+      clearInterval(checkInterval);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+    };
+  }, []);
 
   // // Close dropdowns when clicking outside
   // useEffect(() => {
@@ -178,9 +219,9 @@ const Navbar = () => {
     }`;
 
   return (
-    <nav ref={navRef} className={`fixed top-0 left-0 right-0 z-[9999] border-b transition-all duration-500 ease-in-out ${
+    <nav ref={navRef} className={`fixed top-0 left-0 right-0 z-[9999] border-b transition-all duration-300 ease-in-out ${
       isScrolled 
-        ? 'bg-white shadow-xl py-1.5 sm:py-2 md:bg-white/20 md:backdrop-blur-lg' 
+        ? 'bg-white shadow-xl py-1 sm:py-1.5 md:py-2 md:bg-white/95 md:backdrop-blur-lg' 
         : 'bg-white shadow-lg py-2 sm:py-3 md:py-4 md:bg-white/90 md:backdrop-blur-md'
     }`} style={{ borderColor: '#E5E7EB' }}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 flex justify-between items-center">
@@ -193,8 +234,8 @@ const Navbar = () => {
           <img
             src="/logo4.png"
             alt="सलहाकार Logo"
-            className={`max-h-10 sm:max-h-12 md:max-h-16 w-auto object-contain group-hover:scale-110 transition-all duration-500 ease-out ${
-              isScrolled ? 'max-h-10 sm:max-h-12 md:max-h-16' : 'max-h-10 sm:max-h-12 md:max-h-16'
+            className={`w-auto object-contain group-hover:scale-110 transition-all duration-300 ease-out ${
+              isScrolled ? 'max-h-2 sm:max-h-8 md:max-h-10' : 'max-h-2 sm:max-h-8 md:max-h-10'
             }`}
             style={{ height: 'auto' }}
             onError={(e) => {
@@ -212,9 +253,15 @@ const Navbar = () => {
         </div>
 
         {/* Right Side - Mobile: Language Selector + Menu Button */}
-        <div className="flex items-center gap-1.5 sm:gap-2 md:hidden">
+        <div className={`flex items-center gap-1.5 sm:gap-2 md:hidden transition-all duration-300 ${
+          isScrolled ? 'gap-1' : 'gap-1.5 sm:gap-2'
+        }`}>
           {/* Language Selector - Mobile (in navbar bar) */}
-          <div className="flex-shrink-0 max-w-[80px] sm:max-w-[100px] md:max-w-[120px]">
+          <div className={`flex-shrink-0 transition-all duration-300 ${
+            isScrolled 
+              ? 'max-w-[70px] sm:max-w-[85px] scale-90' 
+              : 'max-w-[80px] sm:max-w-[100px] scale-100'
+          }`}>
             <LanguageSelector />
           </div>
           
@@ -240,8 +287,8 @@ const Navbar = () => {
 
         {/* Nav Links */}
         <ul
-          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static left-0 w-full md:w-auto bg-white md:bg-transparent md:backdrop-blur-lg p-4 sm:p-6 md:p-0 transition-all duration-500 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0  ${
-            isScrolled ? 'top-12 sm:top-14 md:top-16 md:bg-white/70 md:backdrop-blur-lg' : 'top-14 sm:top-16 md:top-20 md:bg-white/90 md:backdrop-blur-md'
+          className={`flex-col md:flex-row md:flex gap-1 sm:gap-2 items-center absolute md:static left-0 w-full md:w-auto bg-white md:bg-transparent md:backdrop-blur-lg p-4 sm:p-6 md:p-0 transition-all duration-300 ease-out shadow-2xl md:shadow-none rounded-2xl md:rounded-none border-t md:border-t-0  ${
+            isScrolled ? 'top-10 sm:top-12 md:top-14 md:bg-white/70 md:backdrop-blur-lg' : 'top-14 sm:top-16 md:top-20 md:bg-white/90 md:backdrop-blur-md'
           } ${menuOpen ? "flex opacity-100 translate-y-0" : "hidden md:flex opacity-0 md:opacity-100 -translate-y-2 md:translate-y-0"}`}
           style={{ borderTopColor: '#E5E7EB', zIndex: 9999 }}
         >
@@ -282,7 +329,11 @@ const Navbar = () => {
                     handleNavClick(item.path);
                   }
                 }}
-                className={`flex items-center justify-between w-full md:w-auto py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 rounded-xl transition-all duration-300 font-medium hover:scale-105 text-xs sm:text-sm md:text-base touch-manipulation relative overflow-hidden group ${(item.path && location.pathname === item.path) ? 'bg-blue-50 text-blue-600' : ''}`}
+                className={`flex items-center justify-between w-full md:w-auto rounded-xl transition-all duration-300 font-medium hover:scale-105 touch-manipulation relative overflow-hidden group ${(item.path && location.pathname === item.path) ? 'bg-blue-50 text-blue-600' : ''} ${
+                  isScrolled 
+                    ? 'py-1.5 sm:py-2 md:py-2 px-2.5 sm:px-3 md:px-3 text-xs sm:text-xs md:text-sm' 
+                    : 'py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-xs sm:text-sm md:text-base'
+                }`}
                 style={{ 
                   color: (item.path && location.pathname === item.path) ? '#1E65AD' : '#8C969F', 
                   fontFamily: 'Heebo',
@@ -645,9 +696,13 @@ const Navbar = () => {
         </ul>
 
         {/* User Profile or Login Button - Right Side */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className={`hidden md:flex items-center gap-2 sm:gap-3 transition-all duration-300 ${
+          isScrolled ? 'gap-2' : 'gap-3'
+        }`}>
           {/* Language Selector */}
-          <LanguageSelector />
+          <div className={isScrolled ? 'scale-90' : 'scale-100'} style={{ transition: 'transform 0.3s ease-in-out' }}>
+            <LanguageSelector />
+          </div>
           
           {isAuthenticated ? (
             <div className="relative">
@@ -732,14 +787,15 @@ const Navbar = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
-                transition: 'all 0.25s ease',
+                transition: 'all 0.3s ease-in-out',
                 background: 'radial-gradient(65.28% 65.28% at 50% 100%, rgba(223, 113, 255, 0.8) 0%, rgba(223, 113, 255, 0) 100%), linear-gradient(0deg, #7a5af8, #7a5af8)',
                 borderRadius: '0.75rem',
                 border: 'none',
                 outline: 'none',
-                padding: '12px 18px',
-                width: '120px',
-                height: '48px'
+                padding: isScrolled ? '8px 14px' : '12px 18px',
+                width: isScrolled ? '100px' : '120px',
+                height: isScrolled ? '40px' : '48px',
+                fontSize: isScrolled ? '13px' : '14px'
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -764,7 +820,11 @@ const Navbar = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2.5"
-                  style={{ width: '24px', height: '18px' }}
+                  style={{ 
+                    width: isScrolled ? '20px' : '24px', 
+                    height: isScrolled ? '16px' : '18px',
+                    transition: 'all 0.3s ease-in-out'
+                  }}
                 >
                   <path d="m15.626 11.769a6 6 0 1 0 -7.252 0 9.008 9.008 0 0 0 -5.374 8.231 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 9.008 9.008 0 0 0 -5.374-8.231zm-7.626-4.769a4 4 0 1 1 4 4 4 4 0 0 1 -4-4zm10 14h-12a1 1 0 0 1 -1-1 7 7 0 0 1 14 0 1 1 0 0 1 -1 1z"></path>
                 </svg>
@@ -773,35 +833,6 @@ const Navbar = () => {
             </button>
           )}
 
-        </div>
-      </div>
-      
-      {/* Smooth Scroll Progress Bar */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 z-[10001] h-1 bg-transparent pointer-events-none"
-        style={{ 
-          transform: 'translateY(100%)'
-        }}
-      >
-        <div
-          className="h-full relative overflow-hidden"
-          style={{
-            width: `${scrollProgress}%`,
-            background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 50%, #1E65AD 100%)',
-            backgroundSize: '200% 100%',
-            boxShadow: '0 -2px 10px rgba(30, 101, 173, 0.3)',
-            willChange: 'width',
-            transition: 'width 0.1s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
-          {/* Shimmer effect */}
-          <div
-            className="absolute inset-0 shimmer opacity-60"
-            style={{
-              width: '100%',
-              height: '100%'
-            }}
-          />
         </div>
       </div>
       

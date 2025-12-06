@@ -745,303 +745,36 @@ const Bookmarks = ({ onBack }) => {
       {/* Tab Content */}
       {activeTab === 'bookmarks' && (
         <>
-          {/* Search and Filters */}
-          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-200">
-            <div className="flex flex-col gap-3">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
+          {/* Search and Filters - Exact Notes Style */}
+          <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search bookmarks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
+                  className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
               </div>
-
-              {/* Filters Row */}
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 sm:space-x-0">
-                {/* Sort */}
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="flex-1 sm:flex-initial px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm bg-white min-w-[120px]"
-                  style={{ fontFamily: 'Roboto, sans-serif' }}
-                >
-                  <option value="recent">Most Recent</option>
-                  <option value="name">Name A-Z</option>
-                  <option value="date">Date Added</option>
-                  <option value="type">Type</option>
-                </select>
-
-                {/* Filter */}
-                <select
-                  value={filterType}
-                  onChange={(e) => handleFilterChange('type', e.target.value)}
-                  className="flex-1 sm:flex-initial px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm bg-white min-w-[120px]"
-                  style={{ fontFamily: 'Roboto, sans-serif' }}
-                >
-                  <option value="all">All Types</option>
-                  <option value="judgement">Judgements</option>
-                  <option value="central_act">Central Acts</option>
-                  <option value="state_act">State Acts</option>
-                  <option value="bsa_iea_mapping">BSA-IEA Mappings</option>
-                  <option value="bns_ipc_mapping">BNS-IPC Mappings</option>
-                </select>
-
-                {/* View Mode */}
-                <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`p-2 sm:p-2.5 transition-colors ${
-                      viewMode === 'grid' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'text-gray-600 hover:bg-gray-50 bg-white'
-                    }`}
-                    title="Grid View"
-                  >
-                    <Grid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`p-2 sm:p-2.5 transition-colors border-l border-gray-300 ${
-                      viewMode === 'list' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'text-gray-600 hover:bg-gray-50 bg-white'
-                    }`}
-                    title="List View"
-                  >
-                    <List className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </button>
-                </div>
-
-                {/* Advanced Filters Toggle */}
-                <button
-                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                  className={`flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 border rounded-lg transition-all duration-200 ${
-                    showAdvancedFilters
-                      ? 'bg-blue-50 border-blue-300 text-blue-700'
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
-                  style={{ fontFamily: 'Roboto, sans-serif' }}
-                >
-                  <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-                  <span className="text-xs sm:text-sm font-medium">Advanced</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-      {/* Advanced Filters Panel */}
-      {showAdvancedFilters && (
-        <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-4 sm:mb-5">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>Advanced Filters</h3>
-            <button
-              onClick={() => setShowAdvancedFilters(false)}
-              className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="h-4 w-4 sm:h-5 sm:w-5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {/* Date Range */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Date Range</label>
-              <div className="space-y-2">
-                <input
-                  type="date"
-                  value={advancedFilters.dateRange.from}
-                  onChange={(e) => handleDateRangeChange('from', e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="From date"
-                />
-                <input
-                  type="date"
-                  value={advancedFilters.dateRange.to}
-                  onChange={(e) => handleDateRangeChange('to', e.target.value)}
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="To date"
-                />
-              </div>
-            </div>
-
-            {/* Court Filter (for judgments) */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Court</label>
-              <input
-                type="text"
-                value={advancedFilters.court}
-                onChange={(e) => handleAdvancedFilterChange('court', e.target.value)}
-                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., Supreme Court"
-              />
-            </div>
-
-            {/* Ministry Filter (for acts) */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Ministry</label>
-              <input
-                type="text"
-                value={advancedFilters.ministry}
-                onChange={(e) => handleAdvancedFilterChange('ministry', e.target.value)}
-                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., Ministry of Law"
-              />
-            </div>
-
-            {/* Year Filter */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Year</label>
-              <input
-                type="number"
-                value={advancedFilters.year}
-                onChange={(e) => handleAdvancedFilterChange('year', e.target.value)}
-                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., 2024"
-                min="1900"
-                max="2030"
-              />
-            </div>
-
-            {/* Favorite Filter */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Favorites</label>
               <select
-                value={advancedFilters.isFavorite === null ? '' : advancedFilters.isFavorite.toString()}
-                onChange={(e) => handleAdvancedFilterChange('isFavorite', e.target.value === '' ? null : e.target.value === 'true')}
-                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={filterType}
+                onChange={(e) => handleFilterChange('type', e.target.value)}
+                className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
+                style={{ fontFamily: 'Roboto, sans-serif' }}
               >
-                <option value="">All</option>
-                <option value="true">Favorites Only</option>
-                <option value="false">Non-Favorites Only</option>
+                <option value="all">All Types</option>
+                <option value="judgement">Judgements</option>
+                <option value="central_act">Central Acts</option>
+                <option value="state_act">State Acts</option>
+                <option value="bsa_iea_mapping">BSA-IEA Mappings</option>
+                <option value="bns_ipc_mapping">BNS-IPC Mappings</option>
               </select>
             </div>
-
-            {/* Tags Filter */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Tags</label>
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="Add tag filter"
-                  className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      const tag = e.target.value.trim();
-                      if (tag && !advancedFilters.tags.includes(tag)) {
-                        handleTagFilterChange(tag);
-                        e.target.value = '';
-                      }
-                    }
-                  }}
-                />
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {advancedFilters.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm"
-                    >
-                      {tag}
-                      <button
-                        onClick={() => handleTagFilterChange(tag)}
-                        className="ml-1 text-blue-600 hover:text-blue-800"
-                      >
-                        <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Filter Actions */}
-          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-3 sm:gap-0 mt-4 sm:mt-6 pt-4 border-t border-gray-200">
-            <button
-              onClick={clearAllFilters}
-              className="px-3 sm:px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium text-xs sm:text-sm w-full sm:w-auto"
-              style={{ fontFamily: 'Roboto, sans-serif' }}
-            >
-              Clear All
-            </button>
-            <button
-              onClick={applyFilters}
-              className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-xs sm:text-sm shadow-sm w-full sm:w-auto"
-              style={{ fontFamily: 'Roboto, sans-serif' }}
-            >
-              Apply Filters
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Active Filters Display */}
-      {(filterType !== 'all' || searchQuery || advancedFilters.dateRange.from || advancedFilters.dateRange.to || 
-        advancedFilters.court || advancedFilters.ministry || advancedFilters.year || 
-        advancedFilters.tags.length > 0 || advancedFilters.isFavorite !== null) && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xs sm:text-sm font-medium text-blue-800">Active Filters:</h3>
-            <button
-              onClick={clearAllFilters}
-              className="text-xs text-blue-600 hover:text-blue-800 underline"
-            >
-              Clear All
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {filterType !== 'all' && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                Type: {filterType.replace('_', ' ')}
-              </span>
-            )}
-            {searchQuery && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                Search: "{searchQuery}"
-              </span>
-            )}
-            {advancedFilters.dateRange.from && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                From: {new Date(advancedFilters.dateRange.from).toLocaleDateString()}
-              </span>
-            )}
-            {advancedFilters.dateRange.to && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                To: {new Date(advancedFilters.dateRange.to).toLocaleDateString()}
-              </span>
-            )}
-            {advancedFilters.court && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                Court: {advancedFilters.court}
-              </span>
-            )}
-            {advancedFilters.ministry && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                Ministry: {advancedFilters.ministry}
-              </span>
-            )}
-            {advancedFilters.year && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                Year: {advancedFilters.year}
-              </span>
-            )}
-            {advancedFilters.tags.map((tag, index) => (
-              <span key={index} className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                Tag: {tag}
-              </span>
-            ))}
-            {advancedFilters.isFavorite !== null && (
-              <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800">
-                {advancedFilters.isFavorite ? 'Favorites Only' : 'Non-Favorites Only'}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Folders */}
       {!currentFolder && (
@@ -1142,8 +875,38 @@ const Bookmarks = ({ onBack }) => {
         </div>
       )}
 
-      {/* Bookmarks Grid/List */}
+      {/* Bookmarks Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {/* Header with Title and View Mode */}
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-base sm:text-lg font-semibold truncate flex-1 min-w-0" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+            <span className="hidden sm:inline">{currentFolder ? `${currentFolder.name} Bookmarks` : 'All Bookmarks'}</span>
+            <span className="sm:hidden">{currentFolder ? currentFolder.name : 'All Bookmarks'}</span>
+            <span className="ml-1 sm:ml-2">({sortedBookmarks.length})</span>
+          </h2>
+          <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+                viewMode === 'grid' ? 'bg-blue-100' : 'hover:bg-gray-100'
+              }`}
+              style={{ color: viewMode === 'grid' ? '#1E65AD' : '#6B7280' }}
+              title="Grid View"
+            >
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+                viewMode === 'list' ? 'bg-blue-100' : 'hover:bg-gray-100'
+              }`}
+              style={{ color: viewMode === 'list' ? '#1E65AD' : '#6B7280' }}
+              title="List View"
+            >
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+          </div>
+        </div>
         {loading && bookmarks.length === 0 ? (
           <div className="p-8 sm:p-12 md:p-16 text-center">
             <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 text-blue-600 mx-auto mb-3 sm:mb-4 animate-spin" />

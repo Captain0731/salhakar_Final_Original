@@ -637,6 +637,7 @@
         <div 
           id="main-scroll-area"
           className="h-screen overflow-y-auto"
+          style={{ scrollBehavior: 'smooth', scrollPaddingTop: '0' }}
         >
         
         {/* Enhanced Header Section */}

@@ -6,7 +6,8 @@ import {
   Code, Image, BookOpen, Globe, Copy, ThumbsUp, 
   ThumbsDown, Save, MoreVertical, ArrowLeft, RefreshCw, 
   Edit, Paperclip, ChevronRight, HelpCircle, Building2, 
-  SquareStack, Lightbulb, Settings, Share2, Shuffle, Square
+  SquareStack, Lightbulb, Settings, Share2, Shuffle, Square,
+  Plus, Search, FolderOpen, MessageSquare, ChevronLeft, Menu
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -27,6 +28,23 @@ export default function LegalChatbot() {
   const audioChunksRef = useRef([]);
   const fileInputRef = useRef(null);
   const abortControllerRef = useRef(null);
+  
+  // Sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Mock chat history
+  const [chatHistory] = useState([
+    { id: 1, title: 'Property Registration Query', date: 'Today', messages: 5 },
+    { id: 2, title: 'Tenant Rights Discussion', date: 'Yesterday', messages: 8 },
+    { id: 3, title: 'Consumer Complaint Process', date: '2 days ago', messages: 12 },
+    { id: 4, title: 'Business Registration Help', date: '3 days ago', messages: 6 },
+    { id: 5, title: 'Divorce Proceedings Info', date: 'Last week', messages: 15 },
+  ]);
+  
+  const filteredChats = chatHistory.filter(chat => 
+    chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const quickQuestions = [
     "What are my rights as a tenant?",
@@ -52,18 +70,21 @@ export default function LegalChatbot() {
   }, []);
 
   const scrollToBottom = useCallback(() => {
-    // Use requestAnimationFrame to ensure DOM is updated
+    // Use requestAnimationFrame to ensure DOM is updated - fast scroll
     requestAnimationFrame(() => {
       setTimeout(() => {
-        // Try scrolling the messages container first
+        // Try scrolling the messages container first - fast smooth scroll
         if (messagesContainerRef.current) {
-          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+          messagesContainerRef.current.scrollTo({
+            top: messagesContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
         }
-        // Also try scrolling to the end ref element
+        // Also try scrolling to the end ref element - fast smooth scroll
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
         }
-      }, 150);
+      }, 50); // Reduced timeout for faster response
     });
   }, []);
 
@@ -393,6 +414,10 @@ export default function LegalChatbot() {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const handleNewChat = () => {
+    clearChat();
+  };
+
   const regenerate = async (messageId) => {
     // Find the user message that triggered this bot response
     const botMessageIndex = messages.findIndex(m => m.id === messageId);
@@ -441,13 +466,150 @@ export default function LegalChatbot() {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="h-screen flex flex-col overflow-hidden overflow-x-hidden" style={{ backgroundColor: '#F9FAFC', scrollBehavior: 'smooth' }}>
       <Navbar />
 
-      {/* Modern Chat Interface */}
-      <div className="flex-1 flex flex-col pt-14 sm:pt-16 md:pt-20 w-full overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
-        {/* Chat Interface - Always Show */}
-        <motion.div
+      {/* Main Layout with Sidebar */}
+      <div className="flex-1 flex pt-14 sm:pt-16 md:pt-20 w-full overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
+        
+        {/* Sidebar */}
+        <div 
+          className={`${sidebarOpen ? 'w-72' : 'w-16'} transition-all duration-300 ease-in-out flex-shrink-0 hidden sm:block`}
+          style={{ backgroundColor: '#FFFFFF', borderRight: '1px solid #E5E7EB' }}
+        >
+          <div className="h-full flex flex-col">
+            {/* Sidebar Header - Toggle Button */}
+            <div className="p-3 border-b flex justify-end" style={{ borderColor: '#E5E7EB' }}>
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-100"
+                title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              >
+                {sidebarOpen ? (
+                  <ChevronLeft className="w-5 h-5" style={{ color: '#6B7280' }} />
+                ) : (
+                  <Menu className="w-5 h-5" style={{ color: '#6B7280' }} />
+                )}
+              </button>
+            </div>
+
+            {/* New Chat Button */}
+            <div className={`${sidebarOpen ? 'p-4' : 'p-2'} border-b`} style={{ borderColor: '#E5E7EB' }}>
+              <button
+                onClick={handleNewChat}
+                className={`${sidebarOpen ? 'w-full flex items-center gap-3 px-4 py-3' : 'w-10 h-10 flex items-center justify-center mx-auto'} rounded-xl transition-all duration-200 hover:shadow-md`}
+                style={{ 
+                  background: 'linear-gradient(135deg, #1E65AD 0%, #2A7BC8 100%)',
+                  color: '#FFFFFF'
+                }}
+                title="New Chat"
+              >
+                <Plus className="w-5 h-5" />
+                {sidebarOpen && <span className="font-semibold" style={{ fontFamily: 'Heebo, sans-serif' }}>New Chat</span>}
+              </button>
+            </div>
+
+            {/* Search */}
+            <div className={`${sidebarOpen ? 'p-4' : 'p-2'}`}>
+              {sidebarOpen ? (
+                <div 
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl"
+                  style={{ backgroundColor: '#F3F4F6' }}
+                >
+                  <Search className="w-4 h-4" style={{ color: '#8C969F' }} />
+                  <input
+                    type="text"
+                    placeholder="Search chats..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1 bg-transparent border-none outline-none text-sm"
+                    style={{ 
+                      fontFamily: 'Heebo, sans-serif',
+                      color: '#374151'
+                    }}
+                  />
+                </div>
+              ) : (
+                <button
+                  className="w-10 h-10 flex items-center justify-center mx-auto rounded-xl transition-all duration-200 hover:bg-gray-100"
+                  title="Search Chats"
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  <Search className="w-5 h-5" style={{ color: '#8C969F' }} />
+                </button>
+              )}
+            </div>
+
+            {/* Chat History */}
+            <div className="flex-1 overflow-y-auto px-2 pb-4">
+              {sidebarOpen ? (
+                <div className="mb-3 px-1">
+                  <div className="flex items-center gap-2 px-2 py-2">
+                    <FolderOpen className="w-4 h-4" style={{ color: '#8C969F' }} />
+                    <span 
+                      className="text-xs font-semibold uppercase tracking-wide"
+                      style={{ color: '#8C969F', fontFamily: 'Heebo, sans-serif' }}
+                    >
+                      Your Chats
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    {filteredChats.map((chat) => (
+                      <button
+                        key={chat.id}
+                        className="w-full flex items-start gap-3 px-3 py-3 rounded-xl transition-all duration-200 hover:bg-gray-50 text-left group"
+                      >
+                        <MessageSquare 
+                          className="w-4 h-4 mt-0.5 flex-shrink-0" 
+                          style={{ color: '#1E65AD' }} 
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p 
+                            className="text-sm font-medium truncate"
+                            style={{ color: '#374151', fontFamily: 'Heebo, sans-serif' }}
+                          >
+                            {chat.title}
+                          </p>
+                          <p 
+                            className="text-xs mt-0.5"
+                            style={{ color: '#8C969F', fontFamily: 'Heebo, sans-serif' }}
+                          >
+                            {chat.date} · {chat.messages} messages
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <div
+                    className="w-10 h-10 flex items-center justify-center rounded-xl"
+                    title="Your Chats"
+                  >
+                    <FolderOpen className="w-5 h-5" style={{ color: '#8C969F' }} />
+                  </div>
+                  {/* Show chat icons when collapsed */}
+                  {filteredChats.slice(0, 5).map((chat) => (
+                    <div
+                      key={chat.id}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200 hover:bg-gray-100 cursor-pointer"
+                      title={chat.title}
+                    >
+                      <MessageSquare className="w-4 h-4" style={{ color: '#1E65AD' }} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: '#F9FAFC' }}>
+          {/* Chat Interface - Always Show */}
+          <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
@@ -458,112 +620,112 @@ export default function LegalChatbot() {
           >
           {/* Messages Container - Modern Chat Layout */}
                 <div 
+                  id="chatbot-scroll-area"
                   ref={messagesContainerRef}
-                  className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8 md:py-10 lg:py-12 pb-28 sm:pb-8 md:pb-10 lg:pb-12 space-y-5 sm:space-y-6 md:space-y-8 w-auto h-auto"
+                  className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-6 sm:py-8 md:py-10 lg:py-12 pb-32 sm:pb-32 md:pb-36 lg:pb-40 space-y-5 sm:space-y-6 md:space-y-8 w-auto h-auto"
                   style={{ 
                     scrollbarWidth: 'thin',
                     scrollbarColor: '#CBD5E1 #F9FAFC',
-                    backgroundColor: '#F9FAFC'
+                    backgroundColor: '#F9FAFC',
+                    scrollBehavior: 'smooth',
+                    scrollPaddingTop: '0'
                   }}
                 >
                   <AnimatePresence>
                     {messages.map((message, index) => (
                       <motion.div
-                      key={message.id}
-                        initial={{ opacity: 0, y: 10 }}
+                        key={message.id}
+                        initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                        transition={{ duration: 0.4, delay: index * 0.05 }}
+                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                {message.sender === 'user' ? (
-                          /* User Message - Modern Bubble Design */
-                          <div className="max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%] ml-auto flex items-end justify-end">
+                        {message.sender === 'user' ? (
+                          /* User Message - Brand Blue Bubble */
+                          <div className="max-w-[80%] sm:max-w-[70%] md:max-w-[60%] flex items-end gap-2">
                             <div 
-                              className="rounded-2xl sm:rounded-3xl px-4 sm:px-5 py-3 sm:py-3.5 shadow-lg" 
+                              className="rounded-2xl rounded-br-md px-5 py-3.5" 
                               style={{ 
-                                background: 'linear-gradient(135deg,rgb(200, 200, 200) 0%,rgb(109, 110, 111) 100%)',
-                                border: 'none',
-                                boxShadow: '0 4px 12px rgba(30, 101, 173, 0.25)'
+                                background: 'linear-gradient(135deg, #1E65AD 0%, #2A7BC8 100%)',
+                                boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)'
                               }}
                             >
-                              <p className="text-sm sm:text-base leading-relaxed break-words" style={{ 
-                        fontFamily: "'Heebo', sans-serif",
+                              <p style={{ 
+                                fontFamily: "'Heebo', sans-serif",
                                 color: '#FFFFFF',
                                 fontSize: '15px',
-                                lineHeight: '1.7',
+                                lineHeight: '1.6',
                                 fontWeight: '400'
-                      }}>
-                        {message.text}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                          /* AI Response - Modern Card Design */
-                          <div className="flex items-start">
-                            <div className="inline-block max-w-[85%] sm:max-w-[75%] md:max-w-[70%] lg:max-w-[65%]">
-                              <div className="rounded-2xl sm:rounded-3xl bg-white shadow-lg overflow-hidden border border-gray-100 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3" style={{
-                                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04)'
                               }}>
-                      {/* AI Response Content */}
-                                <div>
-                        <div 
-                                    className="text-sm sm:text-base leading-relaxed break-words" 
-                          style={{ 
-                            fontFamily: "'Heebo', sans-serif", 
-                                      color: '#1F2937',
-                                      fontSize: '15px',
-                                      lineHeight: '1.6'
-                          }}
-                              >
+                                {message.text}
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          /* AI Response - Simple Bubble */
+                          <div className="max-w-[85%] sm:max-w-[80%] md:max-w-[70%]">
+                            <div 
+                              className="rounded-2xl px-5 py-4"
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)'
+                              }}
+                            >
+                              <div style={{ 
+                                fontFamily: "'Heebo', sans-serif", 
+                                color: '#374151',
+                                fontSize: '15px',
+                                lineHeight: '1.7'
+                              }}>
                                 <ReactMarkdown
                                   components={{
-                              p: ({ children }) => <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }}>{children}</p>,
-                              h1: ({ children }) => <h1 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.375rem', marginTop: '0.5rem', color: '#1F2937' }}>{children}</h1>,
-                              h2: ({ children }) => <h2 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.375rem', marginTop: '0.5rem', color: '#1F2937' }}>{children}</h2>,
-                              h3: ({ children }) => <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.25rem', marginTop: '0.375rem', color: '#1F2937' }}>{children}</h3>,
-                              ul: ({ children }) => <ul style={{ marginLeft: '1rem', marginBottom: '0.5rem', marginTop: '0.5rem', listStyleType: 'disc' }}>{children}</ul>,
-                              ol: ({ children }) => <ol style={{ marginLeft: '1rem', marginBottom: '0.5rem', marginTop: '0.5rem', listStyleType: 'decimal' }}>{children}</ol>,
-                              li: ({ children }) => <li style={{ marginBottom: '0.25rem', color: '#1F2937' }}>{children}</li>,
+                                    p: ({ children }) => <p style={{ marginBottom: '0.5rem', marginTop: '0' }}>{children}</p>,
+                                    h1: ({ children }) => <h1 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', marginTop: '1rem', color: '#1F2937' }}>{children}</h1>,
+                                    h2: ({ children }) => <h2 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', marginTop: '0.75rem', color: '#1F2937' }}>{children}</h2>,
+                                    h3: ({ children }) => <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.375rem', marginTop: '0.5rem', color: '#1F2937' }}>{children}</h3>,
+                                    ul: ({ children }) => <ul style={{ marginLeft: '1.25rem', marginBottom: '0.75rem', marginTop: '0.5rem', listStyleType: 'disc' }}>{children}</ul>,
+                                    ol: ({ children }) => <ol style={{ marginLeft: '1.25rem', marginBottom: '0.75rem', marginTop: '0.5rem', listStyleType: 'decimal' }}>{children}</ol>,
+                                    li: ({ children }) => <li style={{ marginBottom: '0.375rem', color: '#374151', paddingLeft: '0.25rem' }}>{children}</li>,
                                     code: ({ children, className }) => {
                                       const isInline = !className;
                                       return isInline ? (
                                         <code style={{ 
-                                    backgroundColor: '#F3F4F6', 
-                                    padding: '0.125rem 0.375rem', 
-                                          borderRadius: '0.25rem',
+                                          backgroundColor: '#F3F4F6', 
+                                          padding: '0.2rem 0.4rem', 
+                                          borderRadius: '0.375rem',
                                           fontSize: '0.875em',
                                           fontFamily: 'monospace',
-                                    color: '#1F2937'
+                                          color: '#1E65AD'
                                         }}>{children}</code>
                                       ) : (
                                         <code style={{ 
                                           display: 'block',
-                                    backgroundColor: '#F9FAFB', 
-                                    padding: '0.5rem', 
-                                    borderRadius: '0.375rem',
+                                          backgroundColor: '#F8FAFC', 
+                                          padding: '0.75rem', 
+                                          borderRadius: '0.5rem',
                                           fontSize: '0.8125em',
                                           fontFamily: 'monospace',
                                           overflowX: 'auto',
-                                    marginTop: '0.5rem',
-                                    marginBottom: '0.5rem',
-                                    color: '#1F2937',
-                                    border: '1px solid #E5E7EB'
+                                          marginTop: '0.5rem',
+                                          marginBottom: '0.5rem',
+                                          color: '#1F2937',
+                                          border: '1px solid #E5E7EB'
                                         }}>{children}</code>
                                       );
                                     },
                                     blockquote: ({ children }) => (
                                       <blockquote style={{ 
-                                  borderLeft: '3px solid #E5E7EB', 
-                                  paddingLeft: '0.75rem', 
+                                        borderLeft: '3px solid #1E65AD', 
+                                        paddingLeft: '1rem', 
                                         marginLeft: '0',
-                                  marginTop: '0.5rem',
-                                  marginBottom: '0.5rem',
-                                  color: '#6B7280',
-                                  backgroundColor: '#F9FAFB',
-                                  padding: '0.5rem 0.75rem',
-                                        borderRadius: '0.25rem',
-                                        fontSize: '0.875rem'
+                                        marginTop: '0.75rem',
+                                        marginBottom: '0.75rem',
+                                        color: '#6B7280',
+                                        backgroundColor: '#F8FAFC',
+                                        padding: '0.75rem 1rem',
+                                        borderRadius: '0 0.5rem 0.5rem 0',
+                                        fontSize: '0.9375rem'
                                       }}>{children}</blockquote>
                                     ),
                                     a: ({ href, children }) => (
@@ -572,229 +734,280 @@ export default function LegalChatbot() {
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                         style={{ 
-                                              color: '#1E65AD', 
-                                          textDecoration: 'underline',
-                                              textDecorationColor: '#CF9B63',
-                                              textUnderlineOffset: '2px',
-                                              wordBreak: 'break-all',
-                                              fontWeight: '500'
+                                          color: '#1E65AD', 
+                                          textDecoration: 'none',
+                                          fontWeight: '500',
+                                          borderBottom: '1px solid #1E65AD'
                                         }}
-                                            onMouseEnter={(e) => e.target.style.color = '#1a5a9a'}
-                                            onMouseLeave={(e) => e.target.style.color = '#1E65AD'}
                                       >
                                         {children}
                                       </a>
                                     ),
-                              strong: ({ children }) => <strong style={{ fontWeight: '600', color: '#1F2937' }}>{children}</strong>,
-                                    em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
+                                    strong: ({ children }) => <strong style={{ fontWeight: '600', color: '#1F2937' }}>{children}</strong>,
+                                    em: ({ children }) => <em style={{ fontStyle: 'italic', color: '#4B5563' }}>{children}</em>,
                                   }}
                                 >
                                   {message.text}
                                 </ReactMarkdown>
-                                  </div>
                               </div>
-                      </div>
-                      </div>
-                    </div>
-                )}
+                            </div>
+                          </div>
+                        )}
                       </motion.div>
                     ))}
                   </AnimatePresence>
                   
-                   {/* Modern Typing Indicator */}
+                   {/* Typing Indicator */}
                    {isTyping && (
                      <motion.div
                        initial={{ opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
-                       className="flex items-start"
+                       className="flex justify-start"
                      >
-                       <div>
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <motion.div 
-                            className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full"
-                            style={{ backgroundColor: '#1E65AD' }}
-                            animate={{ y: [0, -8, 0] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                          />
-                          <motion.div 
-                            className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full"
-                            style={{ backgroundColor: '#1E65AD' }}
-                            animate={{ y: [0, -8, 0] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
-                          />
-                          <motion.div 
-                            className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full"
-                            style={{ backgroundColor: '#1E65AD' }}
-                            animate={{ y: [0, -8, 0] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
-                          />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
+                       <div 
+                         className="inline-flex items-center gap-1.5 px-5 py-4 rounded-2xl"
+                         style={{
+                           backgroundColor: '#FFFFFF',
+                           boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)'
+                         }}
+                       >
+                         <motion.div 
+                           className="w-2 h-2 rounded-full"
+                           style={{ backgroundColor: '#1E65AD' }}
+                           animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
+                           transition={{ duration: 0.8, repeat: Infinity, delay: 0 }}
+                         />
+                         <motion.div 
+                           className="w-2 h-2 rounded-full"
+                           style={{ backgroundColor: '#1E65AD' }}
+                           animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
+                           transition={{ duration: 0.8, repeat: Infinity, delay: 0.2 }}
+                         />
+                         <motion.div 
+                           className="w-2 h-2 rounded-full"
+                           style={{ backgroundColor: '#1E65AD' }}
+                           animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
+                           transition={{ duration: 0.8, repeat: Infinity, delay: 0.4 }}
+                         />
+                       </div>
+                     </motion.div>
+                   )}
                   
                   <div ref={messagesEndRef} />
                 </div>
 
-            {/* Modern Input Area - Bottom Fixed */}
-            <div className="fixed sm:relative bottom-0 left-0 right-0 sm:left-auto sm:right-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-4 sm:py-5 md:py-6 pb-4 sm:pb-6 md:pb-8 lg:pb-10 z-50 mobile-input-safe-area" style={{ 
-              backgroundColor: 'transparent',
-              border: 'none',
-              boxShadow: 'none'
-            }}>
-              {/* Voice Recording Waveform Indicator */}
-              {isRecording && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-3xl mx-auto mb-4 sm:mb-5 flex items-center justify-center gap-1.5 sm:gap-2 px-4"
-                >
-                  <div className="flex items-center gap-1 sm:gap-1.5">
-                    {[...Array(20)].map((_, i) => (
-                      <motion.div
-                      key={i}
-                        className="w-1 sm:w-1.5 rounded-full"
-                        style={{ backgroundColor: '#1E65AD', height: '20px' }}
-                        animate={{
-                          height: [`${Math.random() * 15 + 10}px`, `${Math.random() * 25 + 15}px`, `${Math.random() * 15 + 10}px`],
-                        }}
-                        transition={{
-                          duration: 0.5 + Math.random() * 0.3,
-                          repeat: Infinity,
-                          delay: i * 0.05
-                      }}
-                    />
-                  ))}
-                </div>
-                  <span className="ml-3 text-xs sm:text-sm font-medium" style={{ color: '#1E65AD', fontFamily: "'Heebo', sans-serif" }}>
-                    Listening...
-                  </span>
-                </motion.div>
-              )}
-              
-              {/* Modern Input Box */}
-              <div className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] max-w-3xl mx-auto">
+            {/* Modern Input Area - Fixed Bottom */}
+            <div 
+              className={`fixed bottom-0 right-0 left-0 px-4 sm:px-6 md:px-8 py-3 sm:py-4 z-50 transition-all duration-300`}
+              style={{ 
+                backgroundColor: 'transparent'
+              }}
+            >
+              {/* White Input Bar with Border & Shadow */}
+              <div className="w-full max-w-4xl mx-auto">
                 <div 
-                  className="relative rounded-2xl sm:rounded-3xl transition-all duration-300"
+                  className="relative rounded-2xl transition-all duration-300"
                   style={{ 
                     backgroundColor: '#FFFFFF',
-                    border: '2px solid #E5E7EB',
-                    minHeight: '64px',
-                    height: 'auto',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04)'
+                    border: '2px solid #1E65AD',
+                    boxShadow: '0 4px 20px rgba(30, 101, 173, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08)'
                   }}
                 >
-                  <div className="flex items-center h-[64px] sm:h-[72px] px-4 sm:px-5 md:px-6">
-                    {/* Search Icon */}
-                    <div className="flex items-center flex-shrink-0 mr-2 sm:mr-3">
+                  <div className="flex items-center h-14 px-3">
+                    {/* Animated Orb Icon */}
+                    <div className="flex items-center justify-center w-12 h-12 flex-shrink-0">
                       <img 
                         src="/uit3.GIF" 
-                        alt="Search" 
-                        className="w-20 h-20 sm:w-6 sm:h-6 object-contain"
-                        style={{ maxWidth: '100%', height: 'auto' }}
+                        alt="AI" 
+                        className="w-10 h-10 object-contain"
                       />
-                        </div>
+                    </div>
 
-                    {/* Input Field */}
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Ask anything about legal matters..."
-                      className="flex-1 h-full bg-transparent border-none outline-none text-sm sm:text-base placeholder-gray-400 focus:placeholder-gray-300"
-                      style={{ 
-                        fontFamily: "'Heebo', sans-serif",
-                        color: '#1F2937',
-                        fontSize: '16px'
-                      }}
-                      disabled={loading || isProcessingVoice}
-                    />
+                    {/* Input Field or Recording Waveform */}
+                    {isRecording ? (
+                      <div className="flex-1 h-full flex items-center justify-center ml-2">
+                        <div className="flex items-center gap-1">
+                          {[...Array(30)].map((_, i) => (
+                            <motion.div
+                              key={i}
+                              className="w-1 rounded-full"
+                              style={{ backgroundColor: '#1E65AD' }}
+                              animate={{
+                                height: [
+                                  `${Math.random() * 4 + 2}px`,
+                                  `${Math.random() * 20 + 10}px`,
+                                  `${Math.random() * 4 + 2}px`
+                                ],
+                              }}
+                              transition={{
+                                duration: 0.4 + Math.random() * 0.3,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                                delay: i * 0.03
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Ask anything"
+                        className="flex-1 h-full bg-transparent border-none outline-none text-base ml-2 placeholder-gray-400"
+                        style={{ 
+                          fontFamily: "'Heebo', sans-serif",
+                          color: '#1F2937',
+                          fontSize: '15px'
+                        }}
+                        disabled={loading || isProcessingVoice}
+                      />
+                    )}
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-                      <button 
-                        onClick={() => fileInputRef.current?.click()}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200" 
-                        title="Attach file"
-                        disabled={loading || isProcessingVoice}
-                        style={{ color: '#6B7280' }}
-                      >
-                        <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* File Attach Button */}
                       <button
-                        onClick={isRecording ? stopRecording : startRecording}
+                        onClick={() => fileInputRef.current?.click()}
                         disabled={loading || isProcessingVoice}
-                        className={`p-2 rounded-lg transition-all duration-200 ${
-                          isRecording ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-100'
-                        }`}
-                        title={isRecording ? "Stop recording" : "Voice input"}
-                        style={{ color: isRecording ? '#EF4444' : '#6B7280' }}
-                    >
-                      {isRecording ? (
-                          <MicOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                        ) : (
-                          <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
-                        )}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-blue-50"
+                        title="Attach file"
+                      >
+                        <Paperclip className="w-5 h-5" style={{ color: '#1E65AD' }} />
                       </button>
+
+                      {/* Microphone Button */}
+                      {isRecording ? (
+                        <motion.button
+                          onClick={stopRecording}
+                          className="w-9 h-9 rounded-lg flex items-center justify-center relative"
+                          style={{ backgroundColor: '#FEE2E2' }}
+                          animate={{ 
+                            scale: [1, 1.1, 1],
+                            boxShadow: [
+                              '0 0 0 0 rgba(239, 68, 68, 0.4)',
+                              '0 0 0 10px rgba(239, 68, 68, 0)',
+                              '0 0 0 0 rgba(239, 68, 68, 0)'
+                            ]
+                          }}
+                          transition={{ 
+                            duration: 1.2, 
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                          title="Stop recording"
+                        >
+                          <motion.div
+                            animate={{ opacity: [1, 0.5, 1] }}
+                            transition={{ duration: 0.8, repeat: Infinity }}
+                          >
+                            <MicOff className="w-5 h-5" style={{ color: '#EF4444' }} />
+                          </motion.div>
+                        </motion.button>
+                      ) : (
+                        <button
+                          onClick={startRecording}
+                          disabled={loading || isProcessingVoice}
+                          className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-blue-50"
+                          title="Voice input"
+                        >
+                          <Mic className="w-5 h-5" style={{ color: '#1E65AD' }} />
+                        </button>
+                      )}
+
+                      {/* Send Button */}
                       {(loading || isTyping) ? (
                         <motion.button
                           onClick={handleStopGeneration}
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all"
-                          style={{ 
-                            background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                            color: 'white',
-                            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-                          }}
+                          className="w-9 h-9 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: '#EF4444' }}
                           title="Stop generation"
                         >
-                          <Square className="w-4 h-4 sm:w-5 sm:h-5" fill="white" />
+                          <Square className="w-4 h-4" fill="#FFFFFF" style={{ color: '#FFFFFF' }} />
                         </motion.button>
+                      ) : isRecording ? (
+                        <motion.div
+                          className="w-9 h-9 rounded-lg flex items-center justify-center"
+                          style={{ backgroundColor: '#1E65AD' }}
+                          animate={{ 
+                            scale: [1, 1.1, 1],
+                            boxShadow: [
+                              '0 0 0 0 rgba(30, 101, 173, 0.4)',
+                              '0 0 0 8px rgba(30, 101, 173, 0)',
+                              '0 0 0 0 rgba(30, 101, 173, 0)'
+                            ]
+                          }}
+                          transition={{ 
+                            duration: 1.5, 
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                          title="Recording..."
+                        >
+                          <motion.div
+                            className="flex items-center gap-0.5"
+                            animate={{ opacity: [0.5, 1, 0.5] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                          >
+                            <motion.div 
+                              className="w-1 rounded-full bg-white"
+                              animate={{ height: ['8px', '14px', '8px'] }}
+                              transition={{ duration: 0.5, repeat: Infinity, delay: 0 }}
+                            />
+                            <motion.div 
+                              className="w-1 rounded-full bg-white"
+                              animate={{ height: ['14px', '8px', '14px'] }}
+                              transition={{ duration: 0.5, repeat: Infinity, delay: 0.1 }}
+                            />
+                            <motion.div 
+                              className="w-1 rounded-full bg-white"
+                              animate={{ height: ['8px', '14px', '8px'] }}
+                              transition={{ duration: 0.5, repeat: Infinity, delay: 0.2 }}
+                            />
+                          </motion.div>
+                        </motion.div>
                       ) : (
                         <motion.button
                           onClick={handleSendMessage}
                           disabled={isProcessingVoice || !inputMessage.trim()}
                           whileHover={{ scale: !isProcessingVoice && inputMessage.trim() ? 1.05 : 1 }}
                           whileTap={{ scale: !isProcessingVoice && inputMessage.trim() ? 0.95 : 1 }}
-                          className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-9 h-9 rounded-lg flex items-center justify-center transition-all"
                           style={{ 
-                            background: isProcessingVoice || !inputMessage.trim() 
-                              ? 'linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%)'
-                              : 'linear-gradient(135deg, #1E65AD 0%, #1a5a9a 100%)',
-                            color: 'white',
-                            boxShadow: isProcessingVoice || !inputMessage.trim()
-                              ? 'none'
-                              : '0 4px 12px rgba(30, 101, 173, 0.3)'
+                            backgroundColor: '#1E65AD'
                           }}
                           title="Send message"
                         >
                           {isProcessingVoice ? (
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           ) : (
-                            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <Send className="w-4 h-4" style={{ color: '#FFFFFF' }} />
                           )}
                         </motion.button>
                       )}
                     </div>
                   </div>
-
-                  {/* Hidden File Input */}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="audio/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      id="audio-file-input"
-                      disabled={loading || isProcessingVoice}
-                    />
-                    </div>
-                  </div>
                 </div>
-        </motion.div>
+              </div>
+              
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="audio/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="audio-file-input"
+                disabled={loading || isProcessingVoice}
+              />
+            </div>
+          </motion.div>
+        </div>
       </div>
 
       {/* Custom Styles */}

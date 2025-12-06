@@ -314,15 +314,42 @@ export default function LegalJudgments() {
         if (key === 'highCourt') {
           params.court_name = value;
         } else if (key === 'decisionDateFrom') {
+          // Validate date format (YYYY-MM-DD) before adding to params
+          if (value && value.trim() !== '' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
           params.decision_date_from = value;
+          } else if (value && value.trim() !== '') {
+            console.warn('Invalid decisionDateFrom format:', value, 'Expected YYYY-MM-DD');
+          }
+        } else if (key === 'decisionDateTo') {
+          // Validate date format (YYYY-MM-DD) before adding to params
+          if (value && value.trim() !== '' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            params.decision_date_to = value;
+          } else if (value && value.trim() !== '') {
+            console.warn('Invalid decisionDateTo format:', value, 'Expected YYYY-MM-DD');
+          }
+        } else if (key === 'decisionDate') {
+          // Validate date format before adding to params
+          if (value && value.trim() !== '' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            params.decision_date = value;
+          } else if (value && value.trim() !== '') {
+            console.warn('Invalid decisionDate format:', value, 'Expected YYYY-MM-DD');
+          }
         } else if (key === 'search') {
           // Search parameter - enable highlights for Elasticsearch (only for High Court)
           params.search = value;
           if (courtType === "highcourt") {
             params.highlight = true; // Enable highlights for full-text search
           }
+        } else if (key === 'disposalNature') {
+          params.disposal_nature = value;
+        } else if (key === 'judge' || key === 'cnr' || key === 'title') {
+          // Enable highlights for judge, CNR, and title searches (only for High Court)
+          params[key] = value;
+          if (courtType === "highcourt") {
+            params.highlight = true; // Enable highlights for field-specific searches
+          }
         } else {
-          // Direct mapping for: title, cnr, judge, petitioner, respondent
+          // Direct mapping for: petitioner, respondent, year
           params[key] = value;
         }
       });
@@ -383,16 +410,26 @@ export default function LegalJudgments() {
         throw new Error('Invalid API response: Expected object but got ' + typeof data);
       }
       
-      // Handle different response structures
+      // Handle different response structures with null safety
       let judgmentsArray = [];
+      if (data && data.data !== null && data.data !== undefined) {
       if (Array.isArray(data.data)) {
         judgmentsArray = data.data;
+        } else {
+          // If data.data exists but isn't an array, try to convert
+          console.warn(`${courtType}: API response data is not an array:`, data.data);
+          judgmentsArray = [];
+        }
       } else if (Array.isArray(data)) {
         // If API returns array directly
         judgmentsArray = data;
-      } else if (data.data) {
-        // If data.data exists but isn't an array, try to convert
-        console.warn(`${courtType}: API response data is not an array:`, data.data);
+      } else if (data && !data.data) {
+        // If data exists but data.data is null/undefined, set empty array
+        console.warn(`${courtType}: API response has no data field or data is null`);
+        judgmentsArray = [];
+      } else {
+        // Fallback: empty array
+        console.warn(`${courtType}: Unexpected API response structure:`, data);
         judgmentsArray = [];
       }
       
@@ -402,7 +439,8 @@ export default function LegalJudgments() {
       
       if (!isMountedRef.current) return;
       
-      const paginationInfo = data.pagination_info || {};
+      // Safely get pagination info
+      const paginationInfo = (data && data.pagination_info) ? data.pagination_info : {};
       
       if (isLoadMore) {
         setJudgments(prev => {
@@ -419,14 +457,14 @@ export default function LegalJudgments() {
         setJudgments(judgmentsArray);
       }
       
-      // Update cursor and hasMore based on API response
-      const newCursor = data.next_cursor || null;
+      // Update cursor and hasMore based on API response with null safety
+      const newCursor = (data && data.next_cursor) ? data.next_cursor : null;
       setNextCursor(newCursor);
       nextCursorRef.current = newCursor;
       setHasMore(paginationInfo.has_more !== false);
       
       // Handle Elasticsearch search metadata (only for High Court)
-      if (data.search_info && courtType === "highcourt") {
+      if (data && data.search_info && courtType === "highcourt") {
         setSearchInfo(data.search_info);
         // Update total count from search results if available
         if (data.search_info.total_matches !== undefined) {
@@ -768,6 +806,7 @@ export default function LegalJudgments() {
       <div 
         id="main-scroll-area"
         className="h-screen overflow-y-auto"
+        style={{ scrollBehavior: 'smooth', scrollPaddingTop: '0' }}
       >
       
       {/* Enhanced Header Section */}
@@ -1077,11 +1116,25 @@ export default function LegalJudgments() {
                 </label>
                 <input
                   type="date"
-                  value={filters.decisionDateFrom || ''}
+                  value={getInputValue('decisionDateFrom') || ''}
                   onChange={(e) => {
                     const newValue = e.target.value;
-                    handleFilterChange('decisionDateFrom', newValue);
+                    // HTML5 date input always returns YYYY-MM-DD format or empty string
+                    // Only update if it's a valid date or empty
+                    if (!newValue || /^\d{4}-\d{2}-\d{2}$/.test(newValue)) {
+                      handleFilterChange('decisionDateFrom', newValue || '');
+                    }
                   }}
+                  onFocus={() => handleInputFocus('decisionDateFrom')}
+                  onBlur={() => {
+                    handleInputBlur('decisionDateFrom');
+                    // Validate date format on blur
+                    const value = getInputValue('decisionDateFrom');
+                    if (value && value.trim() !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                      handleFilterChange('decisionDateFrom', '');
+                    }
+                  }}
+                  max={new Date().toISOString().split('T')[0]} // Prevent future dates
                   className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 />
@@ -1396,7 +1449,20 @@ export default function LegalJudgments() {
                                     </svg>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>CNR</p>
-                                      <p className="text-sm font-medium text-gray-900 font-mono truncate" style={{ fontFamily: 'Roboto Mono, monospace' }}>{judgment.cnr}</p>
+                                      <p 
+                                        className="text-sm font-medium text-gray-900 font-mono truncate" 
+                                        style={{ fontFamily: 'Roboto Mono, monospace' }}
+                                        dangerouslySetInnerHTML={{
+                                          __html: (() => {
+                                            // Display highlights if available (Elasticsearch search results)
+                                            if (judgment.highlights?.cnr && Array.isArray(judgment.highlights.cnr)) {
+                                              return judgment.highlights.cnr[0]; // Use first highlight fragment
+                                            }
+                                            // Fallback to regular CNR
+                                            return (judgment.cnr || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
+                                          })()
+                                        }}
+                                      />
                                     </div>
                                   </div>
                                 )}
@@ -1408,7 +1474,20 @@ export default function LegalJudgments() {
                                     </svg>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Judge</p>
-                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.judge}</p>
+                                      <p 
+                                        className="text-sm font-medium text-gray-900 line-clamp-1" 
+                                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                                        dangerouslySetInnerHTML={{
+                                          __html: (() => {
+                                            // Display highlights if available (Elasticsearch search results)
+                                            if (judgment.highlights?.judge && Array.isArray(judgment.highlights.judge)) {
+                                              return judgment.highlights.judge[0]; // Use first highlight fragment
+                                            }
+                                            // Fallback to regular judge name
+                                            return (judgment.judge || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
+                                          })()
+                                        }}
+                                      />
                                     </div>
                                   </div>
                                 )}

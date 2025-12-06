@@ -4,84 +4,76 @@ import { useNavigate } from "react-router-dom";
 const BlogSection = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const blogPosts = [
     {
       id: 1,
-      title: "Understanding the New Legal Framework: A Comprehensive Guide",
-      description: "Explore the latest changes in Indian legal system and how they impact modern legal practice. Learn about new regulations and their practical applications.",
+      title: "Understanding the New Legal Framework",
+      description: "Explore the latest changes in Indian legal system and how they impact modern legal practice.",
       category: "Legal Updates",
       author: "Dr. Priya Sharma",
-      authorTitle: "Senior Legal Advisor",
-      date: "2024",
+      date: "Dec 15, 2024",
       image: "📚",
-      readTime: "8 min read"
+      readTime: "8 min"
     },
     {
       id: 2,
-      title: "AI-Powered Legal Research: Transforming Case Law Analysis",
-      description: "Discover how artificial intelligence is revolutionizing legal research and case analysis. Learn about the latest tools and techniques for efficient legal work.",
+      title: "AI-Powered Legal Research",
+      description: "Discover how artificial intelligence is revolutionizing legal research and case analysis.",
       category: "Technology",
       author: "Rajesh Kumar",
-      authorTitle: "Legal Tech Specialist",
-      date: "2024",
+      date: "Dec 12, 2024",
       image: "🤖",
-      readTime: "6 min read"
+      readTime: "6 min"
     },
     {
       id: 3,
-      title: "Digital Transformation in Law Firms: Best Practices",
-      description: "Learn how law firms are embracing digital transformation to improve efficiency, client service, and operational excellence in the modern legal landscape.",
+      title: "Digital Transformation in Law Firms",
+      description: "Learn how law firms are embracing digital transformation to improve efficiency.",
       category: "Business",
       author: "Anita Mehta",
-      authorTitle: "Legal Consultant",
-      date: "2024",
+      date: "Dec 10, 2024",
       image: "💼",
-      readTime: "10 min read"
+      readTime: "10 min"
     },
     {
       id: 4,
-      title: "Contract Management in the Digital Age: Tools and Strategies",
-      description: "Master the art of digital contract management with modern tools and proven strategies. Streamline your contract lifecycle and reduce legal risks.",
+      title: "Contract Management Strategies",
+      description: "Master the art of digital contract management with modern tools and proven strategies.",
       category: "Contracts",
       author: "Vikram Singh",
-      authorTitle: "Corporate Lawyer",
-      date: "2024",
+      date: "Dec 8, 2024",
       image: "📋",
-      readTime: "7 min read"
+      readTime: "7 min"
     },
     {
       id: 5,
-      title: "Legal Ethics in the Digital Era: Navigating New Challenges",
-      description: "Explore the evolving landscape of legal ethics in our digital world. Understand new responsibilities and ethical considerations for modern lawyers.",
+      title: "Legal Ethics in the Digital Era",
+      description: "Explore the evolving landscape of legal ethics in our digital world.",
       category: "Ethics",
       author: "Dr. Meera Patel",
-      authorTitle: "Legal Ethics Expert",
-      date: "2024",
+      date: "Dec 5, 2024",
       image: "⚖️",
-      readTime: "9 min read"
+      readTime: "9 min"
     },
     {
       id: 6,
-      title: "Building a Successful Legal Practice: Modern Strategies",
-      description: "Learn proven strategies for building and growing a successful legal practice in today's competitive market. From client acquisition to practice management.",
-      category: "Practice Management",
+      title: "Building a Successful Practice",
+      description: "Learn proven strategies for building and growing a successful legal practice.",
+      category: "Practice",
       author: "Arjun Gupta",
-      authorTitle: "Practice Development Coach",
-      date: "2024",
+      date: "Dec 2, 2024",
       image: "🏆",
-      readTime: "12 min read"
+      readTime: "12 min"
     }
   ];
 
-  const [isMobile, setIsMobile] = useState(false);
-  
-  // Check if mobile on mount and resize
+  // Check if mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -98,276 +90,271 @@ const BlogSection = () => {
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   };
 
-  const goToSlide = (slideIndex) => {
-    setCurrentSlide(slideIndex);
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
   };
 
-  // Auto-slide functionality
+  // Auto-slide
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 6000); // Change slide every 6 seconds
-
+    }, 5000);
     return () => clearInterval(interval);
   }, [totalSlides]);
 
-  // Reset current slide when switching between mobile/desktop
+  // Reset slide on mobile change
   useEffect(() => {
     setCurrentSlide(0);
   }, [isMobile]);
 
-  const getCategoryColor = (category) => {
-    const colors = {
-      "Legal Updates": "#1E65AD",
-      "Technology": "#CF9B63",
-      "Business": "#8C969F",
-      "Contracts": "#1E65AD",
-      "Ethics": "#CF9B63",
-      "Practice Management": "#8C969F"
+  const getCategoryStyle = (category) => {
+    const styles = {
+      "Legal Updates": { bg: "#EBF5FF", color: "#1E65AD" },
+      "Technology": { bg: "#FEF3E2", color: "#CF9B63" },
+      "Business": { bg: "#F3F4F6", color: "#4B5563" },
+      "Contracts": { bg: "#EBF5FF", color: "#1E65AD" },
+      "Ethics": { bg: "#FEF3E2", color: "#CF9B63" },
+      "Practice": { bg: "#F3F4F6", color: "#4B5563" }
     };
-    return colors[category] || "#1E65AD";
+    return styles[category] || { bg: "#EBF5FF", color: "#1E65AD" };
   };
 
   return (
-    <section className="py-10 sm:py-12 md:py-16 lg:py-20 relative overflow-hidden w-full overflow-x-hidden" style={{ backgroundColor: '#F9FAFC' }}>
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-20 w-40 h-40 rounded-full opacity-5 animate-float" style={{ backgroundColor: '#1E65AD' }}></div>
-        <div className="absolute top-40 right-32 w-32 h-32 rounded-full opacity-5 animate-float animation-delay-1000" style={{ backgroundColor: '#CF9B63' }}></div>
-        <div className="absolute bottom-32 left-40 w-36 h-36 rounded-full opacity-5 animate-float animation-delay-2000" style={{ backgroundColor: '#8C969F' }}></div>
-        <div className="absolute bottom-20 right-20 w-28 h-28 rounded-full opacity-5 animate-float animation-delay-3000" style={{ backgroundColor: '#1E65AD' }}></div>
-        
-        {/* Subtle geometric patterns */}
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 rounded-full opacity-20" style={{ backgroundColor: '#CF9B63' }}></div>
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 rounded-full opacity-30" style={{ backgroundColor: '#8C969F' }}></div>
-        <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 rounded-full opacity-25" style={{ backgroundColor: '#1E65AD' }}></div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 relative z-10 w-full overflow-x-hidden">
-        {/* Header Section */}
-        <div className="text-center mb-8 sm:mb-12 md:mb-16">
+    <section 
+      className="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
+      style={{ backgroundColor: '#F9FAFC' }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12 sm:mb-16">
+          <span 
+            className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4"
+            style={{ 
+              backgroundColor: '#EBF5FF', 
+              color: '#1E65AD',
+              fontFamily: 'Heebo, sans-serif'
+            }}
+          >
+            Our Blog
+          </span>
           <h2 
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 px-2 sm:px-4"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4"
             style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}
           >
-            Our Latest Blogs
+            Latest Insights
           </h2>
-          
           <p 
-            className="text-sm sm:text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed px-2 sm:px-4"
-            style={{ color: '#8C969F', fontFamily: 'Heebo' }}
+            className="text-lg max-w-2xl mx-auto"
+            style={{ color: '#8C969F', fontFamily: 'Heebo, sans-serif' }}
           >
-            Stay updated with the latest insights, trends, and best practices in legal technology, 
-            practice management, and industry developments from our expert team.
+            Stay updated with the latest trends in legal technology and best practices
           </p>
         </div>
 
-        {/* Blog Slider */}
-        <div className="relative w-full overflow-x-hidden px-8 sm:px-12 md:px-16">
-          {/* Navigation Arrows */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
-            style={{ 
-              backgroundColor: '#1E65AD',
-              boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              if (window.innerWidth >= 768) {
-                e.target.style.backgroundColor = '#CF9B63';
-                e.target.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.4)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (window.innerWidth >= 768) {
-                e.target.style.backgroundColor = '#1E65AD';
-                e.target.style.boxShadow = '0 4px 15px rgba(30, 101, 173, 0.3)';
-              }
-            }}
-          >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <button
-            onClick={nextSlide}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
-            style={{ 
-              backgroundColor: '#1E65AD',
-              boxShadow: '0 4px 15px rgba(30, 101, 173, 0.3)'
-            }}
-            onMouseEnter={(e) => {
-              if (window.innerWidth >= 768) {
-                e.target.style.backgroundColor = '#CF9B63';
-                e.target.style.boxShadow = '0 6px 20px rgba(207, 155, 99, 0.4)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (window.innerWidth >= 768) {
-                e.target.style.backgroundColor = '#1E65AD';
-                e.target.style.boxShadow = '0 4px 15px rgba(30, 101, 173, 0.3)';
-              }
-            }}
-          >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-
-          {/* Slider Container */}
-          <div className="overflow-hidden w-full">
+        {/* Slider Container */}
+        <div className="relative">
+          {/* Slider */}
+          <div className="overflow-hidden">
             <div 
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              className="flex transition-transform duration-700 ease-in-out"
+              style={{ 
+                transform: `translateX(-${currentSlide * (100 / totalSlides)}%)`,
+                width: `${totalSlides * 100}%`
+              }}
             >
-              {Array.from({ length: totalSlides }, (_, slideIndex) => (
-                <div key={slideIndex} className="w-full flex-shrink-0">
-                  <div className={`grid gap-4 sm:gap-6 md:gap-8 px-2 sm:px-4 ${
-                    isMobile 
-                      ? 'grid-cols-1' 
-                      : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                  }`}>
-                    {blogPosts
-                      .slice(slideIndex * slidesPerView, (slideIndex + 1) * slidesPerView)
-                      .map((post) => (
-                        <article
-                          key={post.id}
-                          onClick={() => navigate('/blog')}
-                          className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden cursor-pointer w-full max-w-full"
-                        >
-                          {/* Blog Image */}
-                          <div className="relative h-32 sm:h-40 md:h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                            <div className="text-4xl sm:text-5xl md:text-6xl">{post.image}</div>
-                            
-                            {/* Category Tag */}
+              {Array.from({ length: totalSlides }, (_, slideIndex) => {
+                const startIndex = slideIndex * slidesPerView;
+                const endIndex = Math.min((slideIndex + 1) * slidesPerView, blogPosts.length);
+                const slidePosts = blogPosts.slice(startIndex, endIndex);
+                
+                return (
+                  <div 
+                    key={slideIndex}
+                    className="flex-shrink-0"
+                    style={{ 
+                      width: `${100 / totalSlides}%`,
+                      padding: '0 8px'
+                    }}
+                  >
+                    <div className={`grid gap-6 md:gap-8 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+                      {slidePosts.map((post) => {
+                        const categoryStyle = getCategoryStyle(post.category);
+                        
+                        return (
+                          <article
+                            key={post.id}
+                            onClick={() => navigate('/blog')}
+                            className="group cursor-pointer"
+                          >
                             <div 
-                              className="absolute top-2 sm:top-3 md:top-4 right-2 sm:right-3 md:right-4 px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold text-white"
-                              style={{ 
-                                backgroundColor: getCategoryColor(post.category),
-                                fontFamily: 'Heebo'
+                              className="bg-white rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col"
+                              style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)' }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-8px)';
+                                e.currentTarget.style.boxShadow = '0 20px 40px rgba(30, 101, 173, 0.15)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.06)';
                               }}
                             >
-                              {post.category}
-                            </div>
-                          </div>
-
-                          {/* Blog Content */}
-                          <div className="p-4 sm:p-5 md:p-6">
-                            {/* Title */}
-                            <h3 
-                              className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 leading-tight break-words"
-                              style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}
-                            >
-                              {post.title}
-                            </h3>
-
-                            {/* Description */}
-                            <p 
-                              className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 leading-relaxed break-words"
-                              style={{ fontFamily: 'Heebo' }}
-                            >
-                              {post.description}
-                            </p>
-
-                            {/* Read Time */}
-                            <div className="flex items-center mb-3 sm:mb-4">
-                              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 flex-shrink-0" style={{ color: '#8C969F' }} fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                              </svg>
-                              <span 
-                                className="text-xs sm:text-sm font-medium"
-                                style={{ color: '#8C969F', fontFamily: 'Heebo' }}
-                              >
-                                {post.readTime}
-                              </span>
-                            </div>
-
-                            {/* Separator Line */}
-                            <div 
-                              className="w-full h-px mb-3 sm:mb-4"
-                              style={{ backgroundColor: '#E5E7EB' }}
-                            ></div>
-
-                            {/* Author Info */}
-                            <div className="flex items-center">
+                              {/* Image Section */}
                               <div 
-                                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg mr-2 sm:mr-3 flex-shrink-0"
-                                style={{ backgroundColor: '#F3F4F6' }}
+                                className="relative h-48 flex items-center justify-center overflow-hidden"
+                                style={{ 
+                                  background: `linear-gradient(135deg, ${categoryStyle.bg} 0%, #FFFFFF 100%)`
+                                }}
                               >
-                                👤
+                                <span className="text-6xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                                  {post.image}
+                                </span>
+                                
+                                {/* Category Badge */}
+                                <span 
+                                  className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold"
+                                  style={{ 
+                                    backgroundColor: categoryStyle.bg, 
+                                    color: categoryStyle.color,
+                                    fontFamily: 'Heebo, sans-serif'
+                                  }}
+                                >
+                                  {post.category}
+                                </span>
+
+                                {/* Read Time Badge */}
+                                <span 
+                                  className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-white"
+                                  style={{ 
+                                    color: '#8C969F',
+                                    fontFamily: 'Heebo, sans-serif',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                                  }}
+                                >
+                                  ⏱️ {post.readTime}
+                                </span>
                               </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 
-                                  className="font-semibold text-xs sm:text-sm truncate"
-                                  style={{ color: '#1E65AD', fontFamily: 'Heebo' }}
+
+                              {/* Content Section */}
+                              <div className="p-6 flex-1 flex flex-col">
+                                <h3 
+                                  className="text-xl font-bold mb-3 leading-tight transition-colors duration-300 group-hover:text-blue-600"
+                                  style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}
                                 >
-                                  {post.author}
-                                </h4>
+                                  {post.title}
+                                </h3>
+
                                 <p 
-                                  className="text-xs truncate"
-                                  style={{ color: '#8C969F', fontFamily: 'Heebo' }}
+                                  className="text-base mb-6 flex-1"
+                                  style={{ color: '#6B7280', fontFamily: 'Heebo, sans-serif', lineHeight: '1.6' }}
                                 >
-                                  {post.authorTitle}
+                                  {post.description}
                                 </p>
-                                <p 
-                                  className="text-xs font-medium truncate"
-                                  style={{ color: '#CF9B63', fontFamily: 'Heebo' }}
+
+                                {/* Author & Date */}
+                                <div 
+                                  className="flex items-center justify-between pt-4"
+                                  style={{ borderTop: '1px solid #F3F4F6' }}
                                 >
-                                  {post.date}
-                                </p>
+                                  <div className="flex items-center gap-3">
+                                    <div 
+                                      className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                                      style={{ backgroundColor: '#F3F4F6' }}
+                                    >
+                                      👤
+                                    </div>
+                                    <div>
+                                      <p 
+                                        className="text-sm font-semibold"
+                                        style={{ color: '#1E65AD', fontFamily: 'Heebo, sans-serif' }}
+                                      >
+                                        {post.author}
+                                      </p>
+                                      <p 
+                                        className="text-xs"
+                                        style={{ color: '#8C969F', fontFamily: 'Heebo, sans-serif' }}
+                                      >
+                                        {post.date}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Arrow */}
+                                  <div 
+                                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-blue-600"
+                                    style={{ backgroundColor: '#F3F4F6' }}
+                                  >
+                                    <svg 
+                                      className="w-5 h-5 transition-colors duration-300 group-hover:text-white" 
+                                      style={{ color: '#1E65AD' }}
+                                      fill="none" 
+                                      stroke="currentColor" 
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </article>
-                      ))}
+                          </article>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
-          {/* Dots Navigation */}
-          <div className="flex justify-center mt-6 sm:mt-8 space-x-2">
-            {Array.from({ length: totalSlides }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? 'scale-125' : 'scale-100'
-                }`}
-                style={{
-                  backgroundColor: index === currentSlide ? '#1E65AD' : '#8C969F'
-                }}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+          {/* Navigation Dots */}
+          <div className="flex items-center justify-center mt-10">
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalSlides }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className="transition-all duration-300"
+                  style={{
+                    width: index === currentSlide ? '28px' : '10px',
+                    height: '10px',
+                    borderRadius: '5px',
+                    backgroundColor: index === currentSlide ? '#1E65AD' : '#D1D5DB'
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-      
-
+        {/* View All Button */}
+        <div className="text-center mt-12">
+          <button
+            onClick={() => navigate('/blog')}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all duration-300"
+            style={{ 
+              backgroundColor: '#CF9B63', 
+              color: '#FFFFFF',
+              fontFamily: 'Heebo, sans-serif',
+              boxShadow: '0 4px 15px rgba(207, 155, 99, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#B8864F';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(207, 155, 99, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#CF9B63';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(207, 155, 99, 0.3)';
+            }}
+          >
+            View All Articles
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </button>
+        </div>
       </div>
-
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        .animation-delay-1000 {
-          animation-delay: 1s;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-3000 {
-          animation-delay: 3s;
-        }
-      `}</style>
     </section>
   );
 };

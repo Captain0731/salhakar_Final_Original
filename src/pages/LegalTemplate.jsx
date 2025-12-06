@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useLayoutEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 
 export default function LegalTemplate() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [templates, setTemplates] = useState([]);
@@ -11,6 +12,13 @@ export default function LegalTemplate() {
   const [error, setError] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [showTemplateDetails, setShowTemplateDetails] = useState(false);
+
+  // Fast scroll to top on route change
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.pathname]);
 
 
   const categories = [
@@ -144,9 +152,9 @@ export default function LegalTemplate() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#F9FAFC', scrollBehavior: 'smooth' }}>
       <Navbar />
-      <div className="p-6 pt-24">
+      <div className="p-6 pt-24" style={{ scrollBehavior: 'smooth' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">

@@ -728,33 +728,68 @@ class ApiService {
       if (params.cursor_decision_date) queryParams.append('cursor_decision_date', params.cursor_decision_date);
       if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
       
+      // Track if we need highlights (for search, title, judge, or CNR filters)
+      let needsHighlight = false;
+      
       // Add search and filter parameters
       if (params.search) {
         queryParams.append('search', params.search);
-        // Enable highlights when search is used (Elasticsearch feature)
-        if (params.highlight !== false) {
-          queryParams.append('highlight', 'true');
-        }
+        needsHighlight = true;
       }
-      if (params.title) queryParams.append('title', params.title);
-      if (params.cnr) queryParams.append('cnr', params.cnr);
+      if (params.title) {
+        queryParams.append('title', params.title);
+        needsHighlight = true;
+      }
+      if (params.cnr) {
+        queryParams.append('cnr', params.cnr);
+        needsHighlight = true;
+      }
       // Support both highCourt (for backward compatibility) and court_name (preferred)
       if (params.court_name) {
         queryParams.append('court_name', params.court_name);
       } else if (params.highCourt) {
         queryParams.append('court_name', params.highCourt);
       }
-      if (params.judge) queryParams.append('judge', params.judge);
+      if (params.judge) {
+        queryParams.append('judge', params.judge);
+        needsHighlight = true;
+      }
+      
+      // Enable highlights when search, title, judge, or CNR filters are used (Elasticsearch feature)
+      if (needsHighlight && params.highlight !== false) {
+        queryParams.append('highlight', 'true');
+      }
       if (params.decisionDateFrom || params.decision_date_from) {
         // Keep date in YYYY-MM-DD format as per API documentation
         const dateValue = params.decisionDateFrom || params.decision_date_from;
+        // Validate date format before sending
+        if (dateValue && dateValue.trim() !== '' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
         queryParams.append('decision_date_from', dateValue);
+        }
       }
       if (params.decision_date_to) {
+        // Validate date format before sending
+        if (params.decision_date_to && params.decision_date_to.trim() !== '' && /^\d{4}-\d{2}-\d{2}$/.test(params.decision_date_to)) {
         queryParams.append('decision_date_to', params.decision_date_to);
+        }
       }
       if (params.year) {
         queryParams.append('year', params.year);
+      }
+      if (params.disposal_nature) {
+        queryParams.append('disposal_nature', params.disposal_nature);
+      }
+      if (params.decision_date) {
+        queryParams.append('decision_date', params.decision_date);
+      }
+      
+      // Elasticsearch features
+      if (params.include_total_count !== undefined) {
+        queryParams.append('include_total_count', params.include_total_count.toString());
+      }
+      // Highlight is already handled above for search, but also support explicit highlight param
+      if (params.highlight && !params.search) {
+        queryParams.append('highlight', 'true');
       }
       
       // Note: Using /api/judgements endpoint for High Court judgments as per API documentation
@@ -787,8 +822,16 @@ class ApiService {
       if (data.data && Array.isArray(data.data)) {
         data.data = data.data.map(judgment => ({
           ...judgment,
-          pdf_url: judgment.pdf_link || judgment.pdf_url // Map pdf_link to pdf_url
+          pdf_url: judgment.pdf_link || judgment.pdf_url, // Map pdf_link to pdf_url
+          // Preserve Elasticsearch metadata if present
+          relevance_score: judgment.relevance_score,
+          highlights: judgment.highlights
         }));
+      }
+      
+      // Preserve search_info if present (Elasticsearch metadata)
+      if (data.search_info) {
+        console.log('🌐 Elasticsearch search info:', data.search_info);
       }
       
       console.log('🌐 Mapped API response:', data);
@@ -1072,12 +1115,37 @@ class ApiService {
       
       console.log(`🌐 Supreme Court response received from ${serverId} server:`, data);
       
+      // Handle null or undefined response
+      if (!data) {
+        console.warn('🌐 Supreme Court API returned null/undefined response');
+        return {
+          data: [],
+          pagination_info: { has_more: false },
+          next_cursor: null
+        };
+      }
+      
+      // Ensure data has a data property
+      if (!data.data) {
+        console.warn('🌐 Supreme Court API response missing data field, initializing empty array');
+        data.data = [];
+      }
+      
       // Map API field names to frontend expected field names
       if (data.data && Array.isArray(data.data)) {
         data.data = data.data.map(judgment => ({
           ...judgment,
           pdf_url: judgment.pdf_link || judgment.pdf_url // Map pdf_link to pdf_url
         }));
+      } else if (!Array.isArray(data.data)) {
+        // If data.data exists but isn't an array, set to empty array
+        console.warn('🌐 Supreme Court API response data is not an array, setting to empty array');
+        data.data = [];
+      }
+      
+      // Ensure pagination_info exists
+      if (!data.pagination_info) {
+        data.pagination_info = { has_more: false };
       }
       
       console.log('🌐 Mapped Supreme Court API response:', data);
