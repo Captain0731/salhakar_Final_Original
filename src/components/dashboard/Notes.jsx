@@ -54,10 +54,13 @@ const Notes = ({ onBack }) => {
   const [newFolderName, setNewFolderName] = useState('');
   const [creatingFolder, setCreatingFolder] = useState(false);
   
+  // Selection state for multiple delete
+  const [selectedItems, setSelectedItems] = useState([]);
+  
   // Delete confirmation modal state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteType, setDeleteType] = useState(null); // 'folder' or 'note'
-  const [deleteItem, setDeleteItem] = useState(null); // The item to delete
+  const [deleteType, setDeleteType] = useState(null); // 'folder' or 'note' or 'multiple'
+  const [deleteItem, setDeleteItem] = useState(null); // The item to delete (single) or array of items (multiple)
   const [deleting, setDeleting] = useState(false);
 
   // Load folders from API
@@ -225,12 +228,14 @@ const Notes = ({ onBack }) => {
     setSelectedFolder(folder);
     setIsFolderView(true); // Enter folder view mode
     setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+    setSelectedItems([]); // Clear selections when folder changes
   };
 
   const handleBackFromFolder = () => {
     setIsFolderView(false);
     setSelectedFolder(null);
     setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+    setSelectedItems([]); // Clear selections when going back
   };
 
   const handleDeleteNote = (noteId, e) => {
@@ -253,6 +258,7 @@ const Notes = ({ onBack }) => {
       // Reload notes
       setNotes(prev => prev.filter(note => note.id !== deleteItem.id));
       setPagination(prev => ({ ...prev, total: Math.max(0, prev.total - 1) }));
+      setSelectedItems(prev => prev.filter(id => id !== deleteItem.id));
       setShowDeleteConfirm(false);
       setDeleteItem(null);
       setDeleteType(null);
@@ -262,6 +268,75 @@ const Notes = ({ onBack }) => {
       setDeleteItem(null);
       setDeleteType(null);
       // Show error in modal or toast
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleSelectItem = (itemId) => {
+    setSelectedItems(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedItems.length === notes.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(notes.map(note => note.id));
+    }
+  };
+
+  const handleDeleteMultiple = () => {
+    if (selectedItems.length === 0) return;
+    
+    // Get the notes to delete
+    const notesToDelete = notes.filter(n => selectedItems.includes(n.id));
+    
+    setDeleteItem(notesToDelete);
+    setDeleteType('multiple');
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteMultiple = async () => {
+    if (!deleteItem || !Array.isArray(deleteItem) || deleteItem.length === 0) return;
+    
+    try {
+      setDeleting(true);
+      const errors = [];
+      
+      // Delete each note
+      for (const note of deleteItem) {
+        try {
+          await apiService.deleteNote(note.id);
+        } catch (err) {
+          console.error(`Error deleting note ${note.id}:`, err);
+          errors.push({ id: note.id, error: err.message });
+        }
+      }
+      
+      // Remove successfully deleted notes from state
+      const deletedIds = deleteItem.map(n => n.id).filter(id => !errors.find(e => e.id === id));
+      setNotes(prev => prev.filter(note => !deletedIds.includes(note.id)));
+      setPagination(prev => ({ ...prev, total: Math.max(0, prev.total - deletedIds.length) }));
+      setSelectedItems([]);
+      
+      if (errors.length > 0) {
+        alert(`Failed to delete ${errors.length} note(s). Please try again.`);
+      }
+      
+      // Close modal
+      setShowDeleteConfirm(false);
+      setDeleteItem(null);
+      setDeleteType(null);
+    } catch (err) {
+      console.error('Error deleting notes:', err);
+      alert('Failed to delete notes. Please try again.');
+      setShowDeleteConfirm(false);
+      setDeleteItem(null);
+      setDeleteType(null);
     } finally {
       setDeleting(false);
     }
@@ -453,6 +528,7 @@ const Notes = ({ onBack }) => {
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+                setSelectedItems([]); // Clear selections when filter changes
               }}
               className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
               style={{ fontFamily: 'Roboto, sans-serif' }}
@@ -463,6 +539,7 @@ const Notes = ({ onBack }) => {
             onChange={(e) => {
               setSelectedReferenceType(e.target.value);
               setPagination(prev => ({ ...prev, page: 1 })); // Reset to first page
+              setSelectedItems([]); // Clear selections when filter changes
             }}
             className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
             style={{ fontFamily: 'Roboto, sans-serif' }}
@@ -623,6 +700,32 @@ const Notes = ({ onBack }) => {
           </div>
         </div>
 
+        {selectedItems.length > 0 && (
+          <div className="p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200 mb-3 sm:mb-4 rounded-t-lg">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+              <span className="text-xs sm:text-sm font-medium text-blue-800" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+              </span>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button 
+                  onClick={handleSelectAll}
+                  className="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                >
+                  {selectedItems.length === notes.length ? 'Deselect All' : 'Select All'}
+                </button>
+                <button 
+                  onClick={handleDeleteMultiple}
+                  className="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                >
+                  Delete Selected
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center py-8 sm:py-12">
             <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-3 sm:mb-4"></div>
@@ -645,10 +748,27 @@ const Notes = ({ onBack }) => {
               return (
                 <div
                   key={note.id}
-                  onClick={() => handleNoteClick(note)}
-                  className="p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 bg-white relative"
+                  onClick={(e) => {
+                    // Only open note if clicking on the card itself, not on buttons
+                    if (e.target.closest('button') || e.target.closest('input')) {
+                      return;
+                    }
+                    handleNoteClick(note);
+                  }}
+                  className={`p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 bg-white relative overflow-visible ${
+                    selectedItems.includes(note.id) ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-200'
+                  }`}
                 >
-                  <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
+                  {/* Selection Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(note.id)}
+                    onChange={() => handleSelectItem(note.id)}
+                    className="absolute top-2 left-2 sm:top-3 sm:left-3 w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer z-50 bg-white shadow-md"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ zIndex: 50 }}
+                  />
+                  <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2 pl-5 sm:pl-6">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span 
@@ -709,15 +829,45 @@ const Notes = ({ onBack }) => {
           </div>
         ) : (
           <div className="space-y-2 sm:space-y-3">
+            {/* List View Header with Select All */}
+            {notes.length > 0 && (
+              <div className="flex items-center gap-3 px-3 sm:px-4 py-2 border-b border-gray-200">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.length === notes.length && notes.length > 0}
+                  onChange={handleSelectAll}
+                  className="rounded w-3.5 h-3.5 sm:w-4 sm:h-4"
+                />
+                <span className="text-xs sm:text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Select All
+                </span>
+              </div>
+            )}
             {notes.map((note) => {
               const folder = folders.find(f => f.id === note.folder_id);
               const colors = getReferenceTypeColors(note.reference_type);
               return (
                 <div
                   key={note.id}
-                  onClick={() => handleNoteClick(note)}
-                  className="p-3 sm:p-4 rounded-lg border border-gray-200 cursor-pointer transition-all duration-200 hover:shadow-md hover:bg-gray-50 flex items-center justify-between gap-2"
+                  onClick={(e) => {
+                    // Only open note if clicking on the row itself, not on buttons
+                    if (e.target.closest('button') || e.target.closest('input')) {
+                      return;
+                    }
+                    handleNoteClick(note);
+                  }}
+                  className={`p-3 sm:p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md flex items-center justify-between gap-2 ${
+                    selectedItems.includes(note.id) ? 'bg-blue-50 border-blue-500' : 'border-gray-200 hover:bg-gray-50'
+                  }`}
                 >
+                  {/* Selection Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(note.id)}
+                    onChange={() => handleSelectItem(note.id)}
+                    className="rounded w-3.5 h-3.5 sm:w-4 sm:h-4"
+                    onClick={(e) => e.stopPropagation()}
+                  />
                   <div className="flex items-center space-x-2 sm:space-x-3 sm:space-x-4 flex-1 min-w-0">
                     <div 
                       className="p-2 sm:p-2.5 md:p-3 rounded-lg flex-shrink-0"
@@ -1103,7 +1253,7 @@ const Notes = ({ onBack }) => {
                     className="text-lg font-semibold text-gray-900"
                     style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
                   >
-                    Delete {deleteType === 'folder' ? 'Folder' : 'Note'}?
+                    Delete {deleteType === 'folder' ? 'Folder' : deleteType === 'multiple' ? 'Notes' : 'Note'}?
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
                     This action cannot be undone
@@ -1114,10 +1264,21 @@ const Notes = ({ onBack }) => {
             
             {/* Content */}
             <div className="p-4 sm:p-6">
-              <p className="text-sm text-gray-700 mb-4">
-                Are you sure you want to delete <strong>"{deleteItem.name}"</strong>? 
-                {deleteType === 'folder' && ' All notes in this folder will become unfiled.'}
-              </p>
+              {deleteType === 'multiple' && Array.isArray(deleteItem) ? (
+                <>
+                  <p className="text-sm text-gray-700 mb-4">
+                    Are you sure you want to delete <strong>{deleteItem.length} note{deleteItem.length > 1 ? 's' : ''}</strong>? 
+                    <br />
+                    <span className="text-xs text-gray-500 mt-1 block">This action cannot be undone.</span>
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-gray-700 mb-4">
+                  Are you sure you want to delete <strong>"{deleteItem?.name || 'this item'}"</strong>? 
+                  {deleteType === 'folder' && ' All notes in this folder will become unfiled.'}
+                  {deleteType !== 'folder' && deleteType !== 'multiple' && ' This action cannot be undone.'}
+                </p>
+              )}
               
               {/* Actions */}
               <div className="flex items-center justify-end gap-3">
@@ -1134,7 +1295,13 @@ const Notes = ({ onBack }) => {
                   Cancel
                 </button>
                 <button
-                  onClick={deleteType === 'folder' ? confirmDeleteFolder : confirmDeleteNote}
+                  onClick={
+                    deleteType === 'folder' 
+                      ? confirmDeleteFolder 
+                      : deleteType === 'multiple' 
+                        ? confirmDeleteMultiple 
+                        : confirmDeleteNote
+                  }
                   disabled={deleting}
                   className="px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ 

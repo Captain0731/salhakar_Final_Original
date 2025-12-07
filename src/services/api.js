@@ -1950,13 +1950,23 @@ class ApiService {
 
   // Bookmark a judgement
   async bookmarkJudgement(judgementId, folderId = null) {
-    // Only include folder_id if it's not null (backend may reject null values)
-    const payload = folderId !== null ? { folder_id: folderId } : {};
-    const response = await fetch(`${this.baseURL}/api/bookmarks/judgements/${judgementId}`, {
+    const headers = this.getAuthHeaders();
+    // Ensure Content-Type header is set for POST requests
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    const fetchOptions = {
       method: 'POST',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(payload)
-    });
+      headers: headers
+    };
+    
+    // Only include body if folderId is provided (backend may reject empty body)
+    if (folderId !== null && folderId !== undefined) {
+      fetchOptions.body = JSON.stringify({ folder_id: folderId });
+    }
+    
+    const response = await fetch(`${this.baseURL}/api/bookmarks/judgements/${judgementId}`, fetchOptions);
     return await this.handleResponse(response);
   }
 
@@ -2410,17 +2420,26 @@ class ApiService {
     
     const url = `${this.baseURL}/api/bookmarks/acts/${validActType}/${numericId}`;
     const headers = this.getAuthHeaders();
-    // Only include folder_id if it's not null (backend may reject null values)
-    const payload = folderId !== null ? { folder_id: folderId } : {};
+    // Ensure Content-Type header is set for POST requests
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    const fetchOptions = {
+      method: 'POST',
+      headers: headers
+    };
+    
+    // Only include body if folderId is provided (backend may reject empty body)
+    if (folderId !== null && folderId !== undefined) {
+      fetchOptions.body = JSON.stringify({ folder_id: folderId });
+    }
     
     console.log('🔖 Bookmarking act:', { actType, validActType, actId, numericId, folderId, url });
     console.log('🔖 Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'None' });
+    console.log('🔖 Body:', folderId !== null && folderId !== undefined ? { folder_id: folderId } : 'No body');
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(payload)
-    });
+    const response = await fetch(url, fetchOptions);
     
     console.log('🔖 Response status:', response.status, response.statusText);
     
@@ -2488,13 +2507,23 @@ class ApiService {
     else if (mappingType === 'bns_ipc_mapping') normalizedType = 'bns_ipc';
     else if (mappingType === 'bnss_crpc_mapping') normalizedType = 'bnss_crpc';
     
-    // Only include folder_id if it's not null (backend may reject null values)
-    const payload = folderId !== null ? { folder_id: folderId } : {};
-    const response = await fetch(`${this.baseURL}/api/bookmarks/mappings/${normalizedType}/${mappingId}`, {
+    const headers = this.getAuthHeaders();
+    // Ensure Content-Type header is set for POST requests
+    if (!headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    const fetchOptions = {
       method: 'POST',
-      headers: this.getAuthHeaders(),
-      body: JSON.stringify(payload)
-    });
+      headers: headers
+    };
+    
+    // Only include body if folderId is provided (backend may reject empty body)
+    if (folderId !== null && folderId !== undefined) {
+      fetchOptions.body = JSON.stringify({ folder_id: folderId });
+    }
+    
+    const response = await fetch(`${this.baseURL}/api/bookmarks/mappings/${normalizedType}/${mappingId}`, fetchOptions);
     return await this.handleResponse(response);
   }
 

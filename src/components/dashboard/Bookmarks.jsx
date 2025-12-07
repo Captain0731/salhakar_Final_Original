@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Bookmark, 
@@ -51,8 +51,8 @@ const Bookmarks = ({ onBack }) => {
 
   // Delete confirmation modal state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteType, setDeleteType] = useState(null); // 'folder' or 'bookmark'
-  const [deleteItem, setDeleteItem] = useState(null); // The item to delete
+  const [deleteType, setDeleteType] = useState(null); // 'folder' or 'bookmark' or 'multiple'
+  const [deleteItem, setDeleteItem] = useState(null); // The item to delete (single) or array of items (multiple)
   const [deleting, setDeleting] = useState(false);
 
   // Helper function to extract title based on bookmark type
@@ -361,17 +361,26 @@ const Bookmarks = ({ onBack }) => {
     if (!isAuthenticated || !user) {
       return;
     }
-    loadBookmarks();
+    // FIX: Reset pagination and clear bookmarks when user changes
+    setPagination({ limit: 50, offset: 0, hasMore: false });
+    loadBookmarks(0); // Explicitly pass offset = 0 to ensure replacement
     loadFolders();
-  }, [isAuthenticated, user?.id]); // Add user.id dependency to reload when user changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id]); // loadBookmarks is stable due to useCallback
 
   // Reload bookmarks when filters change (only if authenticated)
+  // FIX: This effect handles folder changes and filter changes
+  // FIX: Always reset to offset 0 when filters/folder change to prevent duplicates
   useEffect(() => {
     if (!isAuthenticated || !user) {
       return;
     }
-    loadBookmarks();
-  }, [filterType, searchQuery, advancedFilters, currentFolder, user?.id]); // Add user.id to dependencies
+    // FIX: Reset pagination when filters/folder change
+    setPagination({ limit: 50, offset: 0, hasMore: false });
+    // FIX: Explicitly pass offset = 0 to ensure bookmarks are replaced, not appended
+    loadBookmarks(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterType, searchQuery, advancedFilters, currentFolder, user?.id]); // loadBookmarks is stable due to useCallback
 
   // Handle filter changes
   const handleFilterChange = (filterKey, value) => {
@@ -427,9 +436,18 @@ const Bookmarks = ({ onBack }) => {
   };
 
   // Load bookmarks from API with filtering
-  const loadBookmarks = async (offset = 0, limit = 50) => {
+  // FIX: Use useCallback to prevent stale closures and ensure consistent function reference
+  // FIX: Always replace bookmarks when offset is 0 (folder/filter change), never append
+  const loadBookmarks = useCallback(async (offset = 0, limit = 50) => {
     setLoading(true);
     setError(null);
+    
+    // FIX: Clear bookmarks immediately when starting a new load (offset === 0)
+    // This prevents showing stale data while new data is loading
+    if (offset === 0) {
+      setBookmarks([]);
+    }
+    
     try {
       // Build filter parameters based on current filters
       const filterParams = {
@@ -469,9 +487,13 @@ const Bookmarks = ({ onBack }) => {
         }
       }
       
+      // FIX: Always replace bookmarks when offset is 0 (new folder/filter)
+      // Only append when offset > 0 (pagination/load more)
       if (offset === 0) {
+        // Replace all bookmarks - this ensures no duplicates when reopening folders
         setBookmarks(response.bookmarks || []);
       } else {
+        // Append only for pagination (load more)
         setBookmarks(prev => [...prev, ...(response.bookmarks || [])]);
       }
       
@@ -486,7 +508,7 @@ const Bookmarks = ({ onBack }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentFolder, filterType, searchQuery, advancedFilters]); // Dependencies for filter params
 
   // Load folders from API
   const loadFolders = async () => {
@@ -705,6 +727,87 @@ const Bookmarks = ({ onBack }) => {
     }
   };
 
+  const handleDeleteMultiple = () => {
+    if (selectedItems.length === 0) return;
+    
+    // Get the bookmarks to delete
+    const bookmarksToDelete = bookmarks.filter(b => selectedItems.includes(b.id));
+    
+    setDeleteItem(bookmarksToDelete);
+    setDeleteType('multiple');
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteMultiple = async () => {
+    if (!deleteItem || !Array.isArray(deleteItem) || deleteItem.length === 0) return;
+    
+    try {
+      setDeleting(true);
+      const errors = [];
+      
+      // Delete each bookmark
+      for (const bookmark of deleteItem) {
+        try {
+          const bookmarkType = bookmark.type;
+          const item = bookmark.item || bookmark;
+          const itemId = item?.id;
+          const bookmarkId = bookmark.id;
+
+          if (!itemId || !bookmarkType) {
+            // Fallback to generic delete if we don't have type info
+            await apiService.deleteBookmark(bookmarkId);
+          } else {
+            // Use the correct endpoint based on bookmark type
+            switch (bookmarkType) {
+              case 'judgement':
+                await apiService.removeJudgementBookmark(itemId);
+                break;
+              case 'central_act':
+                await apiService.removeActBookmark('central', itemId);
+                break;
+              case 'state_act':
+                await apiService.removeActBookmark('state', itemId);
+                break;
+              case 'bsa_iea_mapping':
+                await apiService.removeMappingBookmark('bsa_iea', itemId);
+                break;
+              case 'bns_ipc_mapping':
+                await apiService.removeMappingBookmark('bns_ipc', itemId);
+                break;
+              default:
+                await apiService.deleteBookmark(bookmarkId);
+            }
+          }
+        } catch (err) {
+          console.error(`Error deleting bookmark ${bookmark.id}:`, err);
+          errors.push({ id: bookmark.id, error: err.message });
+        }
+      }
+      
+      // Remove successfully deleted bookmarks from state
+      const deletedIds = deleteItem.map(b => b.id).filter(id => !errors.find(e => e.id === id));
+      setBookmarks(prev => prev.filter(item => !deletedIds.includes(item.id)));
+      setSelectedItems([]);
+      
+      if (errors.length > 0) {
+        setError(`Failed to delete ${errors.length} bookmark(s). Please try again.`);
+      }
+      
+      // Close modal
+      setShowDeleteConfirm(false);
+      setDeleteItem(null);
+      setDeleteType(null);
+    } catch (err) {
+      setError(err.message || 'Failed to delete bookmarks');
+      console.error('Error deleting bookmarks:', err);
+      setShowDeleteConfirm(false);
+      setDeleteItem(null);
+      setDeleteType(null);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -861,7 +964,14 @@ const Bookmarks = ({ onBack }) => {
                 className="relative flex flex-col items-center p-3 sm:p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 group hover:shadow-md"
               >
                 <button
-                  onClick={() => setCurrentFolder(folder)}
+                  onClick={() => {
+                    // FIX: Clear bookmarks and reset pagination when opening a folder
+                    // This prevents duplicates from previous folder/bookmark state
+                    setBookmarks([]);
+                    setPagination({ limit: 50, offset: 0, hasMore: false });
+                    setSelectedItems([]); // Clear selections when changing folders
+                    setCurrentFolder(folder);
+                  }}
                   className="flex flex-col items-center w-full"
                 >
                   <div 
@@ -898,7 +1008,14 @@ const Bookmarks = ({ onBack }) => {
         <div className="flex items-center justify-between bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-200">
           <div className="flex items-center min-w-0 flex-1">
             <button
-              onClick={() => setCurrentFolder(null)}
+              onClick={() => {
+                // FIX: Clear bookmarks and reset pagination when going back to all folders
+                // This prevents duplicates from previous folder state
+                setBookmarks([]);
+                setPagination({ limit: 50, offset: 0, hasMore: false });
+                setSelectedItems([]); // Clear selections when changing folders
+                setCurrentFolder(null);
+              }}
               className="mr-2 sm:mr-4 p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
               title="Back to all folders"
             >
@@ -984,12 +1101,14 @@ const Bookmarks = ({ onBack }) => {
                   </span>
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button 
+                      onClick={handleSelectAll}
                       className="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     >
-                      Move to Folder
+                      {selectedItems.length === sortedBookmarks.length ? 'Deselect All' : 'Select All'}
                     </button>
                     <button 
+                      onClick={handleDeleteMultiple}
                       className="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                     >
@@ -1351,7 +1470,7 @@ const Bookmarks = ({ onBack }) => {
                     className="text-lg font-semibold text-gray-900"
                     style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
                   >
-                    Delete {deleteType === 'folder' ? 'Folder' : 'Bookmark'}?
+                    Delete {deleteType === 'folder' ? 'Folder' : deleteType === 'multiple' ? 'Bookmarks' : 'Bookmark'}?
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
                     This action cannot be undone
@@ -1362,10 +1481,21 @@ const Bookmarks = ({ onBack }) => {
             
             {/* Content */}
             <div className="p-4 sm:p-6">
-              <p className="text-sm text-gray-700 mb-4">
-                Are you sure you want to delete <strong>"{deleteItem.name}"</strong>? 
-                {deleteType === 'folder' && ' All bookmarks in this folder will become unfiled.'}
-              </p>
+              {deleteType === 'multiple' && Array.isArray(deleteItem) ? (
+                <>
+                  <p className="text-sm text-gray-700 mb-4">
+                    Are you sure you want to delete <strong>{deleteItem.length} bookmark{deleteItem.length > 1 ? 's' : ''}</strong>? 
+                    <br />
+                    <span className="text-xs text-gray-500 mt-1 block">This action cannot be undone.</span>
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm text-gray-700 mb-4">
+                  Are you sure you want to delete <strong>"{deleteItem?.name || 'this item'}"</strong>? 
+                  {deleteType === 'folder' && ' All bookmarks in this folder will become unfiled.'}
+                  {deleteType !== 'folder' && deleteType !== 'multiple' && ' This action cannot be undone.'}
+                </p>
+              )}
               
               {/* Actions */}
               <div className="flex items-center justify-end gap-3">
@@ -1382,7 +1512,13 @@ const Bookmarks = ({ onBack }) => {
                   Cancel
                 </button>
                 <button
-                  onClick={deleteType === 'folder' ? confirmDeleteFolder : confirmDeleteBookmark}
+                  onClick={
+                    deleteType === 'folder' 
+                      ? confirmDeleteFolder 
+                      : deleteType === 'multiple' 
+                        ? confirmDeleteMultiple 
+                        : confirmDeleteBookmark
+                  }
                   disabled={deleting}
                   className="px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ 

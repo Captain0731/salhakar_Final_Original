@@ -103,18 +103,39 @@ const BookmarkButton = ({
     
     setIsCheckingStatus(true);
     try {
-      // Get user's bookmarks and check if this item is bookmarked
-      const response = await apiService.getUserBookmarks({
-        limit: 1000, // Get all bookmarks to check status
-        type: type
-      });
+      // For mapping types, also check the normalized type (e.g., 'bnss_crpc' for 'bnss_crpc_mapping')
+      // Backend might store/return bookmarks with normalized type
+      let normalizedType = type;
+      if (type === 'bsa_iea_mapping') normalizedType = 'bsa_iea';
+      else if (type === 'bns_ipc_mapping') normalizedType = 'bns_ipc';
+      else if (type === 'bnss_crpc_mapping') normalizedType = 'bnss_crpc';
+      
+      // Try to get bookmarks with type filter first
+      // If that fails (e.g., backend doesn't support bnss_crpc_mapping filter), get all bookmarks
+      let response;
+      try {
+        response = await apiService.getUserBookmarks({
+          limit: 1000, // Get all bookmarks to check status
+          type: type
+        });
+      } catch (typeFilterError) {
+        // If type filter fails (e.g., backend doesn't support bnss_crpc_mapping), 
+        // get all bookmarks and filter on frontend
+        console.warn('Type filter failed, fetching all bookmarks:', typeFilterError.message);
+        response = await apiService.getUserBookmarks({
+          limit: 1000
+        });
+      }
       
       const existingBookmark = response.bookmarks?.find(bookmark => {
         const bookmarkItem = bookmark.item || bookmark;
         // Compare IDs - handle both string and numeric
         const itemId = parseInt(item.id);
         const bookmarkItemId = parseInt(bookmarkItem.id);
-        return (bookmarkItemId === itemId || bookmarkItem.id === item.id) && bookmark.type === type;
+        const idMatches = bookmarkItemId === itemId || bookmarkItem.id === item.id;
+        // Check both the original type and normalized type (backend might return normalized type)
+        const typeMatches = bookmark.type === type || bookmark.type === normalizedType;
+        return idMatches && typeMatches;
       });
       
       if (existingBookmark) {
