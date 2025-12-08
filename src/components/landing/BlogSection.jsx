@@ -121,14 +121,14 @@ const BlogSection = () => {
 
   return (
     <section 
-      className="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
+      className="py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden"
       style={{ backgroundColor: '#F9FAFC' }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16">
           <span 
-            className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4"
+            className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4"
             style={{ 
               backgroundColor: '#EBF5FF', 
               color: '#1E65AD',
@@ -138,13 +138,13 @@ const BlogSection = () => {
             Our Blog
           </span>
           <h2 
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 px-2"
             style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}
           >
             Latest Insights
           </h2>
           <p 
-            className="text-lg max-w-2xl mx-auto"
+            className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-2"
             style={{ color: '#8C969F', fontFamily: 'Heebo, sans-serif' }}
           >
             Stay updated with the latest trends in legal technology and best practices
@@ -156,25 +156,25 @@ const BlogSection = () => {
           {/* Left Arrow Button */}
           <button
             onClick={prevSlide}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-20
-                       w-12 h-12 lg:w-14 lg:h-14 rounded-full
-                       bg-white shadow-lg border border-gray-200
-                       flex items-center justify-center
+            className="hidden sm:flex absolute left-2 sm:-left-4 md:-left-8 lg:-left-12 top-1/2 -translate-y-1/2 z-30
+                       w-11 h-11 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full
+                       bg-white shadow-xl border-2 border-gray-200
+                       items-center justify-center
                        transition-all duration-300
-                       hover:scale-110 hover:shadow-xl active:scale-95
-                       hover:bg-gray-50 group"
+                       hover:scale-110 hover:shadow-2xl active:scale-95
+                       hover:bg-gray-50 hover:border-blue-300 group"
             aria-label="Previous blog posts"
           >
             <svg
-              className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
+              className="w-6 h-6 sm:w-6 sm:h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              strokeWidth={2.5}
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
                 d="M15 19l-7-7 7-7"
               />
             </svg>
@@ -200,10 +200,10 @@ const BlogSection = () => {
                     className="flex-shrink-0"
                     style={{ 
                       width: `${100 / totalSlides}%`,
-                      padding: '0 8px'
+                      padding: isMobile ? '0 4px' : '0 8px'
                     }}
                   >
-                    <div className={`grid gap-6 md:gap-8 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+                    <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-3 gap-6 md:gap-8'}`}>
                       {slidePosts.map((post) => {
                         const categoryStyle = getCategoryStyle(post.category);
                         
@@ -227,18 +227,18 @@ const BlogSection = () => {
                         >
                               {/* Image Section */}
                               <div 
-                                className="relative h-48 flex items-center justify-center overflow-hidden"
+                                className="relative h-40 sm:h-48 flex items-center justify-center overflow-hidden"
                                 style={{ 
                                   background: `linear-gradient(135deg, ${categoryStyle.bg} 0%, #FFFFFF 100%)`
                                 }}
                               >
-                                <span className="text-6xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                                <span className="text-5xl sm:text-6xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                                   {post.image}
                                 </span>
                             
                                 {/* Category Badge */}
                                 <span 
-                                  className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold"
+                                  className="absolute top-2 left-2 sm:top-4 sm:left-4 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-semibold"
                               style={{ 
                                     backgroundColor: categoryStyle.bg, 
                                     color: categoryStyle.color,
@@ -250,7 +250,7 @@ const BlogSection = () => {
 
                                 {/* Read Time Badge */}
                                 <span 
-                                  className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium bg-white"
+                                  className="absolute top-2 right-2 sm:top-4 sm:right-4 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-medium bg-white"
                                   style={{ 
                                     color: '#8C969F',
                                     fontFamily: 'Heebo, sans-serif',
@@ -262,16 +262,16 @@ const BlogSection = () => {
                           </div>
 
                               {/* Content Section */}
-                              <div className="p-6 flex-1 flex flex-col">
+                              <div className="p-4 sm:p-5 md:p-6 flex-1 flex flex-col">
                             <h3 
-                                  className="text-xl font-bold mb-3 leading-tight transition-colors duration-300 group-hover:text-blue-600"
+                                  className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 leading-tight transition-colors duration-300 group-hover:text-blue-600"
                               style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}
                             >
                               {post.title}
                             </h3>
 
                             <p 
-                                  className="text-base mb-6 flex-1"
+                                  className="text-sm sm:text-base mb-4 sm:mb-6 flex-1"
                                   style={{ color: '#6B7280', fontFamily: 'Heebo, sans-serif', lineHeight: '1.6' }}
                             >
                               {post.description}
@@ -279,12 +279,12 @@ const BlogSection = () => {
 
                                 {/* Author & Date */}
                                 <div 
-                                  className="flex items-center justify-between pt-4"
+                                  className="flex items-center justify-between pt-3 sm:pt-4"
                                   style={{ borderTop: '1px solid #F3F4F6' }}
                               >
                                   <div>
                                     <p 
-                                      className="text-sm font-semibold"
+                                      className="text-xs sm:text-sm font-semibold"
                                       style={{ color: '#1E65AD', fontFamily: 'Heebo, sans-serif' }}
                                 >
                                       {post.author}
@@ -299,11 +299,11 @@ const BlogSection = () => {
 
                                   {/* Arrow */}
                                   <div 
-                                    className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-blue-600"
+                                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 group-hover:bg-blue-600 flex-shrink-0"
                                     style={{ backgroundColor: '#F3F4F6' }}
                                   >
                                     <svg 
-                                      className="w-5 h-5 transition-colors duration-300 group-hover:text-white" 
+                                      className="w-4 h-4 sm:w-5 sm:h-5 transition-colors duration-300 group-hover:text-white" 
                                       style={{ color: '#1E65AD' }}
                                       fill="none" 
                                       stroke="currentColor" 
@@ -328,42 +328,42 @@ const BlogSection = () => {
           {/* Right Arrow Button */}
           <button
             onClick={nextSlide}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-20
-                       w-12 h-12 lg:w-14 lg:h-14 rounded-full
-                       bg-white shadow-lg border border-gray-200
-                       flex items-center justify-center
+            className="hidden sm:flex absolute right-2 sm:right-4 md:right-8 lg:right-12 top-1/2 -translate-y-1/2 z-30
+                       w-11 h-11 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full
+                       bg-white shadow-xl border-2 border-gray-200
+                       items-center justify-center
                        transition-all duration-300
-                       hover:scale-110 hover:shadow-xl active:scale-95
-                       hover:bg-gray-50 group"
+                       hover:scale-110 hover:shadow-2xl active:scale-95
+                       hover:bg-gray-50 hover:border-blue-300 group"
             aria-label="Next blog posts"
           >
             <svg
-              className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
+              className="w-6 h-6 sm:w-6 sm:h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              strokeWidth={2.5}
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
                 d="M9 5l7 7-7 7"
               />
             </svg>
           </button>
 
           {/* Navigation Dots */}
-          <div className="flex items-center justify-center mt-10">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center mt-6 sm:mt-8 md:mt-10">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {Array.from({ length: totalSlides }, (_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
                   className="transition-all duration-300"
                   style={{
-                    width: index === currentSlide ? '28px' : '10px',
-                    height: '10px',
-                    borderRadius: '5px',
+                    width: index === currentSlide ? '24px' : '8px',
+                    height: '8px',
+                    borderRadius: '4px',
                     backgroundColor: index === currentSlide ? '#1E65AD' : '#D1D5DB'
                   }}
                 />
@@ -373,10 +373,10 @@ const BlogSection = () => {
         </div>
 
         {/* View All Button */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-8 sm:mt-10 md:mt-12">
             <button
             onClick={() => navigate('/blog')}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 rounded-full text-sm sm:text-base font-semibold transition-all duration-300"
               style={{ 
               backgroundColor: '#CF9B63', 
               color: '#FFFFFF',
@@ -395,7 +395,7 @@ const BlogSection = () => {
               }}
             >
             View All Articles
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </button>

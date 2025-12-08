@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -7,6 +7,13 @@ import { Calendar, Clock, User, ArrowLeft, Share2, Tag, Facebook, Twitter, Linke
 const BlogPost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Scroll to top when component mounts or id changes
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [id]);
 
   // Sample blog posts data (in a real app, this would come from an API)
   const blogPosts = {

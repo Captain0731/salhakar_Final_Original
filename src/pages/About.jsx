@@ -31,74 +31,18 @@ const About = () => {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
-      {/* Hero Section - Matching Support Page Style */}
-      <div 
-        className="pt-20 sm:pt-36 md:pt-40 pb-12 sm:pb-20 md:pb-24 relative overflow-hidden h-96"
-        style={{
-          background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
-        }}
-      >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-10 w-96 h-96 rounded-full"
-            style={{ backgroundColor: '#1E65AD', filter: 'blur(100px)' }}
-          ></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full"
-            style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
-          ></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-2"
-              style={{ 
-                fontFamily: "'Bricolage Grotesque', sans-serif",
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                lineHeight: '1.2'
-              }}
-            >
-              Experience Salhakar
+      {/* Enhanced Header Section */}
+      <div className="bg-white border-b border-gray-200 pt-14 sm:pt-16 md:pt-20 animate-slide-in-bottom w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12 w-full">
+          <div className="text-center">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+              About Us
             </h1>
-              <div className="w-24 sm:w-32 md:w-40 h-1.5 sm:h-2 mx-auto rounded-full mb-2"
-              style={{ backgroundColor: '#FFFFFF', opacity: 0.9 }}
-            ></div>
-            <p 
-              className="text-lg sm:text-xl md:text-2xl text-white max-w-3xl mx-auto mb-2"
-              style={{ 
-                fontFamily: "'Heebo', sans-serif",
-                opacity: 0.95,
-                lineHeight: '1.6'
-              }}
-            >
-              where legal research doesn't just keep up, but leads the way.
+            <div className="w-12 sm:w-16 md:w-20 h-0.5 sm:h-1 mx-auto mb-3 sm:mb-4 md:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-3xl mx-auto px-2 sm:px-4 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
+              Learn about our mission to revolutionize legal research and make justice accessible to all
             </p>
-            
-            {/* Features List */}
-            {/* <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
-                  className="flex items-center gap-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full px-4 sm:px-6 py-2 sm:py-3"
-                >
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                  <span 
-                    className="text-sm sm:text-base text-white font-medium"
-                    style={{ fontFamily: "'Heebo', sans-serif" }}
-                  >
-                    {feature}
-                  </span>
-                </motion.div>
-              ))}
-            </div> */}
-          </motion.div>
+          </div>
         </div>
       </div>
 

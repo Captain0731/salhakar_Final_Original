@@ -261,12 +261,13 @@ const LanguageSelector = () => {
                 setShowTooltip(false);
                 setIsHovered(false);
               }}
-              className="flex items-center justify-between gap-1 sm:gap-2 px-1 sm:px-1.5 md:px-3 py-0.5 sm:py-1 md:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[28px] sm:min-h-[32px] md:min-h-[38px] notranslate"
+              className="flex items-center justify-between gap-1 sm:gap-2 px-1 sm:px-1.5 md:px-3 py-0.5 sm:py-1 md:py-2 rounded-md sm:rounded-lg transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full relative z-10 group min-h-[28px] sm:min-h-[32px] md:min-h-[38px] notranslate flex-nowrap"
               style={{ 
                 color: '#1E65AD',
                 fontFamily: 'Roboto, sans-serif',
                 background: 'white',
                 cursor: 'pointer',
+                flexWrap: 'nowrap'
               }}
               aria-label={`Current language: ${currentLanguage.name}. Click to change language.`}
               aria-expanded={isOpen}
@@ -287,7 +288,7 @@ const LanguageSelector = () => {
                 </svg>
                 
                 {/* Auto-scrolling language display */}
-                <div className="h-3.5 sm:h-4 md:h-5 lg:h-6 w-auto min-w-[40px] sm:min-w-[45px] md:min-w-[60px] overflow-hidden relative language-carousel select-none">
+                <div className="h-3.5 sm:h-4 md:h-5 lg:h-6 w-auto min-w-[30px] sm:min-w-[40px] md:min-w-[60px] overflow-hidden relative language-carousel select-none flex-shrink-0">
                   {/* ticker content */}
                   <div
                     className="will-change-transform"
@@ -318,8 +319,8 @@ const LanguageSelector = () => {
               
               {/* Chevron Icon */}
               <svg 
-                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3.5 md:h-3.5 transition-all duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''} ${isHovered ? 'translate-y-0.5' : ''}`}
-                style={{ color: '#1E65AD' }}
+                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3.5 md:h-3.5 transition-all duration-300 flex-shrink-0 self-center ${isOpen ? 'rotate-180' : ''}`}
+                style={{ color: '#1E65AD', marginLeft: 'auto' }}
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"

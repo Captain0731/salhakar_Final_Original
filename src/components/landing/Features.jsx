@@ -273,8 +273,8 @@ const Features = React.forwardRef((props, ref) => {
           <div className="w-12 sm:w-16 md:w-20 lg:w-24 h-0.5 sm:h-1 mx-auto rounded-full" style={{ backgroundColor: '#CF9B63' }}></div>
         </div>
 
-        {/* Features Grid - 2 columns (pairs) on all screen sizes */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-2 gap-3 sm:gap-6 md:gap-8">
+        {/* Features Grid - 2 columns (pairs) only on mobile, 3 columns on larger screens */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 max-w-5xl mx-auto">
           {features.map((feature, index) => (
             <FeatureCard 
               key={feature.id}

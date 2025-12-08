@@ -1,8 +1,15 @@
 import React, { forwardRef } from "react";
+import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import QuickLinks from "./QuickLinks";
 
 const Hero = forwardRef((props, ref) => {
+  const navigate = useNavigate();
+
+  const handleFreeTrialClick = () => {
+    navigate('/pricing');
+  };
+
   return (
     <section
       ref={ref}
@@ -11,6 +18,57 @@ const Hero = forwardRef((props, ref) => {
         background: 'radial-gradient(ellipse at center, #B8D4E8 0%, #D8E8F0 30%, #FCFFFF 50%, #F5F5F0 100%)'
       }}
     >
+      {/* Vertical Free Trial Button - Left Side */}
+      <button
+        onClick={handleFreeTrialClick}
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-10 hidden lg:flex flex-col items-center justify-center gap-3 bg-white text-[#1E65AD] px-2 py-8 rounded-r-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:translate-x-2 border-2 border-[#1E65AD] border-l-0"
+        style={{
+          fontFamily: "'Heebo', sans-serif",
+          fontWeight: 600,
+          boxShadow: '4px 0 20px rgba(30, 101, 173, 0.2)',
+          minWidth: '55px'
+        }}
+      >
+        {/* Text Container */}
+        <div className="flex flex-col items-center gap-1">
+          <span 
+            className="transform -rotate-90"
+            style={{
+              fontSize: '12px',
+              letterSpacing: '0.03em',
+              color: '#1E65AD'
+            }}
+          >
+            Free
+          </span>
+          <span 
+            className="transform -rotate-90"
+            style={{
+              fontSize: '12px',
+              letterSpacing: '0.03em',
+              color: '#1E65AD'
+            }}
+          >
+            Trial
+          </span>
+        </div>
+        
+        {/* Icon at Bottom */}
+        <div className="mb-0">
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2"
+            className="text-[#1E65AD]"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+      </button>
+
       {/* Soft Radial Gradient Background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0" style={{

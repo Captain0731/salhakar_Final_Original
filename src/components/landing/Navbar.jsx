@@ -278,8 +278,8 @@ const Navbar = () => {
             style={{ 
               height: 'auto',
               maxHeight: isScrolled 
-                ? 'clamp(2rem, 5vw, 2.5rem)' 
-                : 'clamp(2.5rem, 6vw, 3rem)',
+                ? 'clamp(1.5rem, 4vw, 2rem)' 
+                : 'clamp(1.75rem, 4.5vw, 2.25rem)',
               width: 'auto'
             }}
             onError={(e) => {

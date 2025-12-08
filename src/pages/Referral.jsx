@@ -95,57 +95,22 @@ export default function Referral() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
       
-      {/* Hero Section */}
-      <div 
-        className="pt-24 sm:pt-32 md:pt-36 lg:pt-40 pb-12 sm:pb-16 md:pb-20 lg:pb-24 relative overflow-hidden min-h-[300px] sm:min-h-[400px] md:h-96"
-        style={{
-          background: 'linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)'
-        }}
-      >
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 sm:top-20 left-5 sm:left-10 w-48 h-48 sm:w-96 sm:h-96 rounded-full"
-            style={{ backgroundColor: '#1E65AD', filter: 'blur(100px)' }}
-          ></div>
-          <div className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-48 h-48 sm:w-96 sm:h-96 rounded-full"
-            style={{ backgroundColor: '#CF9B63', filter: 'blur(100px)' }}
-          ></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 relative z-10 mb-4 sm:mb-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 sm:mb-3"
-              style={{ 
-                fontFamily: "'Bricolage Grotesque', sans-serif",
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                lineHeight: '1.2'
-              }}
-            >
+      {/* Enhanced Header Section */}
+      <div className="bg-white border-b border-gray-200 pt-14 sm:pt-16 md:pt-20 animate-slide-in-bottom w-full overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 lg:py-12 w-full">
+          <div className="text-center">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 animate-fade-in-up" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
               Referral Program
             </h1>
-            <div className="w-16 sm:w-24 md:w-32 lg:w-40 h-1 sm:h-1.5 md:h-2 mx-auto rounded-full mb-2 sm:mb-3"
-              style={{ backgroundColor: '#FFFFFF', opacity: 0.9 }}
-            ></div>
-            <p 
-              className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white max-w-3xl mx-auto mb-2 px-2 sm:px-0"
-              style={{ 
-                fontFamily: "'Heebo', sans-serif",
-                opacity: 0.95,
-                lineHeight: '1.6'
-              }}
-            >
-              Invite friends to सलहाकार and earn rewards for every successful referral. Help others access legal services while earning money for yourself.
+            <div className="w-12 sm:w-16 md:w-20 h-0.5 sm:h-1 mx-auto mb-3 sm:mb-4 md:mb-6 animate-fade-in-up" style={{ backgroundColor: '#CF9B63', animationDelay: '0.2s' }}></div>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-3xl mx-auto px-2 sm:px-4 animate-fade-in-up" style={{ color: '#8C969F', fontFamily: 'Roboto, sans-serif', animationDelay: '0.4s' }}>
+              Invite friends to सलहाकार and earn rewards for every successful referral. Help others access legal services while earning money for yourself
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24 -mt-6 sm:-mt-8 md:-mt-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-10 md:mb-12">

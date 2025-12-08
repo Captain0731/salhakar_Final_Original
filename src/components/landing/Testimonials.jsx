@@ -138,14 +138,14 @@ const Testimonials = () => {
   return (
     <section 
       ref={sectionRef}
-      className="py-16 sm:py-20 lg:py-24 relative overflow-hidden"
+      className="py-10 sm:py-12 md:py-16 relative overflow-hidden"
       style={{ backgroundColor: '#F9FAFC' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-10">
           <span 
-            className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4"
+            className="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-3"
             style={{ 
               backgroundColor: '#EBF5FF', 
               color: '#1E65AD',
@@ -155,13 +155,13 @@ const Testimonials = () => {
             Testimonials
           </span>
           <h2 
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3"
             style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}
           >
             What Our Users Say
           </h2>
           <p 
-            className="text-lg max-w-2xl mx-auto"
+            className="text-base sm:text-lg max-w-2xl mx-auto"
             style={{ color: '#8C969F', fontFamily: 'Heebo, sans-serif' }}
           >
             Trusted by legal professionals across India
@@ -169,14 +169,14 @@ const Testimonials = () => {
         </div>
 
         {/* Testimonials Carousel */}
-        <div className="relative" style={{ minHeight: '400px' }}>
+        <div className="relative" style={{ minHeight: '320px' }}>
           {/* Left Arrow Button */}
           <button
             onClick={goToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-20
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-20
                        w-12 h-12 lg:w-14 lg:h-14 rounded-full
                        bg-white shadow-lg border border-gray-200
-                       flex items-center justify-center
+                       items-center justify-center
                        transition-all duration-300
                        hover:scale-110 hover:shadow-xl active:scale-95
                        hover:bg-gray-50 group"
@@ -197,7 +197,7 @@ const Testimonials = () => {
             </svg>
           </button>
 
-          <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-10" style={{ gap: 'clamp(1rem, 2vw, 2.5rem)' }}>
+          <div className="flex items-center justify-center gap-3 sm:gap-4 md:gap-6" style={{ gap: 'clamp(0.75rem, 1.5vw, 1.5rem)' }}>
             {visibleCards.map(({ index, position }) => {
               const testimonial = testimonials[index];
               const isCenter = position === 'center';
@@ -230,7 +230,7 @@ const Testimonials = () => {
                         ? '0 25px 50px -12px rgba(30, 101, 173, 0.25)' 
                         : '0 10px 25px -10px rgba(0, 0, 0, 0.1)',
                       border: isCenter ? '2px solid #1E65AD' : '1px solid #E5E7EB',
-                      padding: 'clamp(1.5rem, 3vw, 2rem)',
+                      padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
                       borderRadius: 'clamp(1rem, 2vw, 1.5rem)'
                     }}
                   >
@@ -249,7 +249,7 @@ const Testimonials = () => {
                     </div>
 
                     {/* Stars */}
-                    <div className="flex gap-1" style={{ marginBottom: 'clamp(1rem, 2vw, 1.5rem)' }}>
+                    <div className="flex gap-1" style={{ marginBottom: 'clamp(0.75rem, 1.5vw, 1.25rem)' }}>
                       {[1, 2, 3, 4, 5].map((star) => (
                               <svg
                           key={star}
@@ -270,7 +270,7 @@ const Testimonials = () => {
                         fontFamily: 'Heebo, sans-serif',
                         fontSize: 'clamp(0.875rem, 1.2vw, 1.1rem)',
                         lineHeight: '1.75',
-                        marginBottom: 'clamp(1.5rem, 3vw, 2rem)'
+                        marginBottom: 'clamp(1rem, 2vw, 1.5rem)'
                       }}
                           >
                             "{testimonial.content}"
@@ -283,7 +283,7 @@ const Testimonials = () => {
                         backgroundColor: isCenter ? '#1E65AD' : '#D1D5DB',
                         width: 'clamp(2.5rem, 4vw, 3rem)',
                         height: 'clamp(0.25rem, 0.5vw, 0.375rem)',
-                        marginBottom: 'clamp(1rem, 2vw, 1.5rem)'
+                        marginBottom: 'clamp(0.75rem, 1.5vw, 1.25rem)'
                       }}
                     />
 
@@ -320,10 +320,10 @@ const Testimonials = () => {
           {/* Right Arrow Button */}
           <button
             onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-20
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-20
                        w-12 h-12 lg:w-14 lg:h-14 rounded-full
                        bg-white shadow-lg border border-gray-200
-                       flex items-center justify-center
+                       items-center justify-center
                        transition-all duration-300
                        hover:scale-110 hover:shadow-xl active:scale-95
                        hover:bg-gray-50 group"
@@ -346,7 +346,7 @@ const Testimonials = () => {
         </div>
 
         {/* Navigation Dots */}
-        <div className="flex items-center justify-center mt-10">
+        <div className="flex items-center justify-center mt-6 sm:mt-8">
             <div className="flex items-center gap-2">
               {Array.from({ length: totalSlides }, (_, index) => (
                 <button
