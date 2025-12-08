@@ -36,6 +36,11 @@ const Calendar = ({ onBack }) => {
     reminderTime: '15'
   });
 
+  // Delete confirmation modal state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
   // Convert API event format to component format
   const mapApiEventToComponent = (apiEvent) => {
     // Parse date string to Date object
@@ -213,22 +218,28 @@ const Calendar = ({ onBack }) => {
     }
   };
 
-  const handleDeleteEvent = async (eventId) => {
-    if (!window.confirm('Are you sure you want to delete this event?')) {
-      return;
-    }
+  const handleDeleteEvent = (eventId) => {
+    const event = events.find(e => e.id === eventId);
+    setEventToDelete(event);
+    setShowDeleteConfirm(true);
+  };
 
-    setLoading(true);
+  const confirmDeleteEvent = async () => {
+    if (!eventToDelete) return;
+
+    setDeleting(true);
     setError(null);
     try {
-      await apiService.deleteCalendarEvent(eventId);
+      await apiService.deleteCalendarEvent(eventToDelete.id);
       // Reload events
       await loadEvents();
+      setShowDeleteConfirm(false);
+      setEventToDelete(null);
     } catch (err) {
       console.error('Error deleting calendar event:', err);
       setError(err.message || 'Failed to delete calendar event');
     } finally {
-      setLoading(false);
+      setDeleting(false);
     }
   };
 
@@ -800,6 +811,97 @@ const Calendar = ({ onBack }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-50"
+            onClick={() => {
+              if (!deleting) {
+                setShowDeleteConfirm(false);
+                setEventToDelete(null);
+              }
+            }}
+          />
+          <div
+            className="fixed bg-white rounded-xl shadow-2xl z-50"
+            style={{
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90vw',
+              maxWidth: '400px',
+              fontFamily: 'Roboto, sans-serif'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div 
+                  className="p-2.5 rounded-lg flex-shrink-0"
+                  style={{ backgroundColor: '#FEE2E2' }}
+                >
+                  <Trash2 className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 
+                    className="text-lg font-semibold text-gray-900"
+                    style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
+                  >
+                    Delete Event?
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    This action cannot be undone
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Content */}
+            <div className="p-4 sm:p-6">
+              <p className="text-sm text-gray-700 mb-4">
+                Are you sure you want to delete <strong>"{eventToDelete?.title || 'this event'}"</strong>? 
+                <span className="text-xs text-gray-500"> This action cannot be undone.</span>
+              </p>
+              
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setEventToDelete(null);
+                  }}
+                  disabled={deleting}
+                  className="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteEvent}
+                  disabled={deleting}
+                  className="px-4 py-2 rounded-lg transition-colors text-sm font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ 
+                    backgroundColor: deleting ? '#9CA3AF' : '#EF4444',
+                    fontFamily: 'Roboto, sans-serif'
+                  }}
+                >
+                  {deleting ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Deleting...
+                    </span>
+                  ) : (
+                    'Delete'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

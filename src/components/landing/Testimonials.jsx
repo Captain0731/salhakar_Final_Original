@@ -3,6 +3,8 @@ import useScrollAnimation from "../../hooks/useScrollAnimation";
 
 const Testimonials = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedTestimonial, setSelectedTestimonial] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { ref: sectionRef, isVisible } = useScrollAnimation({ threshold: 0.1, rootMargin: '50px' });
   
   const testimonials = [
@@ -73,6 +75,45 @@ const Testimonials = () => {
     setCurrentSlide(index);
   };
 
+  const goToNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  };
+
+  const goToPrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  };
+
+  // Modal functions
+  const openModal = (testimonial) => {
+    setSelectedTestimonial(testimonial);
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedTestimonial(null);
+    document.body.style.overflow = 'unset'; // Restore scroll
+  };
+
+  // Close modal on ESC key
+  useEffect(() => {
+    if (!isModalOpen) return;
+    
+    const handleEsc = (event) => {
+      if (event.keyCode === 27) {
+        setIsModalOpen(false);
+        setSelectedTestimonial(null);
+        document.body.style.overflow = 'unset';
+      }
+    };
+    
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [isModalOpen]);
+
   // Auto-slide
   useEffect(() => {
     const interval = setInterval(() => {
@@ -129,6 +170,33 @@ const Testimonials = () => {
 
         {/* Testimonials Carousel */}
         <div className="relative" style={{ minHeight: '400px' }}>
+          {/* Left Arrow Button */}
+          <button
+            onClick={goToPrev}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-20
+                       w-12 h-12 lg:w-14 lg:h-14 rounded-full
+                       bg-white shadow-lg border border-gray-200
+                       flex items-center justify-center
+                       transition-all duration-300
+                       hover:scale-110 hover:shadow-xl active:scale-95
+                       hover:bg-gray-50 group"
+            aria-label="Previous testimonials"
+          >
+            <svg
+              className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
           <div className="flex items-center justify-center gap-6 md:gap-8">
             {visibleCards.map(({ index, position }) => {
               const testimonial = testimonials[index];
@@ -145,12 +213,12 @@ const Testimonials = () => {
                     maxWidth: isMobile ? '360px' : 'none',
                     opacity: isCenter ? 1 : 0.5,
                     transform: `scale(${isCenter ? 1 : 0.85}) translateY(${isCenter ? 0 : 20}px)`,
-                    zIndex: isCenter ? 10 : 5,
-                    filter: isCenter ? 'none' : 'blur(1px)'
+                    zIndex: isCenter ? 10 : 5
                   }}
                 >
                   <div
-                    className="rounded-3xl p-8 transition-all duration-300 relative overflow-hidden"
+                    onClick={() => openModal(testimonial)}
+                    className="rounded-3xl p-8 transition-all duration-300 relative overflow-hidden cursor-pointer hover:scale-105"
                     style={{ 
                       backgroundColor: isCenter ? '#FFFFFF' : '#F3F4F6',
                       boxShadow: isCenter 
@@ -226,7 +294,34 @@ const Testimonials = () => {
                 );
               })}
             </div>
-          </div>
+
+          {/* Right Arrow Button */}
+          <button
+            onClick={goToNext}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-20
+                       w-12 h-12 lg:w-14 lg:h-14 rounded-full
+                       bg-white shadow-lg border border-gray-200
+                       flex items-center justify-center
+                       transition-all duration-300
+                       hover:scale-110 hover:shadow-xl active:scale-95
+                       hover:bg-gray-50 group"
+            aria-label="Next testimonials"
+          >
+            <svg
+              className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
 
         {/* Navigation Dots */}
         <div className="flex items-center justify-center mt-10">
@@ -247,6 +342,105 @@ const Testimonials = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal Popup */}
+      {isModalOpen && selectedTestimonial && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all duration-300 scale-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+              <h3 className="text-xl font-bold text-gray-900">Testimonial Details</h3>
+              <button
+                onClick={closeModal}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                aria-label="Close modal"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 sm:p-8">
+              {/* User Info */}
+              <div className="mb-6">
+                <h4 className="text-2xl font-bold text-gray-900 mb-1">
+                  {selectedTestimonial.name}
+                </h4>
+                <p className="text-lg text-blue-600 font-medium mb-1">
+                  {selectedTestimonial.title}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {selectedTestimonial.company}
+                </p>
+              </div>
+
+              {/* Stars Rating */}
+              <div className="flex gap-1 mb-6">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg
+                    key={star}
+                    className="w-6 h-6"
+                    fill="#CF9B63"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+
+              {/* Quote Icon */}
+              <div className="absolute top-20 right-8 text-7xl text-blue-50 font-serif leading-none">
+                "
+              </div>
+
+              {/* Testimonial Content */}
+              <div className="relative">
+                <blockquote className="text-lg sm:text-xl text-gray-700 leading-relaxed mb-6">
+                  "{selectedTestimonial.content}"
+                </blockquote>
+              </div>
+
+              {/* Divider */}
+              <div className="w-20 h-1 rounded-full bg-blue-600 mb-6"></div>
+
+              {/* Additional Info */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold text-gray-900">Verified User:</span> This testimonial has been verified by our team.
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-end rounded-b-2xl">
+              <button
+                onClick={closeModal}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

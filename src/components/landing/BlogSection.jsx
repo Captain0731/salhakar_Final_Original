@@ -153,6 +153,33 @@ const BlogSection = () => {
 
           {/* Slider Container */}
         <div className="relative">
+          {/* Left Arrow Button */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 z-20
+                       w-12 h-12 lg:w-14 lg:h-14 rounded-full
+                       bg-white shadow-lg border border-gray-200
+                       flex items-center justify-center
+                       transition-all duration-300
+                       hover:scale-110 hover:shadow-xl active:scale-95
+                       hover:bg-gray-50 group"
+            aria-label="Previous blog posts"
+          >
+            <svg
+              className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
           {/* Slider */}
           <div className="overflow-hidden">
             <div 
@@ -298,6 +325,33 @@ const BlogSection = () => {
             </div>
           </div>
 
+          {/* Right Arrow Button */}
+          <button
+            onClick={nextSlide}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 z-20
+                       w-12 h-12 lg:w-14 lg:h-14 rounded-full
+                       bg-white shadow-lg border border-gray-200
+                       flex items-center justify-center
+                       transition-all duration-300
+                       hover:scale-110 hover:shadow-xl active:scale-95
+                       hover:bg-gray-50 group"
+            aria-label="Next blog posts"
+          >
+            <svg
+              className="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+
           {/* Navigation Dots */}
           <div className="flex items-center justify-center mt-10">
             <div className="flex items-center gap-2">
@@ -316,7 +370,7 @@ const BlogSection = () => {
               ))}
             </div>
           </div>
-            </div>
+        </div>
 
         {/* View All Button */}
         <div className="text-center mt-12">
