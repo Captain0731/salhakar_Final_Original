@@ -2017,57 +2017,133 @@ class ApiService {
 
   // Get full judgment details by ID (for viewing bookmarked judgments)
   async getJudgementById(judgementId) {
+    const endpoint = `${this.baseURL}/api/judgements/${judgementId}`;
+    
     try {
-      const response = await fetch(`${this.baseURL}/api/judgements/${judgementId}`, {
+      console.log(`🔍 Fetching High Court judgment by ID: ${judgementId} from ${endpoint}`);
+      
+      // Try with auth first, then without if 401
+      let response;
+      let headers = this.getAuthHeaders();
+      
+      response = await fetch(endpoint, {
         method: 'GET',
-        headers: this.getAuthHeaders()
+        headers: headers
       });
       
-      if (!response.ok) {
-        // If direct fetch fails, try with fallback search
-        if (response.status === 404) {
-          console.warn(`Judgment ${judgementId} not found via direct endpoint, trying search fallback...`);
-          // Fallback: fetch judgments list and search by ID
-          try {
-            const searchResponse = await this.getJudgements({ limit: 100 });
-            if (searchResponse.data && searchResponse.data.length > 0) {
-              const foundJudgment = searchResponse.data.find(j => 
-                j.id === parseInt(judgementId) || 
-                j.id === judgementId ||
-                j.id === String(judgementId)
-              );
-              if (foundJudgment) {
-                console.log('✅ Found judgment via fallback search');
-                return foundJudgment;
-              }
-            }
-            // Try with larger limit if first attempt didn't find it
-            const largeSearchResponse = await this.getJudgements({ limit: 1000, offset: 0 });
-            if (largeSearchResponse.data && largeSearchResponse.data.length > 0) {
-              const foundJudgment = largeSearchResponse.data.find(j => 
-                j.id === parseInt(judgementId) || 
-                j.id === judgementId ||
-                j.id === String(judgementId)
-              );
-              if (foundJudgment) {
-                console.log('✅ Found judgment via large fallback search');
-                return foundJudgment;
-              }
-            }
-          } catch (fallbackErr) {
-            console.error('Fallback search also failed:', fallbackErr);
-          }
-          throw new Error(`Judgment with ID ${judgementId} not found`);
-        }
-        throw new Error(`Failed to fetch judgment: ${response.statusText}`);
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+      
+      // If 401, try without auth (public endpoint)
+      if (response.status === 401) {
+        console.log('⚠️ Got 401, trying without authentication...');
+        headers = this.getPublicHeaders();
+        response = await fetch(endpoint, {
+          method: 'GET',
+          headers: headers
+        });
+        console.log(`📡 Response status (no auth): ${response.status} ${response.statusText}`);
       }
       
-      const data = await response.json();
-      // Handle both direct object and wrapped responses
-      return data.data || data.judgment || data;
+      if (!response.ok) {
+        let errorMessage = `Failed to fetch judgment: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.message || errorData.detail) {
+            errorMessage = errorData.message || errorData.detail;
+          }
+        } catch (e) {
+          // If response is not JSON, use status text
+        }
+        throw new Error(errorMessage);
+      }
+      
+      // Parse JSON directly - API returns direct object
+      const judgmentData = await response.json();
+      console.log('✅ Received High Court judgment data:', judgmentData);
+      
+      // Return the data directly - it's already in the correct format
+      return judgmentData;
     } catch (err) {
-      console.error('Error fetching judgment by ID:', err);
-      throw err;
+      console.error('❌ Error fetching High Court judgment by ID:', err);
+      
+      // Handle network errors specifically
+      if (err.name === 'TypeError' && (err.message.includes('fetch') || err.message.includes('Failed to fetch'))) {
+        throw new Error('Failed to fetch: Network error. Please check your connection and try again.');
+      }
+      
+      // Re-throw with original message if it's already an Error
+      if (err instanceof Error) {
+        throw err;
+      }
+      
+      // Otherwise wrap in Error
+      throw new Error(err.message || 'Failed to load judgment');
+    }
+  }
+
+  // Get Supreme Court judgment details by ID
+  async getSupremeCourtJudgementById(judgementId) {
+    const endpoint = `${this.baseURL}/api/supreme-court-judgements/${judgementId}`;
+    
+    try {
+      console.log(`🔍 Fetching Supreme Court judgment by ID: ${judgementId} from ${endpoint}`);
+      
+      // Try with auth first, then without if 401
+      let response;
+      let headers = this.getAuthHeaders();
+      
+      response = await fetch(endpoint, {
+        method: 'GET',
+        headers: headers
+      });
+      
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+      
+      // If 401, try without auth (public endpoint)
+      if (response.status === 401) {
+        console.log('⚠️ Got 401, trying without authentication...');
+        headers = this.getPublicHeaders();
+        response = await fetch(endpoint, {
+          method: 'GET',
+          headers: headers
+        });
+        console.log(`📡 Response status (no auth): ${response.status} ${response.statusText}`);
+      }
+      
+      if (!response.ok) {
+        let errorMessage = `Failed to fetch Supreme Court judgment: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.message || errorData.detail) {
+            errorMessage = errorData.message || errorData.detail;
+          }
+        } catch (e) {
+          // If response is not JSON, use status text
+        }
+        throw new Error(errorMessage);
+      }
+      
+      // Parse JSON directly - API returns direct object
+      const judgmentData = await response.json();
+      console.log('✅ Received Supreme Court judgment data:', judgmentData);
+      
+      // Return the data directly - it's already in the correct format
+      return judgmentData;
+    } catch (err) {
+      console.error('❌ Error fetching Supreme Court judgment by ID:', err);
+      
+      // Handle network errors specifically
+      if (err.name === 'TypeError' && (err.message.includes('fetch') || err.message.includes('Failed to fetch'))) {
+        throw new Error('Failed to fetch: Network error. Please check your connection and try again.');
+      }
+      
+      // Re-throw with original message if it's already an Error
+      if (err instanceof Error) {
+        throw err;
+      }
+      
+      // Otherwise wrap in Error
+      throw new Error(err.message || 'Failed to load Supreme Court judgment');
     }
   }
 

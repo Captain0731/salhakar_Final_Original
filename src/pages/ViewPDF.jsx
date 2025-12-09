@@ -218,48 +218,86 @@ export default function ViewPDF() {
 
   useEffect(() => {
     const loadJudgmentData = async () => {
+      console.log('📄 ViewPDF: loadJudgmentData called', {
+        urlId,
+        hasState: !!location.state,
+        hasJudgmentInState: !!location.state?.judgment,
+        hasActInState: !!location.state?.act
+      });
+      
       // Get act or judgment data from location state
       const actData = location.state?.act;
       const judgmentData = location.state?.judgment;
      
       // If URL has ID but no judgment data in state, fetch by ID
       if (urlId && !judgmentData && !actData) {
+        console.log('📄 ViewPDF: Will fetch judgment by ID from URL:', urlId);
         try {
           setLoading(true);
           setError("");
           console.log('📄 ViewPDF: Fetching judgment by ID from URL:', urlId);
           
-          const response = await apiService.getJudgementById(urlId);
+          let fetchedJudgment = null;
+          let fetchError = null;
           
-          // Handle different response structures
-          let fetchedJudgment = response;
-          if (Array.isArray(response)) {
-            fetchedJudgment = response[0]; // Take first item if array
-          } else if (response?.data) {
-            fetchedJudgment = Array.isArray(response.data) ? response.data[0] : response.data;
-          } else if (response?.judgment) {
-            fetchedJudgment = response.judgment;
+          // Try High Court endpoint first
+          try {
+            console.log('🔍 Trying High Court endpoint...');
+            fetchedJudgment = await apiService.getJudgementById(urlId);
+            console.log('✅ Found in High Court');
+          } catch (highCourtErr) {
+            console.log('⚠️ High Court fetch failed:', highCourtErr.message);
+            fetchError = highCourtErr;
+            
+            // If 404 or "not found", try Supreme Court endpoint
+            if (highCourtErr.message.includes('not found') || 
+                highCourtErr.message.includes('404') ||
+                highCourtErr.message.includes('Judgment with ID')) {
+              try {
+                console.log('🔍 Trying Supreme Court endpoint...');
+                fetchedJudgment = await apiService.getSupremeCourtJudgementById(urlId);
+                console.log('✅ Found in Supreme Court');
+                fetchError = null; // Clear error since we found it
+              } catch (supremeCourtErr) {
+                console.log('⚠️ Supreme Court fetch also failed:', supremeCourtErr.message);
+                fetchError = supremeCourtErr;
+              }
+            }
           }
           
           if (fetchedJudgment) {
             console.log('📄 ViewPDF: Fetched judgment data:', fetchedJudgment);
             setJudgmentInfo(fetchedJudgment);
             
+            // Handle both pdf_url (from API) and pdf_link (for backward compatibility)
+            // Supreme Court uses pdf_url, High Court uses pdf_link
             const originalPdfUrl = fetchedJudgment.pdf_link || fetchedJudgment.pdf_url || "";
+            
             if (!originalPdfUrl || originalPdfUrl.trim() === "") {
               console.warn('⚠️ ViewPDF: No PDF URL found in judgment data');
               setError('PDF URL not available for this judgment');
+              setLoading(false);
+              return;
             }
             
+            console.log('📄 ViewPDF: PDF URL resolved:', originalPdfUrl);
             setPdfUrl(originalPdfUrl);
-            setTotalPages(25);
+            setTotalPages(25); // Default page count, could be enhanced with API data
             setLoading(false);
           } else {
-            throw new Error('Judgment not found');
+            // Both endpoints failed
+            throw fetchError || new Error('Judgment not found in High Court or Supreme Court');
           }
         } catch (err) {
           console.error('❌ ViewPDF: Error fetching judgment by ID:', err);
-          setError(err.message || 'Failed to load judgment');
+          // Show more specific error messages
+          let errorMessage = 'Failed to load judgment';
+          if (err.message) {
+            errorMessage = err.message;
+          } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+            errorMessage = 'Network error: Unable to connect to the server. Please check your internet connection.';
+          }
+          setError(errorMessage);
           setLoading(false);
         }
         return;
