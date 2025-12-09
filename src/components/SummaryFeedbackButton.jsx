@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ThumbsUp, ThumbsDown, Loader2, X, Check } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Loader2, X, Check, Copy, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiService from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
-const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted }) => {
+const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted, summaryText = '' }) => {
   const { isAuthenticated } = useAuth();
   const [userRating, setUserRating] = useState(null);
   const [feedbackText, setFeedbackText] = useState('');
@@ -184,65 +184,169 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
     }
   };
 
-  if (!isAuthenticated) {
-    return null; // Don't show feedback buttons if not authenticated
-  }
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!summaryText || summaryText.trim() === '') {
+      alert('No summary content available to copy');
+      return;
+    }
+
+    try {
+      // Remove markdown formatting for plain text copy
+      const plainText = summaryText
+        .replace(/#{1,6}\s+/g, '') // Remove headers
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic
+        .replace(/`(.*?)`/g, '$1') // Remove inline code
+        .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Remove links
+        .trim();
+
+      await navigator.clipboard.writeText(plainText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = summaryText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').trim();
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (e) {
+        alert('Failed to copy text');
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!summaryText || summaryText.trim() === '') {
+      alert('No summary content available to share');
+      return;
+    }
+
+    const plainText = summaryText
+      .replace(/#{1,6}\s+/g, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/`(.*?)`/g, '$1')
+      .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+      .trim();
+
+    const shareData = {
+      title: 'Legal Summary',
+      text: plainText.substring(0, 500) + (plainText.length > 500 ? '...' : ''),
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to copy
+        await navigator.clipboard.writeText(plainText);
+        alert('Summary copied to clipboard!');
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        // Fallback to copy
+        try {
+          await navigator.clipboard.writeText(plainText);
+          alert('Summary copied to clipboard!');
+        } catch (copyErr) {
+          console.error('Failed to share or copy:', copyErr);
+        }
+      }
+    }
+  };
 
   return (
     <>
       <div ref={buttonRef} className="relative flex items-center gap-2">
-        {/* Thumbs Up Button - Icon Only */}
+        {/* Copy Button - First */}
         <motion.button
-          onClick={() => handleRatingClick('thumbs_up')}
-          disabled={submitting || loading}
-          whileHover={{ scale: submitting ? 1 : 1.1 }}
-          whileTap={{ scale: submitting ? 1 : 0.9 }}
-          className={`p-2 rounded-lg transition-all ${
-            userRating === 'thumbs_up'
-              ? 'bg-white bg-opacity-30'
-              : 'bg-white bg-opacity-20 hover:bg-opacity-30'
-          } ${submitting || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          title="Helpful"
+          onClick={handleCopy}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="p-1.5 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 cursor-pointer"
+          title="Copy summary"
         >
-          {submitting && userRating === 'thumbs_up' ? (
-            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-white" />
+          {copied ? (
+            <Check className="w-3.5 h-3.5" style={{ color: '#10B981' }} />
           ) : (
-            <ThumbsUp 
-              className="w-4 h-4 sm:w-5 sm:h-5" 
-              style={{ 
-                color: userRating === 'thumbs_up' ? '#FFFFFF' : '#FFFFFF',
-                fill: userRating === 'thumbs_up' ? '#FFFFFF' : 'none',
-                opacity: userRating === 'thumbs_up' ? 1 : 0.8
-              }} 
-            />
+            <Copy className="w-3.5 h-3.5" style={{ color: '#8C969F' }} />
           )}
         </motion.button>
 
-        {/* Thumbs Down Button - Icon Only */}
+        {/* Thumbs Up Button - Second */}
+        {isAuthenticated && (
+          <motion.button
+            onClick={() => handleRatingClick('thumbs_up')}
+            disabled={submitting || loading}
+            whileHover={{ scale: submitting ? 1 : 1.1 }}
+            whileTap={{ scale: submitting ? 1 : 0.9 }}
+            className={`p-1.5 rounded-lg transition-all ${
+              userRating === 'thumbs_up'
+                ? 'bg-blue-100'
+                : 'bg-gray-100 hover:bg-gray-200'
+            } ${submitting || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            title="Helpful"
+          >
+            {submitting && userRating === 'thumbs_up' ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: '#1E65AD' }} />
+            ) : (
+              <ThumbsUp 
+                className="w-3.5 h-3.5" 
+                style={{ 
+                  color: userRating === 'thumbs_up' ? '#1E65AD' : '#8C969F',
+                  fill: userRating === 'thumbs_up' ? '#1E65AD' : 'none'
+                }} 
+              />
+            )}
+          </motion.button>
+        )}
+
+        {/* Thumbs Down Button - Third */}
+        {isAuthenticated && (
+          <motion.button
+            onClick={() => handleRatingClick('thumbs_down')}
+            disabled={submitting || loading}
+            whileHover={{ scale: submitting ? 1 : 1.1 }}
+            whileTap={{ scale: submitting ? 1 : 0.9 }}
+            className={`p-1.5 rounded-lg transition-all ${
+              userRating === 'thumbs_down'
+                ? 'bg-blue-100'
+                : 'bg-gray-100 hover:bg-gray-200'
+            } ${submitting || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            title="Not Helpful"
+          >
+            {submitting && userRating === 'thumbs_down' ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: '#1E65AD' }} />
+            ) : (
+              <ThumbsDown 
+                className="w-3.5 h-3.5" 
+                style={{ 
+                  color: userRating === 'thumbs_down' ? '#1E65AD' : '#8C969F',
+                  fill: userRating === 'thumbs_down' ? '#1E65AD' : 'none'
+                }} 
+              />
+            )}
+          </motion.button>
+        )}
+
+        {/* Share Button - Last */}
         <motion.button
-          onClick={() => handleRatingClick('thumbs_down')}
-          disabled={submitting || loading}
-          whileHover={{ scale: submitting ? 1 : 1.1 }}
-          whileTap={{ scale: submitting ? 1 : 0.9 }}
-          className={`p-2 rounded-lg transition-all ${
-            userRating === 'thumbs_down'
-              ? 'bg-white bg-opacity-30'
-              : 'bg-white bg-opacity-20 hover:bg-opacity-30'
-          } ${submitting || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-          title="Not Helpful"
+          onClick={handleShare}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="p-1.5 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 cursor-pointer"
+          title="Share summary"
         >
-          {submitting && userRating === 'thumbs_down' ? (
-            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-white" />
-          ) : (
-            <ThumbsDown 
-              className="w-4 h-4 sm:w-5 sm:h-5" 
-              style={{ 
-                color: userRating === 'thumbs_down' ? '#FFFFFF' : '#FFFFFF',
-                fill: userRating === 'thumbs_down' ? '#FFFFFF' : 'none',
-                opacity: userRating === 'thumbs_down' ? 1 : 0.8
-              }} 
-            />
-          )}
+          <Share2 className="w-3.5 h-3.5" style={{ color: '#8C969F' }} />
         </motion.button>
       </div>
 

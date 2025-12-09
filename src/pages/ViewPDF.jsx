@@ -646,33 +646,33 @@ export default function ViewPDF() {
               >
                 {loading ? 'Retrying...' : 'Retry'}
               </button>
-              <button
-                onClick={() => {
-                  // Determine court type from judgment info if available
-                  const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
-                  const isSupremeCourt = courtName && (
-                    courtName.toLowerCase().includes('supreme') || 
-                    courtName.toLowerCase().includes('sc') ||
-                    courtName.toLowerCase() === 'supreme court of india'
-                  );
-                  
-                  const courtType = isSupremeCourt ? 'supremecourt' : 'highcourt';
-                  
-                  // Store court type in localStorage for browser back button support
-                  localStorage.setItem('lastCourtType', courtType);
-                  
-                  // Navigate to judgment access page with court type preserved
-                  navigate(`/judgment-access?court=${courtType}`, { 
-                    state: { 
-                      courtType: courtType
-                    } 
-                  });
-                }}
+            <button
+              onClick={() => {
+                // Determine court type from judgment info if available
+                const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
+                const isSupremeCourt = courtName && (
+                  courtName.toLowerCase().includes('supreme') || 
+                  courtName.toLowerCase().includes('sc') ||
+                  courtName.toLowerCase() === 'supreme court of india'
+                );
+                
+                const courtType = isSupremeCourt ? 'supremecourt' : 'highcourt';
+                
+                // Store court type in localStorage for browser back button support
+                localStorage.setItem('lastCourtType', courtType);
+                
+                // Navigate to judgment access page with court type preserved
+                navigate(`/judgment-access?court=${courtType}`, { 
+                  state: { 
+                    courtType: courtType
+                  } 
+                });
+              }}
                 className="px-5 sm:px-6 py-2 sm:py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm sm:text-base font-medium"
-                style={{ fontFamily: 'Roboto, sans-serif' }}
-              >
-                Go Back
-              </button>
+              style={{ fontFamily: 'Roboto, sans-serif' }}
+            >
+              Go Back
+            </button>
             </div>
           </div>
         </div>
@@ -700,17 +700,40 @@ export default function ViewPDF() {
                     {judgmentInfo && (
                       <div className="flex items-center gap-2 justify-end self-start sm:self-auto relative">
                         <button
-                          onClick={() => {
-                            if (!isUserAuthenticated) {
-                              navigate('/login');
-                              return;
+                          onClick={async () => {
+                            try {
+                              const judgmentId = urlId || judgmentInfo?.id || judgmentInfo?.cnr || '';
+                              const shareUrl = `${window.location.origin}/judgment/${judgmentId}`;
+                              const shareTitle = judgmentInfo?.title || 'Legal Judgment';
+                              const shareText = `Check out this legal judgment: ${shareTitle}`;
+                              
+                              const shareData = {
+                                title: shareTitle,
+                                text: shareText,
+                                url: shareUrl
+                              };
+
+                              if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                                await navigator.share(shareData);
+                              } else {
+                                // Fallback to copy
+                                await navigator.clipboard.writeText(shareUrl);
+                                alert('Link copied to clipboard!');
+                              }
+                            } catch (err) {
+                              if (err.name !== 'AbortError') {
+                                // Fallback to copy
+                                const judgmentId = urlId || judgmentInfo?.id || judgmentInfo?.cnr || '';
+                                const shareUrl = `${window.location.origin}/judgment/${judgmentId}`;
+                                try {
+                                  await navigator.clipboard.writeText(shareUrl);
+                                  alert('Link copied to clipboard!');
+                                } catch (copyErr) {
+                                  console.error('Failed to share or copy:', copyErr);
+                                  alert('Failed to share. Please try again.');
+                                }
+                              }
                             }
-                            const url = window.location.href;
-                            navigator.clipboard.writeText(url).then(() => {
-                              alert('Link copied to clipboard!');
-                            }).catch(() => {
-                              alert('Failed to copy link');
-                            });
                           }}
                           className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
                           style={{ 
@@ -723,7 +746,7 @@ export default function ViewPDF() {
                           onMouseLeave={(e) => {
                             e.target.style.backgroundColor = '#1E65AD';
                           }}
-                          title="Share"
+                          title="Share judgment"
                         >
                           <Share2 className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#FFFFFF' }} />
                         </button>

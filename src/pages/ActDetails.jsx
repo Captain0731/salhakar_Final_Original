@@ -535,13 +535,40 @@ export default function ActDetails() {
                     {act && act.id && (
                       <div className="flex items-center gap-2 justify-end self-start sm:self-auto relative">
                         <button
-                          onClick={() => {
-                            const url = window.location.href;
-                            navigator.clipboard.writeText(url).then(() => {
-                              alert('Link copied to clipboard!');
-                            }).catch(() => {
-                              alert('Failed to copy link');
-                            });
+                          onClick={async () => {
+                            try {
+                              const actId = id || act?.id || '';
+                              const shareUrl = `${window.location.origin}/acts/${actId}`;
+                              const shareTitle = act?.title || act?.name || 'Legal Act';
+                              const shareText = `Check out this legal act: ${shareTitle}`;
+                              
+                              const shareData = {
+                                title: shareTitle,
+                                text: shareText,
+                                url: shareUrl
+                              };
+
+                              if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                                await navigator.share(shareData);
+                              } else {
+                                // Fallback to copy
+                                await navigator.clipboard.writeText(shareUrl);
+                                alert('Link copied to clipboard!');
+                              }
+                            } catch (err) {
+                              if (err.name !== 'AbortError') {
+                                // Fallback to copy
+                                const actId = id || act?.id || '';
+                                const shareUrl = `${window.location.origin}/acts/${actId}`;
+                                try {
+                                  await navigator.clipboard.writeText(shareUrl);
+                                  alert('Link copied to clipboard!');
+                                } catch (copyErr) {
+                                  console.error('Failed to share or copy:', copyErr);
+                                  alert('Failed to share. Please try again.');
+                                }
+                              }
+                            }
                           }}
                           className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
                           style={{ 
@@ -554,7 +581,7 @@ export default function ActDetails() {
                           onMouseLeave={(e) => {
                             e.target.style.backgroundColor = '#1E65AD';
                           }}
-                          title="Share"
+                          title="Share act"
                         >
                           <Share2 className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#FFFFFF' }} />
                         </button>
