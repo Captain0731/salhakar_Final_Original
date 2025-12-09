@@ -2177,6 +2177,44 @@ class ApiService {
     }
   }
 
+  // Generate AI summary for law mapping
+  async generateLawMappingSummary(mappingId, mappingType, options = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+      queryParams.append('mapping_type', mappingType);
+      
+      const endpoint = `/api/law_mapping/${mappingId}/summary?${queryParams.toString()}`;
+      
+      const requestBody = {};
+      if (options.focus) {
+        requestBody.focus = options.focus;
+      }
+      if (options.max_chars_per_chunk) {
+        requestBody.max_chars_per_chunk = options.max_chars_per_chunk;
+      }
+      
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...this.getPublicHeaders()
+        },
+        body: JSON.stringify(requestBody)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Failed to generate summary: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error('Error generating law mapping summary:', err);
+      throw err;
+    }
+  }
+
   // Get law mapping by ID
   async getLawMappingById(mappingId, mappingType) {
     try {

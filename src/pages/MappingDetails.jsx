@@ -1405,7 +1405,11 @@ export default function MappingDetails() {
         onClose={() => {
           setSummaryPopupOpen(false);
         }}
-        item={mapping}
+        item={mapping ? {
+          ...mapping,
+          // Ensure mapping_type is set correctly for API call
+          mapping_type: mapping.mapping_type || getReferenceType().replace('_mapping', '') // Convert 'bns_ipc_mapping' to 'bns_ipc'
+        } : null}
         itemType="mapping"
       />
 

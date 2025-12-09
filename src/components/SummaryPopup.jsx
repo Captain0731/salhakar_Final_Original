@@ -84,8 +84,56 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
         // For acts, use description or summary field
         summaryText = item.summary || item.description || item.long_title || "";
       } else if (itemType === "mapping") {
-        // For mappings, use summary or description
-        summaryText = item.summary || item.description || item.source_description || "";
+        // For mappings, try to generate AI summary first
+        if (item.id) {
+          // Determine mapping_type from item
+          let mappingType = item.mapping_type;
+          
+          // If mapping_type not directly available, infer from reference type
+          if (!mappingType) {
+            // Check for mapping type indicators
+            if (item.ipc_section || item.bns_section) {
+              mappingType = 'bns_ipc';
+            } else if (item.iea_section || item.bsa_section) {
+              mappingType = 'bsa_iea';
+            } else if (item.crpc_section || item.bnss_section) {
+              mappingType = 'bnss_crpc';
+            } else {
+              // Default fallback
+              mappingType = 'bns_ipc';
+            }
+          }
+          
+          if (mappingType) {
+            try {
+              const summaryResponse = await apiService.generateLawMappingSummary(
+                item.id,
+                mappingType,
+                {
+                  focus: "key differences and practical implications",
+                  max_chars_per_chunk: 15000
+                }
+              );
+              
+              if (summaryResponse && summaryResponse.success && summaryResponse.summary) {
+                summaryText = summaryResponse.summary;
+              } else {
+                // Fallback: use existing summary or description
+                summaryText = item.summary || item.description || item.source_description || "";
+              }
+            } catch (err) {
+              console.warn("Could not generate AI summary for mapping:", err);
+              // Fallback: use existing summary or description
+              summaryText = item.summary || item.description || item.source_description || "";
+            }
+          } else {
+            // No mapping_type available, use existing summary or description
+            summaryText = item.summary || item.description || item.source_description || "";
+          }
+        } else {
+          // No ID available, use existing summary or description
+          summaryText = item.summary || item.description || item.source_description || "";
+        }
       }
 
       if (!summaryText || summaryText.trim() === "") {

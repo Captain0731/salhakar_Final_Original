@@ -200,8 +200,11 @@ export default function LegalJudgments() {
   const [hasMore, setHasMore] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [nextCursor, setNextCursor] = useState(null);
+  const [currentOffset, setCurrentOffset] = useState(0); // For Elasticsearch offset-based pagination
+  const [isUsingElasticsearch, setIsUsingElasticsearch] = useState(false); // Track if using ES (offset) or PostgreSQL (cursor)
   const [searchInfo, setSearchInfo] = useState(null); // Elasticsearch search metadata
   const nextCursorRef = useRef(null);
+  const currentOffsetRef = useRef(0);
   const fetchJudgmentsRef = useRef(null);
   const isInitialMountRef = useRef(true);
   const isFetchingRef = useRef(false);
@@ -252,9 +255,12 @@ export default function LegalJudgments() {
     
     setJudgments([]);
     setNextCursor(null);
+    setCurrentOffset(0);
+    currentOffsetRef.current = 0;
     setHasMore(true);
     setError(null);
     setSearchInfo(null); // Reset search info when court type changes
+    setIsUsingElasticsearch(false); // Reset pagination type
     // Reset fetching state when court type changes
     isFetchingRef.current = false;
     setLoading(false);
@@ -291,16 +297,35 @@ export default function LegalJudgments() {
       // Use custom filters if provided, otherwise use current filters from ref
       const activeFilters = customFilters !== null ? customFilters : filtersRef.current;
       const currentNextCursor = nextCursorRef.current;
+      const currentOffsetValue = currentOffsetRef.current;
+      
+      // Check if we're using Elasticsearch (any search/filter that triggers ES)
+      const hasElasticsearchFilters = !!(activeFilters.search || activeFilters.title || activeFilters.judge || activeFilters.cnr || activeFilters.highCourt);
       
       // Reduced logging for production - only log important info
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Fetching ${courtType} judgments with params:`, { isLoadMore, filters: activeFilters, currentNextCursor });
+        console.log(`Fetching ${courtType} judgments with params:`, { 
+          isLoadMore, 
+          filters: activeFilters, 
+          currentNextCursor,
+          currentOffset: currentOffsetValue,
+          usingElasticsearch: hasElasticsearchFilters
+        });
       }
       
       // Prepare params based on court type
       const params = {
         limit: pageSize,
       };
+      
+      // Add offset for Elasticsearch queries (when loading more)
+      if (hasElasticsearchFilters && isLoadMore) {
+        params.offset = currentOffsetValue;
+      } else if (hasElasticsearchFilters && !isLoadMore) {
+        // Reset offset for new searches
+        params.offset = 0;
+        currentOffsetRef.current = 0;
+      }
 
       // Add filters - remove empty ones and map to API format
       Object.keys(activeFilters).forEach(key => {
@@ -354,11 +379,12 @@ export default function LegalJudgments() {
         }
       });
 
-      // Add cursor for pagination if loading more
+      // Add cursor for pagination if loading more (only for PostgreSQL queries, not Elasticsearch)
       // According to API docs:
       // - High Court uses dual cursor: cursor_decision_date (YYYY-MM-DD) + cursor_id
       // - Supreme Court uses single cursor: cursor_id only
-      if (isLoadMore && currentNextCursor) {
+      // - Elasticsearch queries use offset instead of cursor
+      if (isLoadMore && currentNextCursor && !hasElasticsearchFilters) {
         if (courtType === "supremecourt") {
           // Supreme Court: Only cursor_id needed
           if (currentNextCursor.id) {
@@ -457,11 +483,37 @@ export default function LegalJudgments() {
         setJudgments(judgmentsArray);
       }
       
-      // Update cursor and hasMore based on API response with null safety
-      const newCursor = (data && data.next_cursor) ? data.next_cursor : null;
-      setNextCursor(newCursor);
-      nextCursorRef.current = newCursor;
-      setHasMore(paginationInfo.has_more !== false);
+      // Determine if we're using Elasticsearch based on search_info in response
+      const usingElasticsearch = !!(data && data.search_info);
+      setIsUsingElasticsearch(usingElasticsearch);
+      
+      // Update pagination based on type (Elasticsearch uses offset, PostgreSQL uses cursor)
+      if (usingElasticsearch) {
+        // Elasticsearch: Use offset-based pagination
+        if (paginationInfo.next_offset !== undefined) {
+          setCurrentOffset(paginationInfo.next_offset);
+          currentOffsetRef.current = paginationInfo.next_offset;
+        } else if (isLoadMore) {
+          // If no next_offset but we're loading more, increment offset
+          const newOffset = currentOffsetValue + judgmentsArray.length;
+          setCurrentOffset(newOffset);
+          currentOffsetRef.current = newOffset;
+        }
+        // Clear cursor for Elasticsearch queries
+        setNextCursor(null);
+        nextCursorRef.current = null;
+      } else {
+        // PostgreSQL: Use cursor-based pagination
+        const newCursor = (data && data.next_cursor) ? data.next_cursor : null;
+        setNextCursor(newCursor);
+        nextCursorRef.current = newCursor;
+        // Reset offset for PostgreSQL queries
+        setCurrentOffset(0);
+        currentOffsetRef.current = 0;
+      }
+      
+      // Update hasMore from pagination_info (works for both ES and PostgreSQL)
+      setHasMore(paginationInfo.has_more === true);
       
       // Handle Elasticsearch search metadata (only for High Court)
       if (data && data.search_info && courtType === "highcourt") {
@@ -630,6 +682,9 @@ export default function LegalJudgments() {
     // Don't clear judgments immediately - keep existing data visible during loading
     setHasMore(true);
     setNextCursor(null);
+    setCurrentOffset(0);
+    currentOffsetRef.current = 0;
+    setIsUsingElasticsearch(false);
     
     // Fetch immediately without delay
     if (fetchJudgmentsRef.current) {
@@ -660,6 +715,9 @@ export default function LegalJudgments() {
     // This prevents the "flash/refresh" effect
     setHasMore(true);
     setNextCursor(null);
+    setCurrentOffset(0);
+    currentOffsetRef.current = 0;
+    setIsUsingElasticsearch(false);
     setError(null);
     
     // Fetch immediately without delay for smoother experience
@@ -671,10 +729,14 @@ export default function LegalJudgments() {
     }
   };
 
-  // Sync nextCursor ref with state
+  // Sync nextCursor and offset refs with state
   useEffect(() => {
     nextCursorRef.current = nextCursor;
   }, [nextCursor]);
+  
+  useEffect(() => {
+    currentOffsetRef.current = currentOffset;
+  }, [currentOffset]);
 
   // Auto-apply filters removed to prevent duplicate fetches and refresh effect
   // Filters are now applied manually via the Apply Filters button or Enter key
