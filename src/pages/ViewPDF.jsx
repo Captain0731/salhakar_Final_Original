@@ -560,6 +560,76 @@ export default function ViewPDF() {
   }
 
   if (error) {
+    const handleRetry = async () => {
+      if (!urlId) return;
+      
+      setError("");
+      setLoading(true);
+      
+      try {
+        console.log('🔄 Retrying: Fetching judgment by ID from URL:', urlId);
+        
+        let fetchedJudgment = null;
+        let fetchError = null;
+        
+        // Try High Court endpoint first
+        try {
+          console.log('🔍 Retrying High Court endpoint...');
+          fetchedJudgment = await apiService.getJudgementById(urlId);
+          console.log('✅ Found in High Court');
+        } catch (highCourtErr) {
+          console.log('⚠️ High Court fetch failed:', highCourtErr.message);
+          fetchError = highCourtErr;
+          
+          // If 404 or "not found", try Supreme Court endpoint
+          if (highCourtErr.message.includes('not found') || 
+              highCourtErr.message.includes('404') ||
+              highCourtErr.message.includes('Judgment with ID')) {
+            try {
+              console.log('🔍 Retrying Supreme Court endpoint...');
+              fetchedJudgment = await apiService.getSupremeCourtJudgementById(urlId);
+              console.log('✅ Found in Supreme Court');
+              fetchError = null;
+            } catch (supremeCourtErr) {
+              console.log('⚠️ Supreme Court fetch also failed:', supremeCourtErr.message);
+              fetchError = supremeCourtErr;
+            }
+          }
+        }
+        
+        if (fetchedJudgment) {
+          console.log('📄 ViewPDF: Fetched judgment data:', fetchedJudgment);
+          setJudgmentInfo(fetchedJudgment);
+          
+          const originalPdfUrl = fetchedJudgment.pdf_link || fetchedJudgment.pdf_url || "";
+          
+          if (!originalPdfUrl || originalPdfUrl.trim() === "") {
+            console.warn('⚠️ ViewPDF: No PDF URL found in judgment data');
+            setError('PDF URL not available for this judgment');
+            setLoading(false);
+            return;
+          }
+          
+          console.log('📄 ViewPDF: PDF URL resolved:', originalPdfUrl);
+          setPdfUrl(originalPdfUrl);
+          setTotalPages(25);
+          setLoading(false);
+        } else {
+          throw fetchError || new Error('Judgment not found in High Court or Supreme Court');
+        }
+      } catch (err) {
+        console.error('❌ ViewPDF: Error fetching judgment by ID:', err);
+        let errorMessage = 'Failed to load judgment';
+        if (err.message) {
+          errorMessage = err.message;
+        } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+          errorMessage = 'Network error: Unable to connect to the server. Please check your internet connection.';
+        }
+        setError(errorMessage);
+        setLoading(false);
+      }
+    };
+
     return (
       <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
         <Navbar />
@@ -567,33 +637,43 @@ export default function ViewPDF() {
           <div className="text-center max-w-md w-full">
             <div className="text-red-600 text-base sm:text-lg mb-3 sm:mb-4 font-semibold">Error loading PDF</div>
             <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">{error}</p>
-            <button
-              onClick={() => {
-                // Determine court type from judgment info if available
-                const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
-                const isSupremeCourt = courtName && (
-                  courtName.toLowerCase().includes('supreme') || 
-                  courtName.toLowerCase().includes('sc') ||
-                  courtName.toLowerCase() === 'supreme court of india'
-                );
-                
-                const courtType = isSupremeCourt ? 'supremecourt' : 'highcourt';
-                
-                // Store court type in localStorage for browser back button support
-                localStorage.setItem('lastCourtType', courtType);
-                
-                // Navigate to judgment access page with court type preserved
-                navigate(`/judgment-access?court=${courtType}`, { 
-                  state: { 
-                    courtType: courtType
-                  } 
-                });
-              }}
-              className="px-5 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base font-medium"
-              style={{ fontFamily: 'Roboto, sans-serif' }}
-            >
-              Go Back
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+              <button
+                onClick={handleRetry}
+                disabled={loading}
+                className="px-5 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                {loading ? 'Retrying...' : 'Retry'}
+              </button>
+              <button
+                onClick={() => {
+                  // Determine court type from judgment info if available
+                  const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
+                  const isSupremeCourt = courtName && (
+                    courtName.toLowerCase().includes('supreme') || 
+                    courtName.toLowerCase().includes('sc') ||
+                    courtName.toLowerCase() === 'supreme court of india'
+                  );
+                  
+                  const courtType = isSupremeCourt ? 'supremecourt' : 'highcourt';
+                  
+                  // Store court type in localStorage for browser back button support
+                  localStorage.setItem('lastCourtType', courtType);
+                  
+                  // Navigate to judgment access page with court type preserved
+                  navigate(`/judgment-access?court=${courtType}`, { 
+                    state: { 
+                      courtType: courtType
+                    } 
+                  });
+                }}
+                className="px-5 sm:px-6 py-2 sm:py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm sm:text-base font-medium"
+                style={{ fontFamily: 'Roboto, sans-serif' }}
+              >
+                Go Back
+              </button>
+            </div>
           </div>
         </div>
       </div>

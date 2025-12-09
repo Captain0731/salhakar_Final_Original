@@ -2022,26 +2022,67 @@ class ApiService {
     try {
       console.log(`🔍 Fetching High Court judgment by ID: ${judgementId} from ${endpoint}`);
       
-      // Try with auth first, then without if 401
+      // Try without auth first (public endpoint), then with auth if needed
       let response;
-      let headers = this.getAuthHeaders();
+      let headers = this.getPublicHeaders();
       
-      response = await fetch(endpoint, {
-        method: 'GET',
-        headers: headers
-      });
+      // Create abort controller for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
-      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-      
-      // If 401, try without auth (public endpoint)
-      if (response.status === 401) {
-        console.log('⚠️ Got 401, trying without authentication...');
-        headers = this.getPublicHeaders();
+      try {
         response = await fetch(endpoint, {
           method: 'GET',
-          headers: headers
+          headers: headers,
+          signal: controller.signal
         });
-        console.log(`📡 Response status (no auth): ${response.status} ${response.statusText}`);
+        
+        clearTimeout(timeoutId);
+        console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+        
+        // If 401, try with auth
+        if (response.status === 401) {
+          console.log('⚠️ Got 401, trying with authentication...');
+          const authController = new AbortController();
+          const authTimeoutId = setTimeout(() => authController.abort(), 10000);
+          headers = this.getAuthHeaders();
+          try {
+            response = await fetch(endpoint, {
+              method: 'GET',
+              headers: headers,
+              signal: authController.signal
+            });
+            clearTimeout(authTimeoutId);
+            console.log(`📡 Response status (with auth): ${response.status} ${response.statusText}`);
+          } catch (authErr) {
+            clearTimeout(authTimeoutId);
+            throw authErr;
+          }
+        }
+      } catch (fetchErr) {
+        clearTimeout(timeoutId);
+        console.error('❌ Fetch error:', fetchErr);
+        // If network error, try with alternative server
+        if (fetchErr.name === 'TypeError' || fetchErr.name === 'AbortError' || fetchErr.message.includes('fetch')) {
+          console.log('🔄 Trying alternative server...');
+          const altEndpoint = `${API_BASE_URL_AD}/api/judgements/${judgementId}`;
+          const altController = new AbortController();
+          const altTimeoutId = setTimeout(() => altController.abort(), 10000);
+          try {
+            response = await fetch(altEndpoint, {
+              method: 'GET',
+              headers: this.getPublicHeaders(),
+              signal: altController.signal
+            });
+            clearTimeout(altTimeoutId);
+            console.log(`📡 Alternative server response: ${response.status}`);
+          } catch (altErr) {
+            clearTimeout(altTimeoutId);
+            throw new Error('Network error: Unable to connect to the server. Please check your internet connection.');
+          }
+        } else {
+          throw fetchErr;
+        }
       }
       
       if (!response.ok) {
@@ -2067,8 +2108,8 @@ class ApiService {
       console.error('❌ Error fetching High Court judgment by ID:', err);
       
       // Handle network errors specifically
-      if (err.name === 'TypeError' && (err.message.includes('fetch') || err.message.includes('Failed to fetch'))) {
-        throw new Error('Failed to fetch: Network error. Please check your connection and try again.');
+      if (err.name === 'TypeError' || err.name === 'AbortError' || err.message.includes('fetch') || err.message.includes('Network error')) {
+        throw new Error('Network error: Unable to connect to the server. Please check your internet connection and try again.');
       }
       
       // Re-throw with original message if it's already an Error
@@ -2088,26 +2129,67 @@ class ApiService {
     try {
       console.log(`🔍 Fetching Supreme Court judgment by ID: ${judgementId} from ${endpoint}`);
       
-      // Try with auth first, then without if 401
+      // Try without auth first (public endpoint), then with auth if needed
       let response;
-      let headers = this.getAuthHeaders();
+      let headers = this.getPublicHeaders();
       
-      response = await fetch(endpoint, {
-        method: 'GET',
-        headers: headers
-      });
+      // Create abort controller for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
-      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-      
-      // If 401, try without auth (public endpoint)
-      if (response.status === 401) {
-        console.log('⚠️ Got 401, trying without authentication...');
-        headers = this.getPublicHeaders();
+      try {
         response = await fetch(endpoint, {
           method: 'GET',
-          headers: headers
+          headers: headers,
+          signal: controller.signal
         });
-        console.log(`📡 Response status (no auth): ${response.status} ${response.statusText}`);
+        
+        clearTimeout(timeoutId);
+        console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+        
+        // If 401, try with auth
+        if (response.status === 401) {
+          console.log('⚠️ Got 401, trying with authentication...');
+          const authController = new AbortController();
+          const authTimeoutId = setTimeout(() => authController.abort(), 10000);
+          headers = this.getAuthHeaders();
+          try {
+            response = await fetch(endpoint, {
+              method: 'GET',
+              headers: headers,
+              signal: authController.signal
+            });
+            clearTimeout(authTimeoutId);
+            console.log(`📡 Response status (with auth): ${response.status} ${response.statusText}`);
+          } catch (authErr) {
+            clearTimeout(authTimeoutId);
+            throw authErr;
+          }
+        }
+      } catch (fetchErr) {
+        clearTimeout(timeoutId);
+        console.error('❌ Fetch error:', fetchErr);
+        // If network error, try with alternative server
+        if (fetchErr.name === 'TypeError' || fetchErr.name === 'AbortError' || fetchErr.message.includes('fetch')) {
+          console.log('🔄 Trying alternative server...');
+          const altEndpoint = `${API_BASE_URL_AD}/api/supreme-court-judgements/${judgementId}`;
+          const altController = new AbortController();
+          const altTimeoutId = setTimeout(() => altController.abort(), 10000);
+          try {
+            response = await fetch(altEndpoint, {
+              method: 'GET',
+              headers: this.getPublicHeaders(),
+              signal: altController.signal
+            });
+            clearTimeout(altTimeoutId);
+            console.log(`📡 Alternative server response: ${response.status}`);
+          } catch (altErr) {
+            clearTimeout(altTimeoutId);
+            throw new Error('Network error: Unable to connect to the server. Please check your internet connection.');
+          }
+        } else {
+          throw fetchErr;
+        }
       }
       
       if (!response.ok) {
@@ -2133,8 +2215,8 @@ class ApiService {
       console.error('❌ Error fetching Supreme Court judgment by ID:', err);
       
       // Handle network errors specifically
-      if (err.name === 'TypeError' && (err.message.includes('fetch') || err.message.includes('Failed to fetch'))) {
-        throw new Error('Failed to fetch: Network error. Please check your connection and try again.');
+      if (err.name === 'TypeError' || err.name === 'AbortError' || err.message.includes('fetch') || err.message.includes('Network error')) {
+        throw new Error('Network error: Unable to connect to the server. Please check your internet connection and try again.');
       }
       
       // Re-throw with original message if it's already an Error
