@@ -236,6 +236,17 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                   </p>
                 </div>
               </div>
+              
+              {/* Feedback Buttons in Header */}
+              {getReferenceType() && getReferenceId() && (
+                <div className="flex items-center gap-2 mx-3">
+                  <SummaryFeedbackButton
+                    referenceType={getReferenceType()}
+                    referenceId={getReferenceId()}
+                  />
+                </div>
+              )}
+              
               <button
                 onClick={onClose}
                 className="p-1.5 sm:p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors flex-shrink-0 ml-2"
@@ -382,14 +393,6 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                       {summary}
                     </ReactMarkdown>
                   </div>
-                  
-                  {/* Feedback Button */}
-                  {getReferenceType() && getReferenceId() && (
-                    <SummaryFeedbackButton
-                      referenceType={getReferenceType()}
-                      referenceId={getReferenceId()}
-                    />
-                  )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12">

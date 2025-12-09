@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ThumbsUp, ThumbsDown, Loader2, MessageSquare, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ThumbsUp, ThumbsDown, Loader2, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import apiService from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,11 +8,13 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
   const { isAuthenticated } = useAuth();
   const [userRating, setUserRating] = useState(null);
   const [feedbackText, setFeedbackText] = useState('');
-  const [showTextInput, setShowTextInput] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [statistics, setStatistics] = useState(null);
+  const [submittingText, setSubmittingText] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const buttonRef = useRef(null);
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
 
   // Load existing feedback and statistics
   useEffect(() => {
@@ -21,21 +23,86 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
     }
   }, [isAuthenticated, referenceType, referenceId]);
 
+  // Calculate popup position and handle click outside
+  useEffect(() => {
+    if (showPopup && buttonRef.current) {
+      const updatePosition = () => {
+        if (!buttonRef.current) return;
+        
+        const buttonRect = buttonRef.current.getBoundingClientRect();
+        const popupWidth = 384; // w-96 = 384px
+        const popupHeight = 400; // Approximate height
+        const gap = 8; // Gap between button and popup
+        
+        // Calculate position below the button (using viewport coordinates)
+        let top = buttonRect.bottom + gap;
+        let left = buttonRect.left;
+        
+        // Adjust if popup would go off screen to the right
+        if (left + popupWidth > window.innerWidth - 16) {
+          left = window.innerWidth - popupWidth - 16;
+        }
+        
+        // Adjust if popup would go off screen to the left
+        if (left < 16) {
+          left = 16;
+        }
+        
+        // Adjust if popup would go off screen at bottom - show above instead
+        if (buttonRect.bottom + popupHeight + gap > window.innerHeight - 16) {
+          top = buttonRect.top - popupHeight - gap;
+          // If still off screen at top, position at center vertically
+          if (top < 16) {
+            top = Math.max(16, (window.innerHeight - popupHeight) / 2);
+          }
+        }
+        
+        // Ensure minimum top position
+        if (top < 16) {
+          top = 16;
+        }
+        
+        setPopupPosition({ top, left });
+      };
+      
+      updatePosition();
+      
+      // Update position on scroll and resize
+      window.addEventListener('scroll', updatePosition, true);
+      window.addEventListener('resize', updatePosition);
+      
+      const handleClickOutside = (event) => {
+        const target = event.target;
+        // Check if click is outside the popup and buttons
+        if (!target.closest('.feedback-popup-container') && !target.closest('button[title="Helpful"]') && !target.closest('button[title="Not Helpful"]')) {
+          setShowPopup(false);
+          setFeedbackText('');
+        }
+      };
+      
+      // Add event listener after a small delay to avoid immediate closing
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 100);
+      
+      return () => {
+        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('resize', updatePosition);
+        clearTimeout(timeoutId);
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showPopup]);
+
   const loadFeedback = async () => {
     if (!isAuthenticated) return;
     
     setLoading(true);
     try {
       const response = await apiService.getSummaryFeedback(referenceType, referenceId);
-      if (response) {
-        if (response.user_feedback) {
-          setUserRating(response.user_feedback.rating);
-          setFeedbackText(response.user_feedback.feedback_text || '');
-          setSubmitted(true);
-        }
-        if (response.statistics) {
-          setStatistics(response.statistics);
-        }
+      if (response && response.user_feedback) {
+        setUserRating(response.user_feedback.rating);
+        setFeedbackText(response.user_feedback.feedback_text || '');
       }
     } catch (error) {
       console.error('Error loading feedback:', error);
@@ -54,6 +121,7 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
 
     const newRating = userRating === rating ? null : rating; // Toggle if same rating clicked
     setUserRating(newRating);
+    setSelectedRating(newRating);
     setSubmitting(true);
 
     try {
@@ -61,15 +129,20 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
         reference_type: referenceType,
         reference_id: referenceId,
         rating: newRating,
-        feedback_text: feedbackText || null
+        feedback_text: null
       });
 
-      setSubmitted(true);
       if (onFeedbackSubmitted) {
         onFeedbackSubmitted();
       }
       
-      // Reload feedback to get updated statistics
+      // Show popup with input field after successful submission
+      if (newRating) {
+        setShowPopup(true);
+        setFeedbackText(''); // Reset feedback text
+      }
+      
+      // Reload feedback
       await loadFeedback();
     } catch (error) {
       console.error('Error submitting feedback:', error);
@@ -81,28 +154,25 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
     }
   };
 
-  const handleTextSubmit = async () => {
-    if (!isAuthenticated) {
-      alert('Please login to provide feedback');
-      return;
-    }
+  const handleTextFeedbackSubmit = async () => {
+    if (submittingText) return;
 
-    if (submitting) return;
-
-    setSubmitting(true);
+    setSubmittingText(true);
     try {
       await apiService.submitSummaryFeedback({
         reference_type: referenceType,
         reference_id: referenceId,
-        rating: userRating,
-        feedback_text: feedbackText || null
+        rating: selectedRating,
+        feedback_text: feedbackText.trim() || null
       });
 
-      setSubmitted(true);
-      setShowTextInput(false);
       if (onFeedbackSubmitted) {
         onFeedbackSubmitted();
       }
+      
+      // Close popup after successful submission
+      setShowPopup(false);
+      setFeedbackText('');
       
       // Reload feedback
       await loadFeedback();
@@ -110,7 +180,7 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
       console.error('Error submitting text feedback:', error);
       alert('Failed to submit feedback. Please try again.');
     } finally {
-      setSubmitting(false);
+      setSubmittingText(false);
     }
   };
 
@@ -119,119 +189,112 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
   }
 
   return (
-    <div className="mt-4 pt-4 border-t border-gray-200">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-          Was this summary helpful?
-        </p>
-        {statistics && statistics.total_feedback > 0 && (
-          <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-            {statistics.thumbs_up_count} of {statistics.total_feedback} found this helpful
-          </p>
-        )}
-      </div>
-
-      <div className="flex items-center gap-3">
-        {/* Thumbs Up Button */}
+    <>
+      <div ref={buttonRef} className="relative flex items-center gap-2">
+        {/* Thumbs Up Button - Icon Only */}
         <motion.button
           onClick={() => handleRatingClick('thumbs_up')}
           disabled={submitting || loading}
-          whileHover={{ scale: submitting ? 1 : 1.05 }}
-          whileTap={{ scale: submitting ? 1 : 0.95 }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+          whileHover={{ scale: submitting ? 1 : 1.1 }}
+          whileTap={{ scale: submitting ? 1 : 0.9 }}
+          className={`p-2 rounded-lg transition-all ${
             userRating === 'thumbs_up'
-              ? 'bg-green-100 border-2 border-green-500'
-              : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+              ? 'bg-white bg-opacity-30'
+              : 'bg-white bg-opacity-20 hover:bg-opacity-30'
           } ${submitting || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          title="Helpful"
         >
           {submitting && userRating === 'thumbs_up' ? (
-            <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#10B981' }} />
+            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-white" />
           ) : (
             <ThumbsUp 
-              className="w-4 h-4" 
+              className="w-4 h-4 sm:w-5 sm:h-5" 
               style={{ 
-                color: userRating === 'thumbs_up' ? '#10B981' : '#8C969F',
-                fill: userRating === 'thumbs_up' ? '#10B981' : 'none'
+                color: userRating === 'thumbs_up' ? '#FFFFFF' : '#FFFFFF',
+                fill: userRating === 'thumbs_up' ? '#FFFFFF' : 'none',
+                opacity: userRating === 'thumbs_up' ? 1 : 0.8
               }} 
             />
           )}
-          <span 
-            className="text-sm font-medium"
-            style={{ 
-              fontFamily: 'Roboto, sans-serif',
-              color: userRating === 'thumbs_up' ? '#10B981' : '#8C969F'
-            }}
-          >
-            Helpful
-          </span>
         </motion.button>
 
-        {/* Thumbs Down Button */}
+        {/* Thumbs Down Button - Icon Only */}
         <motion.button
           onClick={() => handleRatingClick('thumbs_down')}
           disabled={submitting || loading}
-          whileHover={{ scale: submitting ? 1 : 1.05 }}
-          whileTap={{ scale: submitting ? 1 : 0.95 }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+          whileHover={{ scale: submitting ? 1 : 1.1 }}
+          whileTap={{ scale: submitting ? 1 : 0.9 }}
+          className={`p-2 rounded-lg transition-all ${
             userRating === 'thumbs_down'
-              ? 'bg-red-100 border-2 border-red-500'
-              : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+              ? 'bg-white bg-opacity-30'
+              : 'bg-white bg-opacity-20 hover:bg-opacity-30'
           } ${submitting || loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          title="Not Helpful"
         >
           {submitting && userRating === 'thumbs_down' ? (
-            <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#EF4444' }} />
+            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-white" />
           ) : (
             <ThumbsDown 
-              className="w-4 h-4" 
+              className="w-4 h-4 sm:w-5 sm:h-5" 
               style={{ 
-                color: userRating === 'thumbs_down' ? '#EF4444' : '#8C969F',
-                fill: userRating === 'thumbs_down' ? '#EF4444' : 'none'
+                color: userRating === 'thumbs_down' ? '#FFFFFF' : '#FFFFFF',
+                fill: userRating === 'thumbs_down' ? '#FFFFFF' : 'none',
+                opacity: userRating === 'thumbs_down' ? 1 : 0.8
               }} 
             />
           )}
-          <span 
-            className="text-sm font-medium"
-            style={{ 
-              fontFamily: 'Roboto, sans-serif',
-              color: userRating === 'thumbs_down' ? '#EF4444' : '#8C969F'
-            }}
-          >
-            Not Helpful
-          </span>
-        </motion.button>
-
-        {/* Text Feedback Button */}
-        <motion.button
-          onClick={() => setShowTextInput(!showTextInput)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 border-2 border-transparent hover:bg-gray-100 transition-all"
-        >
-          <MessageSquare className="w-4 h-4" style={{ color: '#8C969F' }} />
-          <span 
-            className="text-sm font-medium text-gray-600"
-            style={{ fontFamily: 'Roboto, sans-serif' }}
-          >
-            Add Comment
-          </span>
         </motion.button>
       </div>
 
-      {/* Text Feedback Input */}
+      {/* Feedback Popup - Positioned below buttons */}
       <AnimatePresence>
-        {showTextInput && (
+        {showPopup && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-3"
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="feedback-popup-container fixed z-[10001] bg-white rounded-xl shadow-2xl p-6 w-80 sm:w-96"
+            style={{ 
+              border: '2px solid #E5E7EB',
+              top: `${popupPosition.top}px`,
+              left: `${popupPosition.left}px`,
+              maxHeight: 'calc(100vh - 20px)',
+              overflowY: 'auto'
+            }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <Check className="w-6 h-6" style={{ color: '#10B981' }} />
+                </div>
+                <h3 className="text-lg font-semibold" style={{ color: '#1F2937', fontFamily: 'Heebo, sans-serif' }}>
+                  Thank You!
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowPopup(false);
+                  setFeedbackText('');
+                }}
+                className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-5 h-5" style={{ color: '#6B7280' }} />
+              </button>
+            </div>
+            
+            <p className="text-sm mb-4" style={{ color: '#6B7280', fontFamily: 'Roboto, sans-serif' }}>
+              Thank you for your feedback! Would you like to share more details? (Optional)
+            </p>
+
+            {/* Text Input */}
+            <div className="mb-4">
               <textarea
                 value={feedbackText}
                 onChange={(e) => setFeedbackText(e.target.value)}
-                placeholder="Share your thoughts about this summary (optional)..."
-                rows={3}
+                placeholder="Share your thoughts about this summary..."
+                rows={4}
                 maxLength={2000}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
                 style={{ 
@@ -239,54 +302,42 @@ const SummaryFeedbackButton = ({ referenceType, referenceId, onFeedbackSubmitted
                   fontSize: '14px'
                 }}
               />
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                  {feedbackText.length}/2000 characters
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setShowTextInput(false);
-                      setFeedbackText('');
-                    }}
-                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 transition-colors"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleTextSubmit}
-                    disabled={submitting}
-                    className="px-4 py-1.5 text-sm text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{ 
-                      fontFamily: 'Roboto, sans-serif',
-                      backgroundColor: '#1E65AD'
-                    }}
-                  >
-                    {submitting ? 'Submitting...' : 'Submit'}
-                  </button>
-                </div>
-              </div>
+              <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                {feedbackText.length}/2000 characters
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setShowPopup(false);
+                  setFeedbackText('');
+                }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors hover:bg-gray-100"
+                style={{ 
+                  color: '#6B7280',
+                  fontFamily: 'Roboto, sans-serif'
+                }}
+              >
+                Skip
+              </button>
+              <button
+                onClick={handleTextFeedbackSubmit}
+                disabled={submittingText}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90"
+                style={{ 
+                  backgroundColor: '#1E65AD',
+                  fontFamily: 'Roboto, sans-serif'
+                }}
+              >
+                {submittingText ? 'Submitting...' : 'Submit'}
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Success Message */}
-      <AnimatePresence>
-        {submitted && !showTextInput && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="mt-2 text-xs text-green-600"
-            style={{ fontFamily: 'Roboto, sans-serif' }}
-          >
-            ✓ Thank you for your feedback!
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 // App.js
 import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import GoogleTranslate from "./components/GoogleTranslate";
@@ -42,6 +43,35 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Chatbot from "./components/Chatbot";
 import Footer from "./components/landing/Footer";
 import CookieConsentPopup from "./components/CookieConsentPopup";
+
+// ScrollToTop component to reset scroll position on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    // Scroll window to top
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    
+    // Also reset any scroll containers
+    const scrollContainers = [
+      document.getElementById('main-scroll-area'),
+      document.getElementById('chatbot-scroll-area'),
+      document.querySelector('[data-scroll-container]')
+    ];
+    
+    scrollContainers.forEach(container => {
+      if (container) {
+        container.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      }
+    });
+    
+    // Also reset document element scroll
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [pathname]);
+
+  return null;
+}
 
 function AppLayout() {
   const location = useLocation();
@@ -86,6 +116,8 @@ function AppLayout() {
   
   return (
     <div style={{ minHeight: "100vh", overflowY: "auto", overflowX: "hidden", width: "100%", maxWidth: "100vw", scrollbarWidth: "none", msOverflowStyle: "none" }} className="scrollbar-hide">
+      {/* Scroll to top on route change */}
+      <ScrollToTop />
       {/* Google Translate Component - Global mount point */}
       <GoogleTranslate />
       {/* Cookie Consent Popup - Shows on first visit */}

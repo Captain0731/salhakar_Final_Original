@@ -120,11 +120,36 @@ const Navbar = () => {
       } else {
         // All routes are now public - no authentication required
         
+        // Scroll to top before navigation
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        
+        // Also reset any scroll containers
+        const scrollContainers = [
+          document.getElementById('main-scroll-area'),
+          document.getElementById('chatbot-scroll-area'),
+          document.querySelector('[data-scroll-container]')
+        ];
+        scrollContainers.forEach(container => {
+          if (container) {
+            container.scrollTo({ top: 0, behavior: 'instant' });
+          }
+        });
+        
         if (filter) {
           navigate(path, { state: { filter } });
         } else {
           navigate(path);
         }
+        
+        // Ensure scroll to top after navigation (in case of delayed rendering)
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'instant' });
+          scrollContainers.forEach(container => {
+            if (container) {
+              container.scrollTo({ top: 0, behavior: 'instant' });
+            }
+          });
+        }, 100);
       }
       setMenuOpen(false);
       setDropdownOpen(null);

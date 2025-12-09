@@ -504,7 +504,77 @@ export default function LegalChatbot() {
       e.preventDefault();
       handleSendMessage();
     }
+    // Shift+Enter allows new line (default behavior for textarea)
+    // If Shift is pressed, allow default behavior (new line)
   };
+
+  // Auto-resize textarea based on content
+  const adjustTextareaHeight = () => {
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+      const maxHeight = 120; // Maximum height in pixels (about 5-6 lines)
+      const newHeight = Math.min(inputRef.current.scrollHeight, maxHeight);
+      inputRef.current.style.height = `${newHeight}px`;
+    }
+  };
+
+  // Auto-wrap text after character limit
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    const cursorPosition = e.target.selectionStart;
+    const maxCharsPerLine = 60; // Character limit per line
+    
+    // Check if we need to add a new line
+    const lines = value.split('\n');
+    let newValue = value;
+    let modified = false;
+    let cursorOffset = 0;
+    
+    lines.forEach((line, index) => {
+      if (line.length > maxCharsPerLine) {
+        // Find the last space before the limit
+        const lastSpaceIndex = line.lastIndexOf(' ', maxCharsPerLine);
+        if (lastSpaceIndex > 0) {
+          const beforeSpace = line.substring(0, lastSpaceIndex);
+          const afterSpace = line.substring(lastSpaceIndex + 1);
+          lines[index] = beforeSpace + '\n' + afterSpace;
+          modified = true;
+          
+          // Calculate cursor offset if we're in this line
+          const lineStart = lines.slice(0, index).join('\n').length + (index > 0 ? 1 : 0);
+          if (cursorPosition >= lineStart && cursorPosition <= lineStart + line.length) {
+            if (cursorPosition > lineStart + lastSpaceIndex) {
+              cursorOffset = 1; // Add 1 for the newline character
+            }
+          }
+        }
+      }
+    });
+    
+    if (modified) {
+      newValue = lines.join('\n');
+      setInputMessage(newValue);
+      // Adjust height and cursor position after state update
+      setTimeout(() => {
+        adjustTextareaHeight();
+        if (inputRef.current && cursorOffset > 0) {
+          const newCursorPos = cursorPosition + cursorOffset;
+          inputRef.current.setSelectionRange(newCursorPos, newCursorPos);
+        }
+      }, 0);
+    } else {
+      setInputMessage(value);
+      // Adjust height for normal typing
+      setTimeout(() => {
+        adjustTextareaHeight();
+      }, 0);
+    }
+  };
+
+  // Adjust textarea height when inputMessage changes
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [inputMessage]);
 
   const clearChat = () => {
     // Reset session for new conversation
@@ -1286,8 +1356,17 @@ export default function LegalChatbot() {
                 ) : (
                           /* AI Response - Simple Bubble */
                           <div className="max-w-[90%] sm:max-w-[80%] md:max-w-[70%]">
+                            <div className="flex items-start gap-2">
+                              {/* Bot Avatar */}
+                              <div className="flex-shrink-0 mt-1">
+                                <img 
+                                  src="/uit3.GIF" 
+                                  alt="AI Assistant" 
+                                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-contain"
+                                />
+                              </div>
                             <div 
-                              className="rounded-xl sm:rounded-2xl px-4 py-3 sm:px-5 sm:py-4"
+                                className="rounded-xl sm:rounded-2xl px-4 py-3 sm:px-5 sm:py-4 flex-1"
                           style={{ 
                                 backgroundColor: '#FFFFFF',
                                 boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08)'
@@ -1372,14 +1451,16 @@ export default function LegalChatbot() {
                                 >
                                   {message.text}
                                 </ReactMarkdown>
+                                </div>
                       </div>
                       </div>
                       
-                      {/* Feedback Button for Assistant Messages */}
+                            {/* Feedback Button for Assistant Messages - Below message bubble, outside text area */}
                       {message.sender === 'bot' && message.id && (
-                        <div className="mt-2 ml-2">
+                              <div className="mt-2 ml-12 sm:ml-14">
                           <ChatFeedbackButton 
                             messageId={message.id}
+                                  messageText={message.text}
                             onFeedbackSubmitted={() => {
                               // Optional: Show notification or update UI
                               console.log('Feedback submitted for message:', message.id);
@@ -1457,15 +1538,17 @@ export default function LegalChatbot() {
                     boxShadow: '0 4px 20px rgba(30, 101, 173, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08)'
                   }}
                 >
-                  <div className="flex items-center h-12 sm:h-14 px-2 sm:px-2.5 sm:px-3 gap-1 sm:gap-1.5 overflow-hidden">
-                    {/* Animated Orb Icon */}
-                    <div className="flex items-center justify-center w-8 h-8 sm:w-12 sm:h-12 flex-shrink-0">
-                      <img 
-                        src="/uit3.GIF" 
-                        alt="AI" 
-                        className="w-6 h-6 sm:w-10 sm:h-10 object-contain"
-                      />
-                    </div>
+                  <div className="flex items-center min-h-[48px] sm:min-h-[56px] px-2 sm:px-2.5 sm:px-3 gap-1 sm:gap-1.5 py-1.5 sm:py-2">
+                    {/* Plus Icon Button for File Attachment */}
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={loading || isProcessingVoice}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-blue-50 active:bg-blue-100 flex-shrink-0"
+                      title="Attach file"
+                      style={{ minWidth: '32px', minHeight: '32px' }}
+                    >
+                      <Plus className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#1E65AD' }} />
+                    </button>
 
                     {/* Input Field or Recording Waveform */}
                     {isRecording ? (
@@ -1494,37 +1577,30 @@ export default function LegalChatbot() {
                 </div>
                         </div>
                     ) : (
-                    <input
+                    <textarea
                       ref={inputRef}
-                      type="text"
                       value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyPress={handleKeyPress}
+                      onChange={handleInputChange}
+                      onKeyDown={handleKeyPress}
                         placeholder="Ask Your Legal Question Here"
-                        className="flex-1 h-full bg-transparent border-none outline-none text-sm sm:text-base ml-1 sm:ml-1.5 sm:ml-2 placeholder-gray-400 min-w-0"
+                      className="flex-1 bg-transparent border-none outline-none text-sm sm:text-base ml-1 sm:ml-1.5 sm:ml-2 placeholder-gray-400 min-w-0 resize-none overflow-y-auto"
                       style={{ 
                         fontFamily: "'Heebo', sans-serif",
                         color: '#1F2937',
                           fontSize: '14px',
-                          lineHeight: '1.5'
+                        lineHeight: '1.5',
+                        minHeight: '24px',
+                        maxHeight: '120px',
+                        paddingTop: '4px',
+                        paddingBottom: '4px'
                       }}
                       disabled={loading || isProcessingVoice}
+                      rows={1}
                     />
                     )}
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-1">
-                      {/* File Attach Button */}
-                      <button 
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={loading || isProcessingVoice}
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-blue-50 active:bg-blue-100 flex-shrink-0"
-                        title="Attach file"
-                        style={{ minWidth: '32px', minHeight: '32px' }}
-                      >
-                        <Paperclip className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: '#1E65AD' }} />
-                      </button>
-
                       {/* Microphone Button */}
                       {isRecording ? (
                         <motion.button
