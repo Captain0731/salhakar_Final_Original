@@ -543,7 +543,7 @@ const BlogSection = () => {
               <button
                 onClick={() => {
                   closeModal();
-                  navigate('/blog');
+                  navigate(`/blog/${selectedBlog.id}`);
                 }}
                 className="px-4 py-2 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium text-sm"
               >

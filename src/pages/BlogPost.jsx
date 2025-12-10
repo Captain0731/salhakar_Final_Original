@@ -19,216 +19,207 @@ const BlogPost = () => {
   const blogPosts = {
     1: {
       id: 1,
-      title: "The Future of Legal Research: AI-Powered Solutions",
+      title: "Understanding the New Legal Framework",
       content: `
-        <p>The legal industry is experiencing a transformative shift, driven by artificial intelligence and advanced technology. At Salhakar, we're at the forefront of this revolution, making legal research more accessible, efficient, and intelligent than ever before.</p>
+        <p>The Indian legal system has undergone significant transformations in recent years. This comprehensive guide explores the latest amendments, their implications, and how legal professionals can adapt to these changes effectively.</p>
         
-        <h2>Understanding AI in Legal Research</h2>
-        <p>Artificial Intelligence has revolutionized how legal professionals conduct research. Gone are the days of manually sifting through thousands of documents. Today, AI-powered platforms can analyze vast amounts of legal data in seconds, providing accurate, relevant results that would have taken hours or even days to find manually.</p>
+        <h2>Recent Legislative Changes</h2>
+        <p>Explore the latest changes in Indian legal system and how they impact modern legal practice. The legal landscape in India has been evolving rapidly with new legislation, amendments to existing laws, and important judicial decisions that reshape how legal professionals operate.</p>
         
-        <p>Our AI technology at Salhakar uses advanced natural language processing to understand complex legal queries. Whether you're searching for specific case law, legal precedents, or statutory provisions, our system can interpret your question and provide precise answers.</p>
+        <p>Recent amendments have introduced new provisions across various areas of law, including criminal law reforms, commercial law updates, and procedural changes. Understanding these changes is crucial for legal professionals who need to stay current with the law.</p>
         
-        <h2>Key Benefits of AI-Powered Legal Research</h2>
+        <h2>Impact on Modern Legal Practice</h2>
+        <p>These changes have far-reaching implications for legal professionals. Learn about recent amendments and their implications for legal professionals working in various practice areas. The new legal framework affects:</p>
         <ul>
-          <li><strong>Speed:</strong> Research that once took hours can now be completed in minutes</li>
-          <li><strong>Accuracy:</strong> AI reduces human error and ensures comprehensive coverage</li>
-          <li><strong>Accessibility:</strong> Legal information is now accessible to everyone, regardless of language or technical expertise</li>
-          <li><strong>Cost-Effective:</strong> Reduce research costs while improving outcomes</li>
+          <li><strong>Case Preparation:</strong> New procedures and requirements for filing and presenting cases</li>
+          <li><strong>Client Advisory:</strong> Updated legal advice based on new legislation</li>
+          <li><strong>Compliance:</strong> New regulatory requirements and compliance obligations</li>
+          <li><strong>Legal Research:</strong> Updated databases and resources reflecting new laws</li>
         </ul>
         
-        <h2>The Salhakar Advantage</h2>
-        <p>What sets Salhakar apart is our commitment to making legal research truly accessible. Our platform supports multiple Indian languages, ensuring that legal professionals across the country can access the information they need in their preferred language.</p>
+        <h2>Adapting to Change</h2>
+        <p>Legal professionals must adapt to these changes to remain effective and compliant. This involves continuous learning, staying updated with legal developments, and leveraging modern tools and platforms that help navigate the evolving legal landscape.</p>
         
-        <p>Our AI doesn't just find information—it understands context, relationships between legal concepts, and can even help you discover connections you might not have considered. This intelligent approach to legal research is transforming how lawyers, students, and researchers work.</p>
-        
-        <h2>Looking Ahead</h2>
-        <p>As AI technology continues to evolve, we're committed to staying at the cutting edge. We're constantly improving our algorithms, expanding our database, and adding new features that make legal research even more powerful and intuitive.</p>
-        
-        <p>The future of legal research is here, and it's more accessible than ever. Join thousands of legal professionals who are already using Salhakar to transform their research workflow.</p>
+        <p>Platforms like Salhakar provide comprehensive access to updated legal information, making it easier for legal professionals to stay current with the latest changes in the legal framework.</p>
       `,
-      author: "Salhakar Team",
-      date: "2024-01-15",
-      readTime: "5 min read",
-      category: "AI & Technology",
-      image: "/logo4.png",
-      tags: ["AI", "Legal Tech", "Innovation"]
-    },
-    2: {
-      id: 2,
-      title: "Understanding BNS to IPC Mapping: A Comprehensive Guide",
-      content: `
-        <p>The transition from the Indian Penal Code (IPC) to the Bharatiya Nyaya Sanhita (BNS) represents one of the most significant legal reforms in India's history. Understanding how these legal frameworks map to each other is crucial for legal professionals navigating this transition.</p>
-        
-        <h2>What is BNS to IPC Mapping?</h2>
-        <p>BNS to IPC mapping refers to the process of correlating sections and provisions between the old IPC and the new BNS. This mapping helps legal professionals understand how existing legal concepts, case law, and precedents translate to the new legal framework.</p>
-        
-        <h2>Key Differences and Similarities</h2>
-        <p>While the BNS introduces several new provisions and reorganizes existing ones, many core legal concepts remain consistent. Understanding these mappings is essential for:</p>
-        <ul>
-          <li>Legal practitioners preparing cases</li>
-          <li>Law students studying criminal law</li>
-          <li>Researchers analyzing legal precedents</li>
-          <li>Judges interpreting new legislation</li>
-        </ul>
-        
-        <h2>How Salhakar Simplifies This Process</h2>
-        <p>At Salhakar, we've developed comprehensive mapping tools that make it easy to navigate between IPC and BNS. Our platform provides:</p>
-        <ul>
-          <li>Section-by-section mapping</li>
-          <li>Cross-references to relevant case law</li>
-          <li>Explanatory notes on changes</li>
-          <li>Search functionality across both frameworks</li>
-        </ul>
-        
-        <h2>Practical Applications</h2>
-        <p>Understanding BNS to IPC mapping is not just academic—it has real-world implications for ongoing cases, legal research, and the practice of law in India. Our tools help ensure continuity and clarity during this transition period.</p>
-      `,
-      author: "Legal Experts",
-      date: "2024-01-10",
+      author: "Dr. Priya Sharma",
+      date: "2024-12-15",
       readTime: "8 min read",
       category: "Legal Updates",
       image: "/logo4.png",
-      tags: ["BNS", "IPC", "Legal Framework"]
+      tags: ["Legal Updates", "Legislation", "Legal Framework"]
+    },
+    2: {
+      id: 2,
+      title: "AI-Powered Legal Research",
+      content: `
+        <p>Artificial intelligence is reshaping the legal industry. From automated case research to predictive analytics, AI tools are helping legal professionals work more efficiently and make better-informed decisions.</p>
+        
+        <h2>Discover How AI is Revolutionizing Legal Research</h2>
+        <p>Discover how artificial intelligence is revolutionizing legal research and case analysis. Modern AI-powered platforms can analyze vast amounts of legal data in seconds, providing accurate, relevant results that would have taken hours or even days to find manually.</p>
+        
+        <p>AI technology uses advanced natural language processing to understand complex legal queries. Whether you're searching for specific case law, legal precedents, or statutory provisions, AI systems can interpret your question and provide precise answers.</p>
+        
+        <h2>Transforming the Way Lawyers Work</h2>
+        <p>See how modern tools are transforming the way lawyers work. AI-powered legal research offers several key advantages:</p>
+        <ul>
+          <li><strong>Speed and Efficiency:</strong> Research that once took hours can now be completed in minutes</li>
+          <li><strong>Accuracy:</strong> AI reduces human error and ensures comprehensive coverage</li>
+          <li><strong>Predictive Analytics:</strong> AI can predict case outcomes and identify relevant precedents</li>
+          <li><strong>Cost Reduction:</strong> Reduce research costs while improving outcomes</li>
+        </ul>
+        
+        <h2>Case Analysis and Research</h2>
+        <p>AI tools are particularly effective in case analysis, helping lawyers identify relevant case law, analyze legal precedents, and understand complex legal relationships. These tools can process thousands of documents simultaneously, finding connections that might not be immediately apparent.</p>
+        
+        <h2>The Future of Legal Practice</h2>
+        <p>As AI technology continues to evolve, it's becoming an indispensable tool for modern legal practice. Legal professionals who embrace AI-powered research tools are better positioned to serve their clients effectively and stay competitive in the evolving legal landscape.</p>
+      `,
+      author: "Rajesh Kumar",
+      date: "2024-12-12",
+      readTime: "6 min read",
+      category: "Technology",
+      image: "/logo4.png",
+      tags: ["AI", "Technology", "Legal Research"]
     },
     3: {
       id: 3,
-      title: "How to Conduct Efficient Legal Research",
+      title: "Digital Transformation in Law Firms",
       content: `
-        <p>Efficient legal research is the cornerstone of successful legal practice. Whether you're preparing for a case, writing a brief, or studying for exams, mastering research techniques can save you countless hours and improve the quality of your work.</p>
+        <p>Digital transformation is no longer optional for law firms. This article explores how leading firms are leveraging technology to streamline operations, enhance client experiences, and stay competitive in the modern legal landscape.</p>
         
-        <h2>Start with a Clear Research Plan</h2>
-        <p>Before diving into research, take time to clearly define your objectives. What specific information are you seeking? What questions need to be answered? A well-defined research plan will guide your efforts and prevent wasted time.</p>
+        <h2>Learn How Law Firms Are Embracing Digital Transformation</h2>
+        <p>Learn how law firms are embracing digital transformation to improve efficiency and client service. The legal industry is experiencing a significant shift towards digitalization, with firms adopting new technologies to modernize their operations and better serve their clients.</p>
         
-        <h2>Use Multiple Research Sources</h2>
-        <p>Effective legal research involves consulting multiple sources:</p>
+        <p>Digital transformation in law firms involves more than just adopting new software—it requires a fundamental shift in how legal services are delivered, how cases are managed, and how client relationships are maintained.</p>
+        
+        <h2>Improving Efficiency and Client Service</h2>
+        <p>Discover best practices and implementation strategies for digital transformation. Key areas where law firms are seeing significant improvements include:</p>
         <ul>
-          <li>Primary sources (statutes, regulations, case law)</li>
-          <li>Secondary sources (legal commentaries, journals)</li>
-          <li>Legal databases and research platforms</li>
-          <li>Expert opinions and analysis</li>
+          <li><strong>Case Management:</strong> Automated workflows and document management systems</li>
+          <li><strong>Client Communication:</strong> Digital portals and communication platforms</li>
+          <li><strong>Legal Research:</strong> AI-powered research tools and databases</li>
+          <li><strong>Billing and Accounting:</strong> Automated time tracking and invoicing systems</li>
         </ul>
         
-        <h2>Leverage Technology</h2>
-        <p>Modern legal research platforms like Salhakar can dramatically improve your efficiency. Our AI-powered search can understand natural language queries, find relevant cases across multiple jurisdictions, and even suggest related legal concepts you might not have considered.</p>
+        <h2>Best Practices for Implementation</h2>
+        <p>Successful digital transformation requires careful planning and execution. Law firms should start by identifying their specific needs, evaluating available solutions, and implementing changes gradually to minimize disruption.</p>
         
-        <h2>Organize Your Findings</h2>
-        <p>As you research, maintain organized notes. Use bookmarks, tags, and folders to categorize information. This organization will save time when you need to reference your research later.</p>
+        <p>Training and change management are also crucial components of successful digital transformation. Ensuring that all team members are comfortable with new technologies and understand their benefits is essential for adoption.</p>
         
-        <h2>Verify and Cross-Reference</h2>
-        <p>Always verify information from multiple sources. Cross-reference cases, check for updates to legislation, and ensure you're working with the most current legal information available.</p>
+        <h2>Staying Competitive</h2>
+        <p>Firms that successfully embrace digital transformation are better positioned to compete in the modern legal market. They can offer faster, more efficient services, improve client satisfaction, and operate more cost-effectively.</p>
       `,
-      author: "Research Team",
-      date: "2024-01-05",
-      readTime: "6 min read",
-      category: "Legal Tips",
+      author: "Anita Mehta",
+      date: "2024-12-10",
+      readTime: "10 min read",
+      category: "Business",
       image: "/logo4.png",
-      tags: ["Research", "Productivity", "Tips"]
+      tags: ["Digital Transformation", "Business", "Technology"]
     },
     4: {
       id: 4,
-      title: "Case Study: Successful Legal Research Using Salhakar",
+      title: "Contract Management Strategies",
       content: `
-        <p>This case study examines how a leading law firm in Mumbai transformed their legal research process using Salhakar's AI-powered platform, achieving a 300% improvement in research efficiency.</p>
+        <p>Effective contract management is crucial for legal success. This guide covers the latest tools, strategies, and best practices for managing contracts efficiently in the digital age.</p>
         
-        <h2>The Challenge</h2>
-        <p>The firm was spending an average of 15-20 hours per week on legal research for each active case. With a growing caseload and increasing client expectations, they needed a solution that could reduce research time without compromising quality.</p>
+        <h2>Master the Art of Digital Contract Management</h2>
+        <p>Master the art of digital contract management with modern tools and proven strategies. In today's fast-paced business environment, effective contract management is essential for legal professionals who need to track, analyze, and manage multiple contracts efficiently.</p>
         
-        <h2>The Solution</h2>
-        <p>After implementing Salhakar, the firm's research team discovered several key advantages:</p>
+        <p>Digital contract management systems help legal professionals streamline their workflow, reduce errors, and ensure compliance with contractual obligations. These systems provide centralized access to contract information, automated reminders, and powerful search capabilities.</p>
+        
+        <h2>Learn How to Streamline Your Contract Workflow</h2>
+        <p>Learn how to streamline your contract workflow with proven strategies and modern tools. Key components of effective contract management include:</p>
         <ul>
-          <li>Faster case law discovery</li>
-          <li>Multilingual research capabilities</li>
-          <li>Intelligent cross-referencing</li>
-          <li>Comprehensive legal database access</li>
+          <li><strong>Contract Creation:</strong> Templates and automated drafting tools</li>
+          <li><strong>Review and Approval:</strong> Digital workflows and approval processes</li>
+          <li><strong>Storage and Organization:</strong> Centralized repositories with search capabilities</li>
+          <li><strong>Monitoring and Compliance:</strong> Automated tracking of key dates and obligations</li>
         </ul>
         
-        <h2>Results</h2>
-        <p>Within three months of implementation, the firm reported:</p>
-        <ul>
-          <li>75% reduction in research time</li>
-          <li>Improved accuracy in case citations</li>
-          <li>Better client satisfaction</li>
-          <li>Increased capacity to handle more cases</li>
-        </ul>
+        <h2>Modern Tools and Technologies</h2>
+        <p>Modern contract management tools leverage AI and automation to make contract management more efficient. These tools can extract key information from contracts, identify risks, and provide insights that help legal professionals make better decisions.</p>
         
-        <h2>Key Takeaways</h2>
-        <p>This case study demonstrates that modern AI-powered legal research tools can significantly enhance law firm operations while maintaining the highest standards of legal research quality.</p>
+        <p>Integration with other legal technology platforms is also important, allowing contract data to flow seamlessly between different systems and applications used in legal practice.</p>
+        
+        <h2>Best Practices</h2>
+        <p>Successful contract management requires a combination of the right tools, clear processes, and ongoing attention to detail. Legal professionals should establish standardized procedures, train team members on best practices, and regularly review and update their contract management approach.</p>
       `,
-      author: "Case Studies",
-      date: "2023-12-28",
+      author: "Vikram Singh",
+      date: "2024-12-08",
       readTime: "7 min read",
-      category: "Case Studies",
+      category: "Contracts",
       image: "/logo4.png",
-      tags: ["Case Study", "Success Story", "Efficiency"]
+      tags: ["Contracts", "Management", "Strategy"]
     },
     5: {
       id: 5,
-      title: "Latest Updates in Indian Legal System",
+      title: "Legal Ethics in the Digital Era",
       content: `
-        <p>Stay informed about the latest changes, amendments, and updates in the Indian legal system. This comprehensive overview covers recent developments that every legal professional should know.</p>
+        <p>As technology continues to evolve, legal professionals face new ethical challenges. This article examines the intersection of law, technology, and ethics, providing guidance for navigating this complex landscape.</p>
         
-        <h2>Recent Legislative Changes</h2>
-        <p>The Indian legal system has seen significant updates in recent months, including new legislation, amendments to existing laws, and important judicial decisions that impact legal practice across the country.</p>
+        <h2>Explore the Evolving Landscape of Legal Ethics</h2>
+        <p>Explore the evolving landscape of legal ethics in our digital world. The rapid advancement of technology has introduced new ethical considerations for legal professionals, requiring them to navigate complex issues related to data privacy, AI use, and digital communication.</p>
         
-        <h2>Key Updates</h2>
+        <p>Legal ethics in the digital era involves understanding how traditional ethical principles apply to new technologies and digital practices. This includes considerations around client confidentiality, data security, and the appropriate use of AI and automation tools.</p>
+        
+        <h2>Understand New Challenges and Responsibilities</h2>
+        <p>Understand new challenges and responsibilities for modern lawyers. Key ethical considerations in the digital era include:</p>
         <ul>
-          <li>New criminal law reforms (BNS, BNSS, BSA)</li>
-          <li>Updates to commercial and corporate law</li>
-          <li>Changes in procedural requirements</li>
-          <li>Important Supreme Court and High Court decisions</li>
+          <li><strong>Data Privacy and Security:</strong> Protecting client information in digital systems</li>
+          <li><strong>AI and Automation:</strong> Ethical use of AI tools in legal practice</li>
+          <li><strong>Digital Communication:</strong> Maintaining confidentiality in digital communications</li>
+          <li><strong>Competence:</strong> Staying current with technology and its ethical implications</li>
         </ul>
         
-        <h2>Impact on Legal Practice</h2>
-        <p>These updates have far-reaching implications for legal professionals. Understanding these changes is essential for effective legal practice and ensuring compliance with current legal requirements.</p>
+        <h2>Navigating Ethical Challenges</h2>
+        <p>Legal professionals must be proactive in understanding and addressing ethical challenges related to technology. This includes staying informed about relevant regulations, implementing appropriate safeguards, and ensuring that technology use aligns with ethical obligations.</p>
         
-        <h2>Staying Updated</h2>
-        <p>Platforms like Salhakar help legal professionals stay current with the latest legal developments, providing timely updates and comprehensive coverage of changes in the legal landscape.</p>
+        <p>Professional development and continuing education are essential for legal professionals to stay current with both technological advances and the ethical considerations they raise.</p>
+        
+        <h2>Best Practices</h2>
+        <p>Adopting best practices for ethical technology use helps legal professionals maintain high standards while leveraging the benefits of modern tools. This includes clear policies, regular training, and ongoing evaluation of technology use in legal practice.</p>
       `,
-      author: "Legal Updates",
-      date: "2023-12-20",
-      readTime: "4 min read",
-      category: "Industry News",
+      author: "Dr. Meera Patel",
+      date: "2024-12-05",
+      readTime: "9 min read",
+      category: "Ethics",
       image: "/logo4.png",
-      tags: ["Legal Updates", "India", "News"]
+      tags: ["Ethics", "Digital Era", "Legal Practice"]
     },
     6: {
       id: 6,
-      title: "Multilingual Legal Research: Breaking Language Barriers",
+      title: "Building a Successful Practice",
       content: `
-        <p>Language should never be a barrier to accessing legal information. At Salhakar, we're committed to making legal research accessible in multiple Indian languages, ensuring that legal professionals across the country can work in their preferred language.</p>
+        <p>Building a successful legal practice requires more than just legal expertise. This comprehensive guide covers business development, client relationships, technology adoption, and other key factors for long-term success.</p>
         
-        <h2>The Language Challenge</h2>
-        <p>India's linguistic diversity presents unique challenges for legal research. Legal professionals often need to work in regional languages, but most legal databases and research tools are primarily available in English.</p>
+        <h2>Learn Proven Strategies for Building and Growing</h2>
+        <p>Learn proven strategies for building and growing a successful legal practice. Success in legal practice involves a combination of legal skills, business acumen, and effective client management. Legal professionals must balance the practice of law with the business aspects of running a practice.</p>
         
-        <h2>Our Solution</h2>
-        <p>Salhakar's multilingual platform supports research in multiple Indian languages, including:</p>
+        <p>Building a successful practice requires strategic planning, clear goals, and a commitment to continuous improvement. This involves understanding your market, identifying your strengths, and developing a clear value proposition for clients.</p>
+        
+        <h2>Get Insights from Industry Experts</h2>
+        <p>Get insights from industry experts and successful practitioners. Key factors for building a successful legal practice include:</p>
         <ul>
-          <li>Hindi</li>
-          <li>Gujarati</li>
-          <li>Tamil</li>
-          <li>Telugu</li>
-          <li>Bengali</li>
-          <li>And many more</li>
+          <li><strong>Business Development:</strong> Building a strong client base and referral network</li>
+          <li><strong>Client Relationships:</strong> Providing excellent service and maintaining strong relationships</li>
+          <li><strong>Technology Adoption:</strong> Leveraging modern tools to improve efficiency and service quality</li>
+          <li><strong>Professional Development:</strong> Continuous learning and skill development</li>
+          <li><strong>Financial Management:</strong> Effective billing, collections, and financial planning</li>
         </ul>
         
-        <h2>Benefits of Multilingual Research</h2>
-        <p>Multilingual legal research capabilities provide several advantages:</p>
-        <ul>
-          <li>Accessibility for non-English speakers</li>
-          <li>Better understanding of regional legal contexts</li>
-          <li>Improved communication with clients</li>
-          <li>Enhanced legal education opportunities</li>
-        </ul>
+        <h2>Client Relationships and Service Excellence</h2>
+        <p>Strong client relationships are the foundation of a successful practice. This involves clear communication, responsiveness, and a commitment to delivering value. Legal professionals should focus on understanding client needs and providing solutions that address those needs effectively.</p>
         
-        <h2>Technology Behind It</h2>
-        <p>Our advanced AI technology uses natural language processing to understand and process legal queries in multiple languages, ensuring accurate and relevant results regardless of the language used.</p>
+        <h2>Long-Term Success</h2>
+        <p>Building a successful practice is a long-term endeavor that requires patience, persistence, and a commitment to excellence. By focusing on client service, professional development, and strategic growth, legal professionals can build practices that thrive over time.</p>
       `,
-      author: "Technology Team",
-      date: "2023-12-15",
-      readTime: "5 min read",
-      category: "AI & Technology",
+      author: "Arjun Gupta",
+      date: "2024-12-02",
+      readTime: "12 min read",
+      category: "Practice",
       image: "/logo4.png",
-      tags: ["Multilingual", "Accessibility", "Technology"]
+      tags: ["Practice", "Business", "Success"]
     }
   };
 
