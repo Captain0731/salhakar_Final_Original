@@ -130,7 +130,7 @@ const BlogSection = () => {
     document.addEventListener('keydown', handleEsc);
     return () => {
       document.removeEventListener('keydown', handleEsc);
-    };
+  };
   }, [isModalOpen]);
 
   // Auto-slide
@@ -236,8 +236,8 @@ const BlogSection = () => {
               
               if (isMobile && !isCenter) return null;
                 
-              return (
-                <div 
+                return (
+                  <div 
                   key={`${blog.id}-${position}`}
                   className="flex-shrink-0 transition-all duration-500 ease-out"
                   style={{
@@ -264,36 +264,36 @@ const BlogSection = () => {
                       border: isCenter ? '2px solid #1E65AD' : '1px solid #E5E7EB',
                       padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
                       borderRadius: 'clamp(1rem, 2vw, 1.5rem)'
-                    }}
-                  >
+                              }}
+                        >
                     {/* Image/Icon Section */}
-                    <div 
+                              <div 
                       className="relative h-32 sm:h-40 flex items-center justify-center overflow-hidden mb-4 rounded-xl"
-                      style={{ 
-                        background: `linear-gradient(135deg, ${categoryStyle.bg} 0%, #FFFFFF 100%)`
-                      }}
-                    >
+                                style={{ 
+                                  background: `linear-gradient(135deg, ${categoryStyle.bg} 0%, #FFFFFF 100%)`
+                                }}
+                              >
                       <span 
                         className="text-4xl sm:text-5xl transition-transform duration-500 hover:scale-110 hover:rotate-6"
                       >
                         {blog.image}
-                      </span>
-                      
-                      {/* Category Badge */}
-                      <span 
+                                </span>
+                            
+                                {/* Category Badge */}
+                                <span 
                         className="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold"
-                        style={{ 
-                          backgroundColor: categoryStyle.bg, 
-                          color: categoryStyle.color,
-                          fontFamily: 'Heebo, sans-serif'
-                        }}
-                      >
+                              style={{ 
+                                    backgroundColor: categoryStyle.bg, 
+                                    color: categoryStyle.color,
+                                    fontFamily: 'Heebo, sans-serif'
+                              }}
+                            >
                         {blog.category}
-                      </span>
-                    </div>
+                                </span>
+                          </div>
 
                     {/* Title */}
-                    <h3 
+                            <h3 
                       className="font-bold mb-2 leading-tight"
                       style={{ 
                         color: isCenter ? '#1E65AD' : '#374151', 
@@ -301,12 +301,12 @@ const BlogSection = () => {
                         fontSize: 'clamp(1rem, 1.5vw, 1.25rem)',
                         marginBottom: 'clamp(0.5rem, 1vw, 0.75rem)'
                       }}
-                    >
+                            >
                       {blog.title}
-                    </h3>
+                            </h3>
 
                     {/* Description */}
-                    <p 
+                            <p 
                       className="leading-relaxed mb-3"
                       style={{ 
                         color: isCenter ? '#6B7280' : '#8C969F', 
@@ -315,9 +315,9 @@ const BlogSection = () => {
                         lineHeight: '1.6',
                         marginBottom: 'clamp(0.75rem, 1.5vw, 1rem)'
                       }}
-                    >
+                            >
                       {blog.description}
-                    </p>
+                            </p>
 
                     {/* Divider */}
                     <div 
@@ -332,7 +332,7 @@ const BlogSection = () => {
 
                     {/* Author & Meta */}
                     <div className="flex items-center justify-between">
-                      <div>
+                                  <div>
                         <h4 
                           className="font-semibold text-xs sm:text-sm"
                           style={{ 
@@ -340,38 +340,38 @@ const BlogSection = () => {
                             fontFamily: 'Heebo, sans-serif',
                             marginBottom: '0.25rem'
                           }}
-                        >
+                                >
                           {blog.author}
                         </h4>
-                        <p 
-                          className="text-xs"
+                                <p 
+                                      className="text-xs"
                           style={{ 
                             color: isCenter ? '#CF9B63' : '#8C969F', 
                             fontFamily: 'Heebo, sans-serif' 
                           }}
-                        >
+                                >
                           {blog.date} · {blog.readTime}
-                        </p>
-                      </div>
-                      <div 
+                                </p>
+                              </div>
+                                  <div 
                         className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-blue-600 flex-shrink-0"
                         style={{ backgroundColor: isCenter ? '#EBF5FF' : '#F3F4F6' }}
-                      >
-                        <svg 
+                                  >
+                                    <svg 
                           className="w-4 h-4 transition-colors duration-300" 
-                          style={{ color: '#1E65AD' }}
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                      </div>
+                                      style={{ color: '#1E65AD' }}
+                                      fill="none" 
+                                      stroke="currentColor" 
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                  </div>
+                                </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
 
           {/* Right Arrow Button */}
@@ -402,52 +402,52 @@ const BlogSection = () => {
           </button>
         </div>
 
-        {/* Navigation Dots */}
+          {/* Navigation Dots */}
         <div className="flex items-center justify-center mt-6 sm:mt-8">
           <div className="flex items-center gap-2">
-            {Array.from({ length: totalSlides }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className="transition-all duration-300"
-                style={{
+              {Array.from({ length: totalSlides }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className="transition-all duration-300"
+                  style={{
                   width: index === currentSlide ? '28px' : '10px',
                   height: '10px',
                   borderRadius: '5px',
-                  backgroundColor: index === currentSlide ? '#1E65AD' : '#D1D5DB'
-                }}
-              />
-            ))}
+                    backgroundColor: index === currentSlide ? '#1E65AD' : '#D1D5DB'
+                  }}
+                />
+              ))}
           </div>
         </div>
 
         {/* View All Button */}
         <div className="text-center mt-8 sm:mt-10">
-          <button
+            <button
             onClick={() => navigate('/blog')}
             className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 rounded-full text-sm sm:text-base font-semibold transition-all duration-300"
-            style={{ 
+              style={{ 
               backgroundColor: '#CF9B63', 
               color: '#FFFFFF',
               fontFamily: 'Heebo, sans-serif',
               boxShadow: '0 4px 15px rgba(207, 155, 99, 0.3)'
-            }}
-            onMouseEnter={(e) => {
+              }}
+              onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = '#B8864F';
               e.currentTarget.style.transform = 'translateY(-2px)';
               e.currentTarget.style.boxShadow = '0 8px 25px rgba(207, 155, 99, 0.4)';
-            }}
-            onMouseLeave={(e) => {
+              }}
+              onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = '#CF9B63';
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 4px 15px rgba(207, 155, 99, 0.3)';
-            }}
-          >
+              }}
+            >
             View All Articles
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </button>
+              </svg>
+            </button>
         </div>
       </div>
 

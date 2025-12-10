@@ -20,32 +20,35 @@ const ReviewPopup = () => {
   ];
 
   // Check if popup should be shown based on timer
+  // DISABLED: Popup will not show automatically
   useEffect(() => {
-    const checkAndShowPopup = () => {
-      const lastShown = localStorage.getItem('reviewPopupLastShown');
-      const now = Date.now();
-      
-      // Determine interval based on authentication status
-      const interval = isAuthenticated ? 10 * 60 * 1000 : 5 * 60 * 1000; // 10 min or 5 min
-      
-      if (!lastShown || (now - parseInt(lastShown)) >= interval) {
-        // Check if user has already submitted a review today
-        const lastSubmitted = localStorage.getItem('reviewPopupLastSubmitted');
-        const today = new Date().toDateString();
-        
-        if (!lastSubmitted || new Date(lastSubmitted).toDateString() !== today) {
-          setShowPopup(true);
-        }
-      }
-    };
+    // Popup is disabled - do not show automatically
+    // const checkAndShowPopup = () => {
+    //   const lastShown = localStorage.getItem('reviewPopupLastShown');
+    //   const now = Date.now();
+    //   
+    //   // Determine interval based on authentication status
+    //   // Logged in: 2 hours (120 minutes), Not logged in: 1.5 hours (90 minutes)
+    //   const interval = isAuthenticated ? 120 * 60 * 1000 : 90 * 60 * 1000;
+    //   
+    //   if (!lastShown || (now - parseInt(lastShown)) >= interval) {
+    //     // Check if user has already submitted a review today
+    //     const lastSubmitted = localStorage.getItem('reviewPopupLastSubmitted');
+    //     const today = new Date().toDateString();
+    //     
+    //     if (!lastSubmitted || new Date(lastSubmitted).toDateString() !== today) {
+    //       setShowPopup(true);
+    //     }
+    //   }
+    // };
 
-    // Check immediately
-    checkAndShowPopup();
+    // Check immediately - DISABLED
+    // checkAndShowPopup();
 
-    // Check every minute
-    const intervalId = setInterval(checkAndShowPopup, 60 * 1000);
+    // Check every minute - DISABLED
+    // const intervalId = setInterval(checkAndShowPopup, 60 * 1000);
 
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, [isAuthenticated]);
 
   const handleReactionClick = (reaction) => {

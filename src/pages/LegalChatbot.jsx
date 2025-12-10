@@ -512,9 +512,17 @@ export default function LegalChatbot() {
   const adjustTextareaHeight = () => {
     if (inputRef.current) {
       inputRef.current.style.height = 'auto';
-      const maxHeight = 120; // Maximum height in pixels (about 5-6 lines)
-      const newHeight = Math.min(inputRef.current.scrollHeight, maxHeight);
+      const maxHeight = 200; // Maximum height in pixels (about 8-10 lines)
+      const scrollHeight = inputRef.current.scrollHeight;
+      const newHeight = Math.min(scrollHeight, maxHeight);
       inputRef.current.style.height = `${newHeight}px`;
+      
+      // If content exceeds maxHeight, enable scrolling
+      if (scrollHeight > maxHeight) {
+        inputRef.current.style.overflowY = 'auto';
+      } else {
+        inputRef.current.style.overflowY = 'hidden';
+      }
     }
   };
 
@@ -1495,7 +1503,7 @@ export default function LegalChatbot() {
                     boxShadow: '0 4px 20px rgba(30, 101, 173, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08)'
                   }}
                 >
-                  <div className="flex items-center min-h-[48px] sm:min-h-[56px] px-2 sm:px-2.5 sm:px-3 gap-1 sm:gap-1.5 py-1.5 sm:py-2">
+                  <div className="flex items-center min-h-[48px] sm:min-h-[56px] px-2 sm:px-2.5 gap-1.5 sm:gap-2 py-1.5 sm:py-2">
                     {/* Plus Icon Button for File Attachment */}
                     <button
                       onClick={() => fileInputRef.current?.click()}
@@ -1509,7 +1517,7 @@ export default function LegalChatbot() {
 
                     {/* Input Field or Recording Waveform */}
                     {isRecording ? (
-                      <div className="flex-1 h-full flex items-center justify-center ml-1 sm:ml-1.5 sm:ml-2 min-w-0">
+                      <div className="flex-1 h-full flex items-center justify-center min-w-0">
                         <div className="flex items-center gap-0.5 sm:gap-1">
                     {[...Array(20)].map((_, i) => (
                       <motion.div
@@ -1540,16 +1548,21 @@ export default function LegalChatbot() {
                       onChange={handleInputChange}
                       onKeyDown={handleKeyPress}
                         placeholder="Ask Your Legal Question Here"
-                      className="flex-1 bg-transparent border-none outline-none text-sm sm:text-base ml-1 sm:ml-1.5 sm:ml-2 placeholder-gray-400 min-w-0 resize-none overflow-y-auto"
+                      className="flex-1 bg-transparent border-none outline-none text-sm sm:text-base placeholder-gray-400 min-w-0 resize-none"
                       style={{ 
                         fontFamily: "'Heebo', sans-serif",
                         color: '#1F2937',
                           fontSize: '14px',
-                        lineHeight: '1.5',
+                        lineHeight: '1.6',
                         minHeight: '24px',
-                        maxHeight: '120px',
-                        paddingTop: '4px',
-                        paddingBottom: '4px'
+                        maxHeight: '200px',
+                        padding: '2px 0',
+                        margin: '0',
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        wordWrap: 'break-word',
+                        whiteSpace: 'pre-wrap',
+                        verticalAlign: 'middle'
                       }}
                       disabled={loading || isProcessingVoice}
                       rows={1}
@@ -1557,7 +1570,7 @@ export default function LegalChatbot() {
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-1">
+                    <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                       {/* Microphone Button */}
                       {isRecording ? (
                         <motion.button

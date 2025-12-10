@@ -348,6 +348,20 @@ export default function Login() {
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#f8fafc' }}>
+      {/* Skip Button - Mobile Only */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        onClick={() => navigate("/")}
+        className="lg:hidden fixed top-4 right-4 z-50 bg-white/90 backdrop-blur-md border-2 border-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-white transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+        style={{ fontFamily: 'Roboto, sans-serif' }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Skip
+      </motion.button>
 
       <div className="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8 relative z-10">
         <motion.div
@@ -358,12 +372,12 @@ export default function Login() {
         >
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
             <div className="lg:grid lg:grid-cols-2 min-h-[600px]">
-            {/* Left Panel - Branding */}
+            {/* Left Panel - Branding - Hidden on Mobile */}
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative p-8 sm:p-12 lg:p-16 flex flex-col justify-center items-center text-white overflow-hidden"
+                className="hidden lg:flex relative p-8 sm:p-12 lg:p-16 flex-col justify-center items-center text-white overflow-hidden"
                 style={{
                   background: 'linear-gradient(135deg, #1E65AD 0%, #1a5a9a 50%, #CF9B63 100%)',
                 }}

@@ -3,7 +3,7 @@
 const API_BASE_URL_PR = 'https://operantly-unchattering-ernie.ngrok-free.dev';
 
 // Alternative server (ad) - Fallback
-const API_BASE_URL_AD = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
+const API_BASE_URL_AD = 'https://hammerhead-app-a45bw.ondigitalocean.app';
 
 // Server configuration with identifiers
 const API_SERVERS = [

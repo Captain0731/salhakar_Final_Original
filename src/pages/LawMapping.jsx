@@ -1287,7 +1287,7 @@ export default function LawMapping() {
                         </div>
 
                         {/* Subject and Summary */}
-                        <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 pt-2 sm:pt-3 border-t border-gray-100">
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 pt-2 sm:pt-3 border-t border-gray-100 items-start sm:items-center">
                           <div className="flex-1 min-w-0">
                             <h3 
                               className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold mb-1.5 sm:mb-2 md:mb-3 break-words leading-tight" 
@@ -1356,14 +1356,14 @@ export default function LawMapping() {
                             )}
                           </div>
                           
-                          <div className="flex-shrink-0 w-1/6 mt-1 sm:mt-0 justify-right items-end">
+                          <div className="flex-shrink-0 ml-auto">
                             {/* View Details Button */}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 viewMappingDetails(mapping);
                               }}
-                              className="w-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium text-xs sm:text-sm md:text-base shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-all font-medium text-xs sm:text-sm md:text-base shadow-sm hover:shadow-md transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                               style={{ fontFamily: 'Roboto, sans-serif' }}
                             >
                               <span className="flex items-center justify-center gap-1.5 sm:gap-2">

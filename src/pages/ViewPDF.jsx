@@ -727,7 +727,7 @@ export default function ViewPDF() {
                                 const shareUrl = `${window.location.origin}/judgment/${judgmentId}`;
                                 try {
                                   await navigator.clipboard.writeText(shareUrl);
-                                  alert('Link copied to clipboard!');
+                              alert('Link copied to clipboard!');
                                 } catch (copyErr) {
                                   console.error('Failed to share or copy:', copyErr);
                                   alert('Failed to share. Please try again.');

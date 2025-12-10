@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
@@ -553,7 +553,7 @@ export default function ActDetails() {
                               } else {
                                 // Fallback to copy
                                 await navigator.clipboard.writeText(shareUrl);
-                                alert('Link copied to clipboard!');
+                              alert('Link copied to clipboard!');
                               }
                             } catch (err) {
                               if (err.name !== 'AbortError') {
@@ -1466,200 +1466,220 @@ export default function ActDetails() {
       </div>
       </div>
 
-      {/* Draggable Notes Popup */}
-      {showNotesPopup && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-30 z-40"
-            onClick={() => setShowNotesPopup(false)}
-          />
-          
-          {/* Draggable Popup */}
-          <div
-            className="fixed bg-white rounded-lg shadow-2xl z-50 flex flex-col"
-            style={{
-              left: `${popupPosition.x}px`,
-              top: `${popupPosition.y}px`,
-              width: `${popupSize.width}px`,
-              height: `${popupSize.height}px`,
-              minWidth: '400px',
-              minHeight: '300px',
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              fontFamily: 'Roboto, sans-serif',
-              userSelect: isDragging || isResizing ? 'none' : 'auto'
-            }}
-            onMouseDown={(e) => {
-              // Only start dragging if clicking on the header
-              if (e.target.closest('.notes-popup-header')) {
-                setIsDragging(true);
-                const rect = e.currentTarget.getBoundingClientRect();
-                setDragOffset({
-                  x: e.clientX - rect.left,
-                  y: e.clientY - rect.top
-                });
-              }
-            }}
-            onMouseMove={(e) => {
-              if (isDragging) {
-                const newX = e.clientX - dragOffset.x;
-                const newY = e.clientY - dragOffset.y;
-                
-                // Constrain to viewport
-                const maxX = window.innerWidth - popupSize.width;
-                const maxY = window.innerHeight - popupSize.height;
-                
-                setPopupPosition({
-                  x: Math.max(0, Math.min(newX, maxX)),
-                  y: Math.max(0, Math.min(newY, maxY))
-                });
-              } else if (isResizing) {
-                const deltaX = e.clientX - resizeStart.x;
-                const deltaY = e.clientY - resizeStart.y;
-                
-                const newWidth = Math.max(400, Math.min(window.innerWidth * 0.9, resizeStart.width + deltaX));
-                const newHeight = Math.max(300, Math.min(window.innerHeight * 0.9, resizeStart.height + deltaY));
-                
-                setPopupSize({
-                  width: newWidth,
-                  height: newHeight
-                });
-                
-                // Adjust position if popup goes out of bounds
-                const maxX = window.innerWidth - newWidth;
-                const maxY = window.innerHeight - newHeight;
-                setPopupPosition(prev => ({
-                  x: Math.min(prev.x, maxX),
-                  y: Math.min(prev.y, maxY)
-                }));
-              }
-            }}
-            onMouseUp={() => {
-              setIsDragging(false);
-              setIsResizing(false);
-            }}
-            onMouseLeave={() => {
-              setIsDragging(false);
-              setIsResizing(false);
-            }}
-          >
-            {/* Header - Draggable Area */}
-            <div 
-              className="notes-popup-header flex items-center justify-between p-4 border-b border-gray-200"
-              style={{ 
-                borderTopLeftRadius: '0.5rem', 
-                borderTopRightRadius: '0.5rem',
-                cursor: isDragging ? 'grabbing' : 'move',
-                userSelect: 'none',
-                background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
+      {/* Draggable Notes Popup - Improved Mobile */}
+      <AnimatePresence>
+        {showNotesPopup && (
+          <>
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
+              onClick={() => setShowNotesPopup(false)}
+            />
+            
+            {/* Popup - Full screen bottom sheet on mobile, draggable on desktop */}
+            <motion.div
+              initial={{ opacity: 0, y: '100%' }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: '100%' }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="fixed bg-white rounded-t-3xl sm:rounded-xl md:rounded-2xl shadow-2xl z-50 flex flex-col"
+              style={{
+                left: isMobile ? '0' : `${popupPosition.x}px`,
+                top: isMobile ? 'auto' : `${popupPosition.y}px`,
+                bottom: isMobile ? '0' : 'auto',
+                right: isMobile ? '0' : 'auto',
+                width: isMobile ? '100%' : `${popupSize.width}px`,
+                height: isMobile ? '95vh' : `${popupSize.height}px`,
+                minWidth: isMobile ? 'auto' : '400px',
+                minHeight: isMobile ? '95vh' : '300px',
+                maxWidth: isMobile ? '100%' : '90vw',
+                maxHeight: isMobile ? '95vh' : '90vh',
+                fontFamily: 'Roboto, sans-serif',
+                userSelect: (isDragging || isResizing) && !isMobile ? 'none' : 'auto'
               }}
-              onMouseEnter={(e) => {
-                if (!isDragging) {
-                  e.currentTarget.style.cursor = 'move';
+              onMouseDown={(e) => {
+                // Only start dragging if clicking on the header and not on mobile
+                if (!isMobile && e.target.closest('.notes-popup-header')) {
+                  setIsDragging(true);
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setDragOffset({
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                  });
                 }
               }}
+              onMouseMove={(e) => {
+                if (!isMobile && isDragging) {
+                  const newX = e.clientX - dragOffset.x;
+                  const newY = e.clientY - dragOffset.y;
+                  
+                  // Constrain to viewport
+                  const maxX = window.innerWidth - popupSize.width;
+                  const maxY = window.innerHeight - popupSize.height;
+                  
+                  setPopupPosition({
+                    x: Math.max(0, Math.min(newX, maxX)),
+                    y: Math.max(0, Math.min(newY, maxY))
+                  });
+                } else if (!isMobile && isResizing) {
+                  const deltaX = e.clientX - resizeStart.x;
+                  const deltaY = e.clientY - resizeStart.y;
+                  
+                  const newWidth = Math.max(400, Math.min(window.innerWidth * 0.9, resizeStart.width + deltaX));
+                  const newHeight = Math.max(300, Math.min(window.innerHeight * 0.9, resizeStart.height + deltaY));
+                  
+                  setPopupSize({
+                    width: newWidth,
+                    height: newHeight
+                  });
+                  
+                  // Adjust position if popup goes out of bounds
+                  const maxX = window.innerWidth - newWidth;
+                  const maxY = window.innerHeight - newHeight;
+                  setPopupPosition(prev => ({
+                    x: Math.min(prev.x, maxX),
+                    y: Math.min(prev.y, maxY)
+                  }));
+                }
+              }}
+              onMouseUp={() => {
+                setIsDragging(false);
+                setIsResizing(false);
+              }}
+              onMouseLeave={() => {
+                setIsDragging(false);
+                setIsResizing(false);
+              }}
             >
-              <div className="flex items-center gap-2">
-                <StickyNote className="h-5 w-5 text-white" />
-                <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                  Notes
-                </h3>
+              {/* Mobile Drag Handle */}
+              <div className="sm:hidden flex justify-center pt-3 pb-2">
+                <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
               </div>
-              <div className="flex items-center gap-2">
-                {/* Size Control Buttons */}
-                <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
+              
+              {/* Header - Draggable Area (Desktop only) */}
+              <div 
+                className="notes-popup-header flex items-center justify-between p-4 sm:p-5 border-b border-gray-200"
+                style={{ 
+                  cursor: isMobile ? 'default' : (isDragging ? 'grabbing' : 'move'),
+                  userSelect: 'none',
+                  background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isMobile && !isDragging) {
+                    e.currentTarget.style.cursor = 'move';
+                  }
+                }}
+              >
+                <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                    <StickyNote className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                      Notes
+                    </h3>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* Size Control Buttons - Desktop only */}
+                  {!isMobile && (
+                    <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPopupSize(prev => ({
+                            width: Math.max(400, prev.width - 50),
+                            height: Math.max(300, prev.height - 50)
+                          }));
+                        }}
+                        className="text-white hover:text-gray-200 transition-colors p-1.5 rounded hover:bg-opacity-20"
+                        style={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          borderRadius: '0.25rem',
+                          cursor: 'pointer'
+                        }}
+                        title="Make Smaller"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPopupSize(prev => ({
+                            width: Math.min(window.innerWidth * 0.9, prev.width + 50),
+                            height: Math.min(window.innerHeight * 0.9, prev.height + 50)
+                          }));
+                        }}
+                        className="text-white hover:text-gray-200 transition-colors p-1.5 rounded hover:bg-opacity-20"
+                        style={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          borderRadius: '0.25rem',
+                          cursor: 'pointer'
+                        }}
+                        title="Make Bigger"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.max(400, prev.width - 50),
-                        height: Math.max(300, prev.height - 50)
-                      }));
+                      setShowNotesPopup(false);
                     }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
+                    className="text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-opacity-20 flex-shrink-0"
                     style={{ 
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
                       cursor: 'pointer'
                     }}
-                    title="Make Smaller"
+                    title="Close"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.min(window.innerWidth * 0.9, prev.width + 50),
-                        height: Math.min(window.innerHeight * 0.9, prev.height + 50)
-                      }));
-                    }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
-                    style={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer'
-                    }}
-                    title="Make Bigger"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
-                
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowNotesPopup(false);
-                  }}
-                  className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20 flex-shrink-0"
-                  style={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '0.25rem',
-                    cursor: 'pointer'
-                  }}
-                  title="Close"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
               </div>
-            </div>
-            
-            {/* Resize Handle - Bottom Right Corner */}
-            <div
-              className="absolute bottom-0 right-0 w-6 h-6"
-              style={{
-                background: 'linear-gradient(135deg, transparent 0%, transparent 50%, rgba(30, 101, 173, 0.3) 50%, rgba(30, 101, 173, 0.3) 100%)',
-                borderBottomRightRadius: '0.5rem',
-                cursor: 'nwse-resize'
-              }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                setIsResizing(true);
-                setResizeStart({
-                  x: e.clientX,
-                  y: e.clientY,
-                  width: popupSize.width,
-                  height: popupSize.height
-                });
-              }}
-              onMouseEnter={(e) => {
-                if (!isResizing) {
-                  e.currentTarget.style.cursor = 'nwse-resize';
-                }
-              }}
-              title="Drag to resize"
-            />
+              
+              {/* Resize Handle - Bottom Right Corner (Desktop only) */}
+              {!isMobile && (
+                <div
+                  className="absolute bottom-0 right-0 w-6 h-6"
+                  style={{
+                    background: 'linear-gradient(135deg, transparent 0%, transparent 50%, rgba(30, 101, 173, 0.3) 50%, rgba(30, 101, 173, 0.3) 100%)',
+                    borderBottomRightRadius: '0.5rem',
+                    cursor: 'nwse-resize'
+                  }}
+                  onMouseDown={(e) => {
+                    e.stopPropagation();
+                    setIsResizing(true);
+                    setResizeStart({
+                      x: e.clientX,
+                      y: e.clientY,
+                      width: popupSize.width,
+                      height: popupSize.height
+                    });
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isResizing) {
+                      e.currentTarget.style.cursor = 'nwse-resize';
+                    }
+                  }}
+                  title="Drag to resize"
+                />
+              )}
 
-            {/* Folder Tabs */}
-            <div className="border-b border-gray-200 bg-gray-50 flex items-center gap-1 px-2 py-1 overflow-x-auto">
-              <div className="flex items-center gap-1 flex-1 min-w-0">
+            {/* Folder Tabs - Improved Mobile */}
+            <div className="border-b-2 border-gray-200 bg-gray-50 flex items-center gap-1 px-3 sm:px-4 py-2 sm:py-3 overflow-x-auto">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
                 {notesFolders.map((folder) => (
                   <button
                     key={folder.id}
@@ -1673,7 +1693,7 @@ export default function ActDetails() {
                       setActiveFolderId(folder.id);
                       setNotesContent(folder.content || '');
                     }}
-                    className={`px-3 py-2 rounded-t-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${
+                    className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-t-lg text-sm sm:text-base font-medium transition-all whitespace-nowrap flex items-center gap-2 ${
                       activeFolderId === folder.id
                         ? 'bg-white text-blue-600 border-b-2 border-blue-600'
                         : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
@@ -1769,8 +1789,8 @@ export default function ActDetails() {
               </div>
             </div>
 
-            {/* Content Area */}
-            <div className="flex-1 overflow-hidden flex flex-col" style={{ cursor: 'text' }}>
+            {/* Content Area - Improved Mobile */}
+            <div className="flex-1 overflow-hidden flex flex-col" style={{ cursor: 'text', minHeight: 0 }}>
               <textarea
                 value={notesContent}
                 onChange={(e) => {
@@ -1781,14 +1801,15 @@ export default function ActDetails() {
                   ));
                 }}
                 placeholder="Write your notes here..."
-                className="flex-1 w-full p-4 border-0 resize-none focus:outline-none focus:ring-0"
+                className="flex-1 w-full p-4 sm:p-5 md:p-6 border-0 resize-none focus:outline-none focus:ring-0"
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
-                  minHeight: '300px',
-                  fontSize: '14px',
-                  lineHeight: '1.6',
+                  fontSize: isMobile ? '16px' : '14px',
+                  lineHeight: '1.8',
                   color: '#1E65AD',
-                  cursor: 'text'
+                  cursor: 'text',
+                  WebkitAppearance: 'none',
+                  WebkitTapHighlightColor: 'transparent'
                 }}
               />
             </div>
@@ -1819,7 +1840,7 @@ export default function ActDetails() {
                 </div>
               )}
               
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+            <div className="flex items-center justify-end gap-3 p-4 sm:p-5 border-t-2 border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
                   // Save current folder content before closing
@@ -1828,7 +1849,7 @@ export default function ActDetails() {
                   ));
                   setShowNotesPopup(false);
                 }}
-                className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm sm:text-base shadow-sm"
                 style={{ fontFamily: 'Roboto, sans-serif', cursor: 'pointer' }}
               >
                 Cancel
@@ -1942,7 +1963,7 @@ export default function ActDetails() {
                   }
                 }}
                 disabled={isSaving}
-                className={`px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md ${
+                className={`px-5 sm:px-6 py-2.5 sm:py-3 text-white rounded-lg transition-all font-medium text-sm sm:text-base shadow-md hover:shadow-lg ${
                   isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                 }`}
                 style={{ 
@@ -1964,9 +1985,10 @@ export default function ActDetails() {
               </button>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
 
     </div>

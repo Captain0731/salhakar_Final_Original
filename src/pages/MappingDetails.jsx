@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../components/landing/Navbar";
 import apiService from "../services/api";
 import BookmarkButton from "../components/BookmarkButton";
@@ -325,122 +326,122 @@ export default function MappingDetails() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9FAFC' }}>
       <Navbar />
-      <div className="pt-16 sm:pt-20">
-        <div className="flex-1 p-2 sm:p-3 md:p-4 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
+      <div className="pt-14 sm:pt-16 md:pt-20">
+        <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6" style={{ minHeight: 'calc(100vh - 80px)' }}>
           <div className="max-w-7xl mx-auto h-full">
-            <div className="space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6">
+            <div className="space-y-4 sm:space-y-5 md:space-y-6">
               
-              {/* Header Section */}
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-2 sm:p-3 md:p-4 lg:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                      <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold break-words" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+              {/* Header Section - Improved Mobile Layout */}
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-5 md:p-6">
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  {/* Title and Action Buttons Row */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold break-words mb-2" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                         {mappingInfo.title}
                       </h1>
-                      {mapping && (
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <button
-                            onClick={async () => {
-                              try {
+                      <div className="w-16 sm:w-20 md:w-24 h-1 bg-gradient-to-r mt-2" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
+                    </div>
+                    {mapping && (
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                          onClick={async () => {
+                            try {
+                              const mappingId = mapping?.id || mapping?.mapping_id || '';
+                              const shareUrl = mappingId 
+                                ? `${window.location.origin}/mapping-details?id=${mappingId}`
+                                : window.location.href;
+                              const shareTitle = mappingInfo?.title || mapping?.title || 'Legal Mapping';
+                              const shareText = `Check out this legal mapping: ${shareTitle}`;
+                              
+                              const shareData = {
+                                title: shareTitle,
+                                text: shareText,
+                                url: shareUrl
+                              };
+
+                              if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                                await navigator.share(shareData);
+                              } else {
+                                await navigator.clipboard.writeText(shareUrl);
+                                alert('Link copied to clipboard!');
+                              }
+                            } catch (err) {
+                              if (err.name !== 'AbortError') {
                                 const mappingId = mapping?.id || mapping?.mapping_id || '';
-                                // Since mapping-details doesn't have ID in route, use current URL or construct with ID if available
                                 const shareUrl = mappingId 
                                   ? `${window.location.origin}/mapping-details?id=${mappingId}`
                                   : window.location.href;
-                                const shareTitle = mappingInfo?.title || mapping?.title || 'Legal Mapping';
-                                const shareText = `Check out this legal mapping: ${shareTitle}`;
-                                
-                                const shareData = {
-                                  title: shareTitle,
-                                  text: shareText,
-                                  url: shareUrl
-                                };
-
-                                if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-                                  await navigator.share(shareData);
-                                } else {
-                                  // Fallback to copy
+                                try {
                                   await navigator.clipboard.writeText(shareUrl);
                                   alert('Link copied to clipboard!');
-                                }
-                              } catch (err) {
-                                if (err.name !== 'AbortError') {
-                                  // Fallback to copy
-                                  const mappingId = mapping?.id || mapping?.mapping_id || '';
-                                  const shareUrl = mappingId 
-                                    ? `${window.location.origin}/mapping-details?id=${mappingId}`
-                                    : window.location.href;
-                                  try {
-                                    await navigator.clipboard.writeText(shareUrl);
-                                    alert('Link copied to clipboard!');
-                                  } catch (copyErr) {
-                                    console.error('Failed to share or copy:', copyErr);
-                                    alert('Failed to share. Please try again.');
-                                  }
+                                } catch (copyErr) {
+                                  console.error('Failed to share or copy:', copyErr);
+                                  alert('Failed to share. Please try again.');
                                 }
                               }
-                            }}
-                            className="p-1.5 sm:p-2 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
-                            style={{ 
-                              backgroundColor: '#1E65AD',
-                              color: '#FFFFFF'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.backgroundColor = '#1a5a9a';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.backgroundColor = '#1E65AD';
-                            }}
-                            title="Share mapping"
-                          >
-                            <Share2 className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#FFFFFF' }} />
-                          </button>
-                          <BookmarkButton
-                            item={mapping}
-                            type={
-                              mappingType === 'bns_ipc' ? 'bns_ipc_mapping' : 
-                              mappingType === 'bsa_iea' ? 'bsa_iea_mapping' : 
-                              mappingType === 'bnss_crpc' ? 'bnss_crpc_mapping' : 
-                              'bns_ipc_mapping'
                             }
-                            size="small"
-                            showText={false}
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <div className="w-12 sm:w-16 h-1 bg-gradient-to-r mt-2 sm:mt-3" style={{ background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)' }}></div>
+                          }}
+                          className="p-2 sm:p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
+                          style={{ 
+                            backgroundColor: '#1E65AD',
+                            color: '#FFFFFF'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.backgroundColor = '#1a5a9a';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.backgroundColor = '#1E65AD';
+                          }}
+                          title="Share mapping"
+                        >
+                          <Share2 className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: '#FFFFFF' }} />
+                        </button>
+                        <BookmarkButton
+                          item={mapping}
+                          type={
+                            mappingType === 'bns_ipc' ? 'bns_ipc_mapping' : 
+                            mappingType === 'bsa_iea' ? 'bsa_iea_mapping' : 
+                            mappingType === 'bnss_crpc' ? 'bnss_crpc_mapping' : 
+                            'bns_ipc_mapping'
+                          }
+                          size="small"
+                          showText={false}
+                        />
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Back Button - Full Width on Mobile */}
                   <button
                     onClick={goBack}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-xs sm:text-sm md:text-base shadow-sm hover:shadow-md flex items-center justify-center gap-1.5 sm:gap-2 w-full sm:w-auto"
+                    className="w-full sm:w-auto sm:ml-auto px-4 sm:px-5 py-2.5 sm:py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-sm sm:text-base shadow-sm hover:shadow-md flex items-center justify-center gap-2"
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   >
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    Back
+                    Back to Mappings
                   </button>
                 </div>
               </div>
 
-              {/* Toolbar - Search, Summary, Notes */}
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-2 sm:p-2.5 md:p-3 lg:p-4">
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3">
+              {/* Toolbar - Search, Summary, Notes - Improved Mobile Layout */}
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
                   {/* Search Bar */}
-                  <div className="relative flex-1 min-w-[120px] sm:min-w-[200px]">
+                  <div className="relative flex-1 w-full">
                     <img 
                       src="/uit3.GIF" 
                       alt="Search" 
-                      className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-12 w-8 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-12 lg:w-12 object-contain pointer-events-none z-10"
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 h-8 w-8 sm:h-10 sm:w-10 object-contain pointer-events-none z-10"
                     />
                     <input
                       type="text"
                       placeholder="Search With Kiki AI..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 sm:pl-12 md:pl-14 lg:pl-16 pr-2 sm:pr-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-xs sm:text-sm"
+                      className="w-full pl-11 sm:pl-14 pr-3 sm:pr-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm sm:text-base"
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && searchQuery.trim()) {
@@ -450,12 +451,12 @@ export default function MappingDetails() {
                     />
                   </div>
                   
-                  {/* Action Buttons Container */}
-                  <div className="flex items-center gap-0.5 sm:gap-1 md:gap-2.5 flex-shrink-0 w-full sm:w-auto">
+                  {/* Action Buttons Container - Improved Mobile Layout */}
+                  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto">
                     {/* Summary Button */}
                     <button
                       type="button"
-                      className="animated-icon-button flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-white font-medium text-[10px] sm:text-xs md:text-sm transition-colors hover:opacity-90"
+                      className="animated-icon-button flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg text-white font-medium text-sm sm:text-base transition-colors hover:opacity-90 shadow-md hover:shadow-lg"
                       style={{ 
                         backgroundColor: '#1E65AD',
                         fontFamily: 'Roboto, sans-serif'
@@ -470,7 +471,7 @@ export default function MappingDetails() {
                       title="View Summary"
                     >
                       <svg
-                        className="icon w-3 h-3 sm:w-4 sm:h-4"
+                        className="icon w-4 h-4 sm:w-5 sm:h-5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -487,7 +488,7 @@ export default function MappingDetails() {
                     {isUserAuthenticated ? (
                       <button
                         type="button"
-                        className="animated-icon-button flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-white font-medium text-[10px] sm:text-xs md:text-sm transition-colors hover:opacity-90 relative"
+                        className="animated-icon-button flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg text-white font-medium text-sm sm:text-base transition-colors hover:opacity-90 relative shadow-md hover:shadow-lg"
                         style={{ 
                           backgroundColor: '#1E65AD',
                           fontFamily: 'Roboto, sans-serif'
@@ -516,7 +517,7 @@ export default function MappingDetails() {
                         title="Add Notes"
                       >
                         <svg
-                          className="icon w-3 h-3 sm:w-4 sm:h-4"
+                          className="icon w-4 h-4 sm:w-5 sm:h-5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -529,7 +530,7 @@ export default function MappingDetails() {
                         </svg>
                         <span>Notes</span>
                         {notesCount > 0 && (
-                          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] px-1 flex items-center justify-center z-20 shadow-lg" style={{ fontSize: notesCount > 9 ? '10px' : '11px', lineHeight: '1' }}>
+                          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-[20px] px-1.5 flex items-center justify-center z-20 shadow-lg" style={{ fontSize: notesCount > 9 ? '10px' : '12px', lineHeight: '1' }}>
                             {notesCount > 99 ? '99+' : notesCount}
                           </span>
                         )}
@@ -537,7 +538,7 @@ export default function MappingDetails() {
                     ) : (
                       <button
                         type="button"
-                        className="animated-icon-button flex-1 sm:flex-none flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-white font-medium text-[10px] sm:text-xs md:text-sm transition-colors hover:opacity-90"
+                        className="animated-icon-button flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg text-white font-medium text-sm sm:text-base transition-colors hover:opacity-90 shadow-md hover:shadow-lg"
                         style={{ 
                           backgroundColor: '#1E65AD',
                           fontFamily: 'Roboto, sans-serif'
@@ -548,7 +549,7 @@ export default function MappingDetails() {
                         title="Login to Add Notes"
                       >
                         <svg
-                          className="icon w-3 h-3 sm:w-4 sm:h-4"
+                          className="icon w-4 h-4 sm:w-5 sm:h-5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -566,46 +567,46 @@ export default function MappingDetails() {
                 </div>
               </div>
 
-              {/* Main Content - Two Column Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
+              {/* Main Content - Two Column Layout - Improved Mobile */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
                 
                 {/* Source Section Card */}
-                <div className={`${mappingInfo.sourceColor.bg} rounded-lg sm:rounded-xl shadow-lg border-2 ${mappingInfo.sourceColor.border} p-3 sm:p-4 md:p-5 lg:p-6`}>
-                  <div className="text-center mb-4 sm:mb-5 md:mb-6">
-                    <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                <div className={`${mappingInfo.sourceColor.bg} rounded-xl sm:rounded-2xl shadow-lg border-2 ${mappingInfo.sourceColor.border} p-3 sm:p-5 md:p-6 lg:p-8`}>
+                  <div className="text-center mb-3 sm:mb-5 md:mb-6">
+                    <h3 className="text-xs sm:text-base md:text-lg lg:text-xl font-semibold mb-2 sm:mb-3" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                       {mappingInfo.sourceLabel}
                     </h3>
                     {sourceSection && (
-                      <div className={`text-3xl sm:text-4xl md:text-5xl font-bold ${mappingInfo.sourceColor.text} mb-3 sm:mb-4`}>
+                      <div className={`text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold ${mappingInfo.sourceColor.text} mb-2 sm:mb-4`}>
                         {sourceSection}
                       </div>
                     )}
-                    <div className="text-xs sm:text-sm text-gray-700 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="text-[10px] sm:text-sm md:text-base text-gray-700 font-medium leading-tight" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {mappingInfo.sourceAct}
                     </div>
                   </div>
                   
                   {/* Source Section Details */}
                   {mapping.ipc_description && (
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
-                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-2 sm:mt-4 md:mt-5 pt-2 sm:pt-4 md:pt-5 border-t-2 border-gray-300">
+                      <h4 className="text-xs sm:text-sm md:text-base font-semibold mb-1 sm:mb-2 md:mb-3 text-gray-800">Section Description</h4>
+                      <p className="text-[10px] sm:text-sm md:text-base text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-none" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.ipc_description}
                       </p>
                     </div>
                   )}
                   {mapping.iea_description && (
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
-                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-2 sm:mt-4 md:mt-5 pt-2 sm:pt-4 md:pt-5 border-t-2 border-gray-300">
+                      <h4 className="text-xs sm:text-sm md:text-base font-semibold mb-1 sm:mb-2 md:mb-3 text-gray-800">Section Description</h4>
+                      <p className="text-[10px] sm:text-sm md:text-base text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-none" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.iea_description}
                       </p>
                     </div>
                   )}
                   {mapping.crpc_description && (
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
-                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-2 sm:mt-4 md:mt-5 pt-2 sm:pt-4 md:pt-5 border-t-2 border-gray-300">
+                      <h4 className="text-xs sm:text-sm md:text-base font-semibold mb-1 sm:mb-2 md:mb-3 text-gray-800">Section Description</h4>
+                      <p className="text-[10px] sm:text-sm md:text-base text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-none" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.crpc_description}
                       </p>
                     </div>
@@ -613,42 +614,42 @@ export default function MappingDetails() {
                 </div>
 
                 {/* Target Section Card */}
-                <div className={`${mappingInfo.targetColor.bg} rounded-lg sm:rounded-xl shadow-lg border-2 ${mappingInfo.targetColor.border} p-3 sm:p-4 md:p-5 lg:p-6`}>
-                  <div className="text-center mb-4 sm:mb-5 md:mb-6">
-                    <h3 className="text-sm sm:text-base md:text-lg font-semibold mb-2" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                <div className={`${mappingInfo.targetColor.bg} rounded-xl sm:rounded-2xl shadow-lg border-2 ${mappingInfo.targetColor.border} p-3 sm:p-5 md:p-6 lg:p-8`}>
+                  <div className="text-center mb-3 sm:mb-5 md:mb-6">
+                    <h3 className="text-xs sm:text-base md:text-lg lg:text-xl font-semibold mb-2 sm:mb-3" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                       {mappingInfo.targetLabel}
                     </h3>
                     {targetSection && (
-                      <div className={`text-3xl sm:text-4xl md:text-5xl font-bold ${mappingInfo.targetColor.text} mb-3 sm:mb-4`}>
+                      <div className={`text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold ${mappingInfo.targetColor.text} mb-2 sm:mb-4`}>
                         {targetSection}
                       </div>
                     )}
-                    <div className="text-xs sm:text-sm text-gray-700 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="text-[10px] sm:text-sm md:text-base text-gray-700 font-medium leading-tight" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {mappingInfo.targetAct}
                     </div>
                   </div>
                   
                   {/* Target Section Details */}
                   {mapping.bns_description && (
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
-                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-2 sm:mt-4 md:mt-5 pt-2 sm:pt-4 md:pt-5 border-t-2 border-gray-300">
+                      <h4 className="text-xs sm:text-sm md:text-base font-semibold mb-1 sm:mb-2 md:mb-3 text-gray-800">Section Description</h4>
+                      <p className="text-[10px] sm:text-sm md:text-base text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-none" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.bns_description}
                       </p>
                     </div>
                   )}
                   {mapping.bsa_description && (
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
-                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-2 sm:mt-4 md:mt-5 pt-2 sm:pt-4 md:pt-5 border-t-2 border-gray-300">
+                      <h4 className="text-xs sm:text-sm md:text-base font-semibold mb-1 sm:mb-2 md:mb-3 text-gray-800">Section Description</h4>
+                      <p className="text-[10px] sm:text-sm md:text-base text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-none" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.bsa_description}
                       </p>
                     </div>
                   )}
                   {mapping.bnss_description && (
-                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-300">
-                      <h4 className="text-xs sm:text-sm font-semibold mb-1.5 sm:mb-2 text-gray-800">Section Description</h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <div className="mt-2 sm:mt-4 md:mt-5 pt-2 sm:pt-4 md:pt-5 border-t-2 border-gray-300">
+                      <h4 className="text-xs sm:text-sm md:text-base font-semibold mb-1 sm:mb-2 md:mb-3 text-gray-800">Section Description</h4>
+                      <p className="text-[10px] sm:text-sm md:text-base text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-none" style={{ fontFamily: 'Roboto, sans-serif' }}>
                         {mapping.bnss_description}
                       </p>
                     </div>
@@ -656,26 +657,26 @@ export default function MappingDetails() {
                 </div>
               </div>
 
-              {/* Subject and Summary Section */}
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 break-words" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+              {/* Subject and Summary Section - Improved Mobile */}
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-5 sm:p-6 md:p-8">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 break-words" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                   Subject: {subject}
                 </h3>
                 {summary && (
-                  <div className="mt-3 sm:mt-4">
-                    <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t-2 border-gray-200">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-700 mb-3" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       Description
                     </h4>
-                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
                       {summary}
                     </p>
                   </div>
                 )}
               </div>
 
-              {/* All Mapping Data Section - Shows all fields from API */}
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
-                <h3 className="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-5 md:mb-6" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+              {/* All Mapping Data Section - Shows all fields from API - Improved Mobile */}
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-5 sm:p-6 md:p-8">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-5 sm:mb-6" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                   Complete Mapping Information
                 </h3>
                 
@@ -812,59 +813,53 @@ export default function MappingDetails() {
                   {/* <h4 className="text-lg font-semibold text-gray-800 mb-4" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                     Additional Information
                   </h4> */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    {/* {mapping.id && (
-                      <div>
-                        <h5 className="text-sm font-semibold text-gray-700 mb-1">Mapping ID</h5>
-                        <p className="text-sm text-gray-600">{mapping.id}</p>
-                      </div>
-                    )} */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                     {mapping.mapping_type && (
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Mapping Type</h5>
-                        <p className="text-xs sm:text-sm text-gray-600">{mapping.mapping_type}</p>
+                      <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Mapping Type</h5>
+                        <p className="text-sm sm:text-base text-gray-600">{mapping.mapping_type}</p>
                       </div>
                     )}
                     {mapping.title && mapping.title !== subject && (
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Title</h5>
-                        <p className="text-xs sm:text-sm text-gray-600 break-words">{mapping.title}</p>
+                      <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Title</h5>
+                        <p className="text-sm sm:text-base text-gray-600 break-words">{mapping.title}</p>
                       </div>
                     )}
                     {mapping.description && mapping.description !== summary && (
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Description</h5>
-                        <p className="text-xs sm:text-sm text-gray-600 break-words">{mapping.description}</p>
+                      <div className="sm:col-span-2 bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Description</h5>
+                        <p className="text-sm sm:text-base text-gray-600 break-words leading-relaxed">{mapping.description}</p>
                       </div>
                     )}
                     {mapping.notes && (
-                      <div className="sm:col-span-2">
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Notes</h5>
-                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words">{mapping.notes}</p>
+                      <div className="sm:col-span-2 bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Notes</h5>
+                        <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words">{mapping.notes}</p>
                       </div>
                     )}
                     {mapping.comments && (
-                      <div className="sm:col-span-2">
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Comments</h5>
-                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words">{mapping.comments}</p>
+                      <div className="sm:col-span-2 bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Comments</h5>
+                        <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words">{mapping.comments}</p>
                       </div>
                     )}
                     {mapping.remarks && (
-                      <div className="sm:col-span-2">
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Remarks</h5>
-                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed break-words">{mapping.remarks}</p>
+                      <div className="sm:col-span-2 bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Remarks</h5>
+                        <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words">{mapping.remarks}</p>
                       </div>
                     )}
                     {mapping.created_at && (
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Created At</h5>
-                        <p className="text-xs sm:text-sm text-gray-600">{new Date(mapping.created_at).toLocaleString()}</p>
+                      <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Created At</h5>
+                        <p className="text-sm sm:text-base text-gray-600">{new Date(mapping.created_at).toLocaleString()}</p>
                       </div>
                     )}
                     {mapping.updated_at && (
-                      <div>
-                        <h5 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">Updated At</h5>
-                        <p className="text-xs sm:text-sm text-gray-600">{new Date(mapping.updated_at).toLocaleString()}</p>
+                      <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <h5 className="text-sm sm:text-base font-semibold text-gray-700 mb-2">Updated At</h5>
+                        <p className="text-sm sm:text-base text-gray-600">{new Date(mapping.updated_at).toLocaleString()}</p>
                       </div>
                     )}
                   </div>
@@ -909,20 +904,18 @@ export default function MappingDetails() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="bg-white rounded-lg sm:rounded-xl shadow-lg border border-gray-200 p-3 sm:p-4 md:p-5 lg:p-6">
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                  <button
-                    onClick={goBack}
-                    className="flex-1 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 border-2 border-gray-300 text-gray-700 rounded-lg sm:rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-xs sm:text-sm md:text-base shadow-sm hover:shadow-md flex items-center justify-center gap-1.5 sm:gap-2"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  >
-                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back to Mappings
-                  </button>
-                </div>
+              {/* Action Buttons - Improved Mobile */}
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-5 sm:p-6">
+                <button
+                  onClick={goBack}
+                  className="w-full sm:w-auto sm:ml-auto px-6 sm:px-8 py-3 sm:py-3.5 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 font-medium text-sm sm:text-base shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to Mappings
+                </button>
               </div>
 
             </div>
@@ -930,33 +923,43 @@ export default function MappingDetails() {
         </div>
       </div>
 
-      {/* Draggable Notes Popup */}
-      {showNotesPopup && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-30 z-40"
-            onClick={() => setShowNotesPopup(false)}
-          />
-          
-          {/* Draggable Popup */}
-          <div
-            className="fixed bg-white rounded-lg shadow-2xl z-50 flex flex-col"
+      {/* Draggable Notes Popup - Improved Mobile */}
+      <AnimatePresence>
+        {showNotesPopup && (
+          <>
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
+              onClick={() => setShowNotesPopup(false)}
+            />
+            
+            {/* Popup - Full screen bottom sheet on mobile, draggable on desktop */}
+            <motion.div
+            initial={{ opacity: 0, y: '100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '100%' }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed bg-white rounded-t-3xl sm:rounded-xl md:rounded-2xl shadow-2xl z-50 flex flex-col"
             style={{
-              left: `${popupPosition.x}px`,
-              top: `${popupPosition.y}px`,
-              width: `${popupSize.width}px`,
-              height: `${popupSize.height}px`,
-              minWidth: '400px',
-              minHeight: '300px',
-              maxWidth: '90vw',
-              maxHeight: '90vh',
+              left: isMobile ? '0' : `${popupPosition.x}px`,
+              top: isMobile ? 'auto' : `${popupPosition.y}px`,
+              bottom: isMobile ? '0' : 'auto',
+              right: isMobile ? '0' : 'auto',
+              width: isMobile ? '100%' : `${popupSize.width}px`,
+              height: isMobile ? '95vh' : `${popupSize.height}px`,
+              minWidth: isMobile ? 'auto' : '400px',
+              minHeight: isMobile ? '95vh' : '300px',
+              maxWidth: isMobile ? '100%' : '90vw',
+              maxHeight: isMobile ? '95vh' : '90vh',
               fontFamily: 'Roboto, sans-serif',
-              userSelect: isDragging || isResizing ? 'none' : 'auto'
+              userSelect: (isDragging || isResizing) && !isMobile ? 'none' : 'auto'
             }}
             onMouseDown={(e) => {
-              // Only start dragging if clicking on the header
-              if (e.target.closest('.notes-popup-header')) {
+              // Only start dragging if clicking on the header and not on mobile
+              if (!isMobile && e.target.closest('.notes-popup-header')) {
                 setIsDragging(true);
                 const rect = e.currentTarget.getBoundingClientRect();
                 setDragOffset({
@@ -966,7 +969,7 @@ export default function MappingDetails() {
               }
             }}
             onMouseMove={(e) => {
-              if (isDragging) {
+              if (!isMobile && isDragging) {
                 const newX = e.clientX - dragOffset.x;
                 const newY = e.clientY - dragOffset.y;
                 
@@ -978,7 +981,7 @@ export default function MappingDetails() {
                   x: Math.max(0, Math.min(newX, maxX)),
                   y: Math.max(0, Math.min(newY, maxY))
                 });
-              } else if (isResizing) {
+              } else if (!isMobile && isResizing) {
                 const deltaX = e.clientX - resizeStart.x;
                 const deltaY = e.clientY - resizeStart.y;
                 
@@ -1008,122 +1011,132 @@ export default function MappingDetails() {
               setIsResizing(false);
             }}
           >
-            {/* Header - Draggable Area */}
+            {/* Mobile Drag Handle */}
+            <div className="sm:hidden flex justify-center pt-3 pb-2">
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+            </div>
+            
+            {/* Header - Draggable Area (Desktop only) */}
             <div 
-              className="notes-popup-header flex items-center justify-between p-4 border-b border-gray-200"
+              className="notes-popup-header flex items-center justify-between p-4 sm:p-5 border-b border-gray-200"
               style={{ 
-                borderTopLeftRadius: '0.5rem', 
-                borderTopRightRadius: '0.5rem',
-                cursor: isDragging ? 'grabbing' : 'move',
+                cursor: isMobile ? 'default' : (isDragging ? 'grabbing' : 'move'),
                 userSelect: 'none',
                 background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
               }}
               onMouseEnter={(e) => {
-                if (!isDragging) {
+                if (!isMobile && !isDragging) {
                   e.currentTarget.style.cursor = 'move';
                 }
               }}
             >
-              <div className="flex items-center gap-2">
-                <StickyNote className="h-5 w-5 text-white" />
-                <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                  Notes
-                </h3>
+              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                  <StickyNote className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                    Notes
+                  </h3>
+                </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* Size Control Buttons */}
-                <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.max(400, prev.width - 50),
-                        height: Math.max(300, prev.height - 50)
-                      }));
-                    }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
-                    style={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer'
-                    }}
-                    title="Make Smaller"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.min(window.innerWidth * 0.9, prev.width + 50),
-                        height: Math.min(window.innerHeight * 0.9, prev.height + 50)
-                      }));
-                    }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
-                    style={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer'
-                    }}
-                    title="Make Bigger"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                </div>
+                {/* Size Control Buttons - Desktop only */}
+                {!isMobile && (
+                  <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPopupSize(prev => ({
+                          width: Math.max(400, prev.width - 50),
+                          height: Math.max(300, prev.height - 50)
+                        }));
+                      }}
+                      className="text-white hover:text-gray-200 transition-colors p-1.5 rounded hover:bg-opacity-20"
+                      style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer'
+                      }}
+                      title="Make Smaller"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPopupSize(prev => ({
+                          width: Math.min(window.innerWidth * 0.9, prev.width + 50),
+                          height: Math.min(window.innerHeight * 0.9, prev.height + 50)
+                        }));
+                      }}
+                      className="text-white hover:text-gray-200 transition-colors p-1.5 rounded hover:bg-opacity-20"
+                      style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer'
+                      }}
+                      title="Make Bigger"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
                 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowNotesPopup(false);
                   }}
-                  className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20 flex-shrink-0"
+                  className="text-white hover:text-gray-200 transition-colors p-2 rounded-full hover:bg-opacity-20 flex-shrink-0"
                   style={{ 
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '0.25rem',
                     cursor: 'pointer'
                   }}
                   title="Close"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
             </div>
             
-            {/* Resize Handle - Bottom Right Corner */}
-            <div
-              className="absolute bottom-0 right-0 w-6 h-6"
-              style={{
-                background: 'linear-gradient(135deg, transparent 0%, transparent 50%, rgba(30, 101, 173, 0.3) 50%, rgba(30, 101, 173, 0.3) 100%)',
-                borderBottomRightRadius: '0.5rem',
-                cursor: 'nwse-resize'
-              }}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                setIsResizing(true);
-                setResizeStart({
-                  x: e.clientX,
-                  y: e.clientY,
-                  width: popupSize.width,
-                  height: popupSize.height
-                });
-              }}
-              onMouseEnter={(e) => {
-                if (!isResizing) {
-                  e.currentTarget.style.cursor = 'nwse-resize';
-                }
-              }}
-              title="Drag to resize"
-            />
+            {/* Resize Handle - Bottom Right Corner (Desktop only) */}
+            {!isMobile && (
+              <div
+                className="absolute bottom-0 right-0 w-6 h-6"
+                style={{
+                  background: 'linear-gradient(135deg, transparent 0%, transparent 50%, rgba(30, 101, 173, 0.3) 50%, rgba(30, 101, 173, 0.3) 100%)',
+                  borderBottomRightRadius: '0.5rem',
+                  cursor: 'nwse-resize'
+                }}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  setIsResizing(true);
+                  setResizeStart({
+                    x: e.clientX,
+                    y: e.clientY,
+                    width: popupSize.width,
+                    height: popupSize.height
+                  });
+                }}
+                onMouseEnter={(e) => {
+                  if (!isResizing) {
+                    e.currentTarget.style.cursor = 'nwse-resize';
+                  }
+                }}
+                title="Drag to resize"
+              />
+            )}
 
-            {/* Folder Tabs */}
-            <div className="border-b border-gray-200 bg-gray-50 flex items-center gap-1 px-2 py-1 overflow-x-auto">
-              <div className="flex items-center gap-1 flex-1 min-w-0">
+            {/* Folder Tabs - Improved Mobile */}
+            <div className="border-b-2 border-gray-200 bg-gray-50 flex items-center gap-1 px-3 sm:px-4 py-2 sm:py-3 overflow-x-auto">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
                 {notesFolders.map((folder) => (
                   <button
                     key={folder.id}
@@ -1137,7 +1150,7 @@ export default function MappingDetails() {
                       setActiveFolderId(folder.id);
                       setNotesContent(folder.content || '');
                     }}
-                    className={`px-3 py-2 rounded-t-lg text-sm font-medium transition-all whitespace-nowrap flex items-center gap-2 ${
+                    className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-t-lg text-sm sm:text-base font-medium transition-all whitespace-nowrap flex items-center gap-2 ${
                       activeFolderId === folder.id
                         ? 'bg-white text-blue-600 border-b-2 border-blue-600'
                         : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
@@ -1233,8 +1246,8 @@ export default function MappingDetails() {
               </div>
             </div>
 
-            {/* Content Area */}
-            <div className="flex-1 overflow-hidden flex flex-col" style={{ cursor: 'text' }}>
+            {/* Content Area - Improved Mobile */}
+            <div className="flex-1 overflow-hidden flex flex-col" style={{ cursor: 'text', minHeight: 0 }}>
               <textarea
                 value={notesContent}
                 onChange={(e) => {
@@ -1245,14 +1258,15 @@ export default function MappingDetails() {
                   ));
                 }}
                 placeholder="Write your notes here..."
-                className="flex-1 w-full p-4 border-0 resize-none focus:outline-none focus:ring-0"
+                className="flex-1 w-full p-4 sm:p-5 md:p-6 border-0 resize-none focus:outline-none focus:ring-0"
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
-                  minHeight: '300px',
-                  fontSize: '14px',
-                  lineHeight: '1.6',
+                  fontSize: isMobile ? '16px' : '14px',
+                  lineHeight: '1.8',
                   color: '#1E65AD',
-                  cursor: 'text'
+                  cursor: 'text',
+                  WebkitAppearance: 'none',
+                  WebkitTapHighlightColor: 'transparent'
                 }}
               />
             </div>
@@ -1283,7 +1297,7 @@ export default function MappingDetails() {
                 </div>
               )}
               
-              <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-end gap-3 p-4 sm:p-5 border-t-2 border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
                   // Save current folder content before closing
@@ -1292,7 +1306,7 @@ export default function MappingDetails() {
                   ));
                   setShowNotesPopup(false);
                 }}
-                className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm sm:text-base shadow-sm"
                 style={{ fontFamily: 'Roboto, sans-serif', cursor: 'pointer' }}
               >
                 Cancel
@@ -1405,7 +1419,7 @@ export default function MappingDetails() {
                   }
                 }}
                 disabled={isSaving}
-                className={`px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md ${
+                className={`px-5 sm:px-6 py-2.5 sm:py-3 text-white rounded-lg transition-all font-medium text-sm sm:text-base shadow-md hover:shadow-lg ${
                   isSaving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                 }`}
                 style={{ 
@@ -1427,9 +1441,10 @@ export default function MappingDetails() {
               </button>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Summary Popup */}
       <SummaryPopup
