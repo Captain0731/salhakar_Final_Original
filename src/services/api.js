@@ -1064,11 +1064,18 @@ class ApiService {
 
   // Supreme Court Judgements Elasticsearch Search API
   async searchSupremeCourtJudgements(params = {}) {
-    const { q, size = 10, judge, petitioner, respondent, cnr, year } = params;
+    const { q, size = 10, offset = 0, judge, petitioner, respondent, cnr, year } = params;
     
     const queryParams = new URLSearchParams();
+    
+    // Full-text search query (optional - if omitted, returns all judgments)
     if (q) queryParams.append('q', q);
-    if (size) queryParams.append('size', size.toString());
+    
+    // Pagination parameters (required for offset-based pagination)
+    queryParams.append('size', size.toString());
+    queryParams.append('offset', offset.toString());
+    
+    // Field-specific filters with boosting
     if (judge) queryParams.append('judge', judge);
     if (petitioner) queryParams.append('petitioner', petitioner);
     if (respondent) queryParams.append('respondent', respondent);
@@ -1079,17 +1086,40 @@ class ApiService {
     console.log('🔍 Supreme Court ES Search URL:', url);
     console.log('🔍 Supreme Court ES Search Params:', params);
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: this.getAuthHeaders()
-    });
+    // Try with auth first, then without if 401 (for public access)
+    let response;
+    let headers = this.getAuthHeaders();
+
+    try {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: headers
+      });
+
+      // If 401, try without auth (public endpoint)
+      if (response.status === 401) {
+        console.log('⚠️ Got 401, trying without authentication...');
+        headers = this.getPublicHeaders();
+        response = await fetch(url, {
+          method: 'GET',
+          headers: headers
+        });
+      }
+    } catch (fetchError) {
+      console.error('❌ Network error fetching Supreme Court search:', fetchError);
+      throw new Error('Failed to fetch: Network error. Please check your connection and try again.');
+    }
 
     const data = await this.handleResponse(response);
     
     // Debug: Log raw response
     console.log('🔍 Supreme Court ES Raw Response:', {
       success: data?.success,
+      query: data?.query,
+      total_results: data?.total_results,
+      returned_results: data?.returned_results,
       resultsCount: data?.results?.length,
+      pagination_info: data?.pagination_info,
       firstResultStructure: data?.results?.[0] ? Object.keys(data.results[0]) : null,
       firstResultHighlight: data?.results?.[0]?.highlight,
       fullResponse: data
@@ -1098,7 +1128,7 @@ class ApiService {
     return data;
   }
 
-  // Supreme Court Judgements API (public access)
+  // Supreme Court Judgements API (public access) - Regular endpoint with cursor-based pagination
   async getSupremeCourtJudgements(params = {}) {
     console.log('🌐 getSupremeCourtJudgements called with params:', params);
     
@@ -1106,24 +1136,29 @@ class ApiService {
       console.log('🌐 Making real API call for Supreme Court judgments');
       const queryParams = new URLSearchParams();
       
-      // Add pagination parameters
-      if (params.limit) queryParams.append('limit', params.limit);
-      if (params.offset) queryParams.append('offset', params.offset);
+      // Add pagination parameters (cursor-based, not offset-based)
+      if (params.limit) queryParams.append('limit', params.limit.toString());
       
-      // Add cursor-based pagination for Supreme Court
-      if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id);
+      // Add cursor-based pagination for Supreme Court (single cursor: cursor_id)
+      if (params.cursor_id) queryParams.append('cursor_id', params.cursor_id.toString());
       
-      // Add search and filter parameters
-      if (params.search) queryParams.append('search', params.search);
+      // Add filter parameters (partial match filters for regular endpoint)
       if (params.title) queryParams.append('title', params.title);
       if (params.cnr) queryParams.append('cnr', params.cnr);
       if (params.judge) queryParams.append('judge', params.judge);
       if (params.petitioner) queryParams.append('petitioner', params.petitioner);
       if (params.respondent) queryParams.append('respondent', params.respondent);
+      if (params.year) queryParams.append('year', params.year.toString());
+      if (params.disposal_nature) queryParams.append('disposal_nature', params.disposal_nature);
+      if (params.decision_date) queryParams.append('decision_date', params.decision_date);
       if (params.decisionDateFrom || params.decision_date_from) {
         // Keep date in YYYY-MM-DD format as per API documentation
         const dateValue = params.decisionDateFrom || params.decision_date_from;
         queryParams.append('decision_date_from', dateValue);
+      }
+      if (params.decisionDateTo || params.decision_date_to) {
+        const dateValue = params.decisionDateTo || params.decision_date_to;
+        queryParams.append('decision_date_to', dateValue);
       }
       
       const endpoint = `/api/supreme-court-judgements?${queryParams.toString()}`;
@@ -2032,7 +2067,7 @@ class ApiService {
       
       try {
         response = await fetch(endpoint, {
-          method: 'GET',
+        method: 'GET',
           headers: headers,
           signal: controller.signal
         });
@@ -2186,7 +2221,7 @@ class ApiService {
           } catch (altErr) {
             clearTimeout(altTimeoutId);
             throw new Error('Network error: Unable to connect to the server. Please check your internet connection.');
-          }
+        }
         } else {
           throw fetchErr;
         }
@@ -2221,7 +2256,7 @@ class ApiService {
       
       // Re-throw with original message if it's already an Error
       if (err instanceof Error) {
-        throw err;
+      throw err;
       }
       
       // Otherwise wrap in Error

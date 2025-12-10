@@ -439,13 +439,16 @@ export default function LegalJudgments() {
         }
         
         if (hasSearchQuery) {
-          // Use new Elasticsearch search endpoint
+          // Use new Elasticsearch search endpoint (offset-based pagination)
+          const currentOffsetValue = isLoadMore ? currentOffsetRef.current : 0;
+          
           const esParams = {
             q: searchValue || titleValue || '',
-            size: pageSize
+            size: pageSize,
+            offset: currentOffsetValue  // Add offset for pagination
           };
           
-          // Add filters
+          // Add filters (field-specific filters with boosting)
           if (activeFilters.judge) esParams.judge = activeFilters.judge;
           if (activeFilters.petitioner) esParams.petitioner = activeFilters.petitioner;
           if (activeFilters.respondent) esParams.respondent = activeFilters.respondent;
@@ -456,9 +459,9 @@ export default function LegalJudgments() {
             if (year) esParams.year = year;
           }
           
-          // Note: The new endpoint uses 'size' parameter (1-20, default 10)
-          // For pagination, we'll need to track offset separately or use cursor if API supports it
-          // For now, we'll use size and handle pagination on frontend
+          // API uses offset-based pagination (not cursor-based)
+          // offset: starting position for results
+          // size: number of results per page (1-20, default 10)
           
           const esResponse = await apiService.searchSupremeCourtJudgements(esParams);
           
@@ -498,6 +501,7 @@ export default function LegalJudgments() {
               
               // Ensure highlights object has the expected structure
               // Handle both array and single value formats
+              // API returns highlights for: pdf_text, title, judge, petitioner, respondent, cnr
               const processedHighlights = {
                 title: Array.isArray(highlightObj.title) 
                   ? highlightObj.title 
@@ -508,6 +512,12 @@ export default function LegalJudgments() {
                 judge: Array.isArray(highlightObj.judge) 
                   ? highlightObj.judge 
                   : (highlightObj.judge ? [highlightObj.judge] : []),
+                petitioner: Array.isArray(highlightObj.petitioner) 
+                  ? highlightObj.petitioner 
+                  : (highlightObj.petitioner ? [highlightObj.petitioner] : []),
+                respondent: Array.isArray(highlightObj.respondent) 
+                  ? highlightObj.respondent 
+                  : (highlightObj.respondent ? [highlightObj.respondent] : []),
                 cnr: Array.isArray(highlightObj.cnr) 
                   ? highlightObj.cnr 
                   : (highlightObj.cnr ? [highlightObj.cnr] : [])
@@ -567,16 +577,24 @@ export default function LegalJudgments() {
               });
             }
             
+            // Use pagination_info from API response (offset-based pagination)
+            const paginationInfo = esResponse.pagination_info || {};
             const totalReturned = esResponse.returned_results || 0;
             const totalAvailable = esResponse.total_results || 0;
-            const currentOffset = isLoadMore ? currentOffsetValue : 0;
-            const hasMoreResults = (currentOffset + totalReturned) < totalAvailable;
+            const nextOffset = paginationInfo.next_offset !== null && paginationInfo.next_offset !== undefined 
+              ? paginationInfo.next_offset 
+              : (currentOffsetValue + totalReturned);
+            const hasMoreResults = paginationInfo.has_more !== undefined 
+              ? paginationInfo.has_more 
+              : (nextOffset < totalAvailable);
             
             data = {
               data: mappedResults,
               pagination_info: {
+                offset: paginationInfo.offset || currentOffsetValue,
+                next_offset: nextOffset,
                 has_more: hasMoreResults,
-                next_offset: currentOffset + totalReturned
+                current_page_size: paginationInfo.current_page_size || totalReturned
               },
               total_results: totalAvailable,
               returned_results: totalReturned,
@@ -588,14 +606,14 @@ export default function LegalJudgments() {
               }
             };
             
-            // Update offset for next page
+            // Update offset for next page using API's next_offset
             if (isLoadMore) {
-              const newOffset = currentOffsetValue + totalReturned;
-              currentOffsetRef.current = newOffset;
-              setCurrentOffset(newOffset);
+              currentOffsetRef.current = nextOffset;
+              setCurrentOffset(nextOffset);
             } else {
-              currentOffsetRef.current = totalReturned;
-              setCurrentOffset(totalReturned);
+              // Reset offset for new search
+              currentOffsetRef.current = 0;
+              setCurrentOffset(0);
             }
             
             setIsUsingElasticsearch(true);
@@ -1812,7 +1830,20 @@ export default function LegalJudgments() {
                                     </svg>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Petitioner</p>
-                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.petitioner}</p>
+                                      <p 
+                                        className="text-sm font-medium text-gray-900 line-clamp-1" 
+                                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                                        dangerouslySetInnerHTML={{
+                                          __html: (() => {
+                                            // Display highlights if available (Elasticsearch search results)
+                                            if (judgment.highlights?.petitioner && Array.isArray(judgment.highlights.petitioner)) {
+                                              return judgment.highlights.petitioner[0]; // Use first highlight fragment
+                                            }
+                                            // Fallback to regular petitioner name
+                                            return (judgment.petitioner || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
+                                          })()
+                                        }}
+                                      />
                                     </div>
                                   </div>
                                 )}
@@ -1824,7 +1855,20 @@ export default function LegalJudgments() {
                                     </svg>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-xs text-gray-500 mb-0.5" style={{ fontFamily: 'Roboto, sans-serif' }}>Respondent</p>
-                                      <p className="text-sm font-medium text-gray-900 line-clamp-1" style={{ fontFamily: 'Roboto, sans-serif' }}>{judgment.respondent}</p>
+                                      <p 
+                                        className="text-sm font-medium text-gray-900 line-clamp-1" 
+                                        style={{ fontFamily: 'Roboto, sans-serif' }}
+                                        dangerouslySetInnerHTML={{
+                                          __html: (() => {
+                                            // Display highlights if available (Elasticsearch search results)
+                                            if (judgment.highlights?.respondent && Array.isArray(judgment.highlights.respondent)) {
+                                              return judgment.highlights.respondent[0]; // Use first highlight fragment
+                                            }
+                                            // Fallback to regular respondent name
+                                            return (judgment.respondent || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
+                                          })()
+                                        }}
+                                      />
                                     </div>
                                   </div>
                                 )}
