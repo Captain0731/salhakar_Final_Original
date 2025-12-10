@@ -208,10 +208,11 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="relative z-10 bg-white rounded-t-3xl sm:rounded-xl md:rounded-2xl shadow-2xl max-w-3xl w-full h-[95vh] sm:h-auto sm:max-h-[85vh] overflow-hidden flex flex-col"
             style={{ 
-              minHeight: '95vh'
+              minHeight: '95vh',
+              backdropFilter: 'blur(10px)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -222,23 +223,23 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
             
             {/* Header - Improved Mobile */}
             <div
-              className="px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200 flex items-center justify-between flex-shrink-0"
+              className="px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-200 flex items-center justify-between flex-shrink-0"
               style={{
                 background: "linear-gradient(135deg, #1E65AD 0%, #CF9B63 100%)",
               }}
             >
-              <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h2
-                    className="text-xl sm:text-2xl font-bold text-white truncate"
+                    className="text-lg sm:text-2xl font-bold text-white truncate"
                     style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}
                   >
                     Summary
                   </h2>
-                  <p className="text-sm sm:text-base text-white text-opacity-90 truncate mt-1" style={{ fontFamily: "Roboto, sans-serif" }}>
+                  <p className="text-xs sm:text-base text-white text-opacity-90 truncate mt-0.5 sm:mt-1" style={{ fontFamily: "Roboto, sans-serif" }}>
                     {getItemTitle()}
                   </p>
                 </div>
@@ -246,7 +247,7 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
               
               <button
                 onClick={onClose}
-                className="p-2 sm:p-2.5 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors flex-shrink-0 ml-3"
+                className="p-1.5 sm:p-2.5 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors flex-shrink-0 ml-2 sm:ml-3"
                 aria-label="Close popup"
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -255,26 +256,26 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
 
             {/* Content - Improved Mobile */}
             <div 
-              className="flex-1 overflow-y-auto p-4 sm:p-5 md:p-6"
+              className="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6"
               style={{ 
                 minHeight: 0,
-                maxHeight: 'calc(95vh - 140px)',
+                maxHeight: 'calc(95vh - 120px)',
                 WebkitOverflowScrolling: 'touch'
               }}
             >
               {loading ? (
-                <div className="flex flex-col items-center justify-center py-8 sm:py-12">
-                  <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 animate-spin mb-4" />
-                  <p className="text-base sm:text-lg text-gray-600" style={{ fontFamily: "Roboto, sans-serif" }}>
+                <div className="flex flex-col items-center justify-center py-6 sm:py-12">
+                  <Loader2 className="w-8 h-8 sm:w-12 sm:h-12 text-blue-600 animate-spin mb-3 sm:mb-4" />
+                  <p className="text-sm sm:text-lg text-gray-600" style={{ fontFamily: "Roboto, sans-serif" }}>
                     Loading summary...
                   </p>
                 </div>
               ) : error ? (
-                <div className="flex flex-col items-center justify-center py-8 sm:py-12">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-50 flex items-center justify-center mb-4">
-                    <X className="w-8 h-8 sm:w-10 sm:h-10 text-red-600" />
+                <div className="flex flex-col items-center justify-center py-6 sm:py-12">
+                  <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-red-50 flex items-center justify-center mb-3 sm:mb-4">
+                    <X className="w-6 h-6 sm:w-10 sm:h-10 text-red-600" />
                   </div>
-                  <p className="text-base sm:text-lg text-red-600 text-center px-4" style={{ fontFamily: "Roboto, sans-serif" }}>
+                  <p className="text-sm sm:text-lg text-red-600 text-center px-3 sm:px-4" style={{ fontFamily: "Roboto, sans-serif" }}>
                     {error}
                   </p>
                 </div>
@@ -289,7 +290,7 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                   }}
                 >
                   <div 
-                    className="text-gray-700 leading-relaxed text-[15px] sm:text-sm"
+                    className="text-gray-700 leading-relaxed text-sm sm:text-base"
                     style={{
                       lineHeight: '1.8'
                     }}
@@ -297,7 +298,7 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                     <ReactMarkdown
                       components={{
                         p: ({ children }) => (
-                          <p className="text-[15px] sm:text-sm mb-5 mt-5" style={{ 
+                          <p className="text-sm sm:text-base mb-3 sm:mb-5 mt-3 sm:mt-5" style={{ 
                             lineHeight: '1.8',
                             wordWrap: 'break-word'
                           }}>
@@ -305,28 +306,28 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                           </p>
                         ),
                         ul: ({ children }) => (
-                          <ul className="ml-5 sm:ml-6 mb-5 mt-5 pl-3 sm:pl-4" style={{ 
+                          <ul className="ml-4 sm:ml-6 mb-3 sm:mb-5 mt-3 sm:mt-5 pl-2 sm:pl-4" style={{ 
                             listStyleType: 'disc'
                           }}>
                             {children}
                           </ul>
                         ),
                         ol: ({ children }) => (
-                          <ol className="ml-5 sm:ml-6 mb-5 mt-5 pl-3 sm:pl-4" style={{ 
+                          <ol className="ml-4 sm:ml-6 mb-3 sm:mb-5 mt-3 sm:mt-5 pl-2 sm:pl-4" style={{ 
                             listStyleType: 'decimal'
                           }}>
                             {children}
                           </ol>
                         ),
                         li: ({ children }) => (
-                          <li className="text-[15px] sm:text-sm mb-3" style={{ 
+                          <li className="text-sm sm:text-base mb-2 sm:mb-3" style={{ 
                             lineHeight: '1.8'
                           }}>
                             {children}
                           </li>
                         ),
                         strong: ({ children }) => (
-                          <strong className="text-[16px] sm:text-[15px]" style={{ 
+                          <strong className="text-sm sm:text-base" style={{ 
                             fontWeight: 'bold', 
                             color: '#1E65AD'
                           }}>
@@ -339,7 +340,7 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                           </em>
                         ),
                         h1: ({ children }) => (
-                          <h1 className="text-[22px] sm:text-xl mb-4 mt-6" style={{ 
+                          <h1 className="text-lg sm:text-xl mb-3 sm:mb-4 mt-4 sm:mt-6" style={{ 
                             fontWeight: 'bold',
                             color: '#1E65AD'
                           }}>
@@ -347,7 +348,7 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                           </h1>
                         ),
                         h2: ({ children }) => (
-                          <h2 className="text-[20px] sm:text-lg mb-3 mt-5" style={{ 
+                          <h2 className="text-base sm:text-lg mb-2 sm:mb-3 mt-3 sm:mt-5" style={{ 
                             fontWeight: 'bold',
                             color: '#1E65AD'
                           }}>
@@ -355,7 +356,7 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                           </h2>
                         ),
                         h3: ({ children }) => (
-                          <h3 className="text-[18px] sm:text-base mb-2 mt-4" style={{ 
+                          <h3 className="text-sm sm:text-base mb-2 mt-3 sm:mt-4" style={{ 
                             fontWeight: 'bold',
                             color: '#1E65AD'
                           }}>
@@ -370,7 +371,7 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                   
                   {/* Feedback Buttons Below Content - Improved Mobile */}
                   {getReferenceType() && getReferenceId() && (
-                    <div className="mt-6 sm:mt-8 pt-5 sm:pt-6 border-t-2 border-gray-200">
+                    <div className="mt-4 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-gray-200">
                     <SummaryFeedbackButton
                       referenceType={getReferenceType()}
                       referenceId={getReferenceId()}
@@ -380,8 +381,8 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                   )}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 sm:py-12">
-                  <p className="text-base sm:text-lg text-gray-600 text-center px-4" style={{ fontFamily: "Roboto, sans-serif" }}>
+                <div className="flex flex-col items-center justify-center py-6 sm:py-12">
+                  <p className="text-sm sm:text-lg text-gray-600 text-center px-3 sm:px-4" style={{ fontFamily: "Roboto, sans-serif" }}>
                     No summary available for this item.
                   </p>
                 </div>

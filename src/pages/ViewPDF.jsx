@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import Navbar from "../components/landing/Navbar";
 import BookmarkButton from "../components/BookmarkButton";
@@ -2355,28 +2355,33 @@ export default function ViewPDF() {
       </div>
 
       {/* Draggable Notes Popup */}
-      {showNotesPopup && (
-        <>
-          {/* Backdrop */}
-          <div 
+      <AnimatePresence>
+        {showNotesPopup && (
+          <>
+            {/* Backdrop */}
+            <motion.div 
             className="fixed inset-0 bg-black bg-opacity-30 z-[10000]"
             onClick={() => setShowNotesPopup(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           />
           
           {/* Draggable Popup */}
-          <div
-            className={`fixed bg-white rounded-lg shadow-2xl z-[10001] flex flex-col ${isMobile ? 'inset-4 sm:inset-auto' : ''}`}
+          <motion.div
+            className={`fixed bg-white shadow-2xl z-[10001] flex flex-col ${isMobile ? 'rounded-t-3xl' : 'rounded-lg'}`}
             style={isMobile ? {
-              width: 'calc(100vw - 2rem)',
-              height: 'calc(100vh - 2rem)',
-              left: '1rem',
-              top: '1rem',
-              right: '1rem',
-              bottom: '1rem',
+              width: '100vw',
+              height: '95vh',
+              left: 0,
+              bottom: 0,
+              right: 0,
               maxWidth: 'none',
               maxHeight: 'none',
               fontFamily: 'Roboto, sans-serif',
-              userSelect: 'auto'
+              userSelect: 'auto',
+              backdropFilter: 'blur(10px)',
             } : {
               left: `${popupPosition.x}px`,
               top: `${popupPosition.y}px`,
@@ -2389,6 +2394,10 @@ export default function ViewPDF() {
               fontFamily: 'Roboto, sans-serif',
               userSelect: isDragging || isResizing ? 'none' : 'auto'
             }}
+            initial={isMobile ? { y: '100%' } : { opacity: 0, scale: 0.95 }}
+            animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1 }}
+            exit={isMobile ? { y: '100%' } : { opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onMouseDown={!isMobile ? (e) => {
               // Only start dragging if clicking on the header
               if (e.target.closest('.notes-popup-header')) {
@@ -2443,12 +2452,19 @@ export default function ViewPDF() {
               setIsResizing(false);
             } : undefined}
           >
+            {/* Drag Handle for Mobile */}
+            {isMobile && (
+              <div className="flex justify-center pt-2 pb-1">
+                <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+              </div>
+            )}
+
             {/* Header - Draggable Area */}
             <div 
-              className={`notes-popup-header flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 flex-shrink-0 ${isMobile ? '' : 'cursor-move'}`}
+              className={`notes-popup-header flex items-center justify-between ${isMobile ? 'p-3' : 'p-3 sm:p-4'} border-b border-gray-200 flex-shrink-0 ${isMobile ? '' : 'cursor-move'}`}
               style={{ 
-                borderTopLeftRadius: '0.5rem', 
-                borderTopRightRadius: '0.5rem',
+                borderTopLeftRadius: isMobile ? '0' : '0.5rem', 
+                borderTopRightRadius: isMobile ? '0' : '0.5rem',
                 cursor: isMobile ? 'default' : (isDragging ? 'grabbing' : 'move'),
                 userSelect: 'none',
                 background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)'
@@ -2460,62 +2476,64 @@ export default function ViewPDF() {
               } : undefined}
             >
               <div className="flex items-center gap-2">
-                <StickyNote className="h-5 w-5 text-white" />
-                <h3 className="text-lg font-bold text-white" style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                <StickyNote className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} text-white`} />
+                <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-white`} style={{ fontFamily: "'Bricolage Grotesque', sans-serif" }}>
                   Notes
                 </h3>
               </div>
               <div className="flex items-center gap-2">
-                {/* Size Control Buttons */}
-                <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.max(400, prev.width - 50),
-                        height: Math.max(300, prev.height - 50)
-                      }));
-                    }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
-                    style={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer'
-                    }}
-                    title="Make Smaller"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPopupSize(prev => ({
-                        width: Math.min(window.innerWidth * 0.9, prev.width + 50),
-                        height: Math.min(window.innerHeight * 0.9, prev.height + 50)
-                      }));
-                    }}
-                    className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
-                    style={{ 
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '0.25rem',
-                      cursor: 'pointer'
-                    }}
-                    title="Make Bigger"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                </div>
+                {/* Size Control Buttons - Hide on Mobile */}
+                {!isMobile && (
+                  <div className="flex items-center gap-1 border-r border-white border-opacity-30 pr-2 mr-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPopupSize(prev => ({
+                          width: Math.max(400, prev.width - 50),
+                          height: Math.max(300, prev.height - 50)
+                        }));
+                      }}
+                      className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
+                      style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer'
+                      }}
+                      title="Make Smaller"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPopupSize(prev => ({
+                          width: Math.min(window.innerWidth * 0.9, prev.width + 50),
+                          height: Math.min(window.innerHeight * 0.9, prev.height + 50)
+                        }));
+                      }}
+                      className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20"
+                      style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '0.25rem',
+                        cursor: 'pointer'
+                      }}
+                      title="Make Bigger"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
                 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowNotesPopup(false);
                   }}
-                  className="text-white hover:text-gray-200 transition-colors p-1 rounded hover:bg-opacity-20 flex-shrink-0"
+                  className={`text-white hover:text-gray-200 transition-colors ${isMobile ? 'p-1.5' : 'p-1'} rounded hover:bg-opacity-20 flex-shrink-0`}
                   style={{ 
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     borderRadius: '0.25rem',
@@ -2523,7 +2541,7 @@ export default function ViewPDF() {
                   }}
                   title="Close"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`${isMobile ? 'w-5 h-5' : 'w-5 h-5'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -2559,7 +2577,7 @@ export default function ViewPDF() {
             )}
 
             {/* Folder Selector and Note Selector */}
-            <div className="border-b border-gray-200 bg-gray-50 flex items-center gap-1 px-2 py-1 overflow-x-auto">
+            <div className={`border-b border-gray-200 bg-gray-50 flex items-center gap-1 ${isMobile ? 'px-2 py-2' : 'px-2 py-1'} overflow-x-auto`}>
               <div className="flex items-center gap-1 flex-1 min-w-0">
                 {/* Folder Dropdown */}
                 <select
@@ -2568,7 +2586,7 @@ export default function ViewPDF() {
                     const folderId = e.target.value ? parseInt(e.target.value) : null;
                     setActiveFolderId(folderId);
                   }}
-                  className="px-3 py-2 rounded-lg text-sm font-medium border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className={`${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} rounded-lg font-medium border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500`}
                   style={{ fontFamily: 'Roboto, sans-serif' }}
                 >
                   <option value="">Unfiled</option>
@@ -2607,8 +2625,8 @@ export default function ViewPDF() {
                         }
                       }}
                       placeholder="Folder name..."
-                      className="px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      style={{ fontFamily: 'Roboto, sans-serif', minWidth: '120px' }}
+                      className={`${isMobile ? 'px-2 py-1 text-xs' : 'px-2 py-1 text-sm'} border border-blue-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                      style={{ fontFamily: 'Roboto, sans-serif', minWidth: isMobile ? '100px' : '120px' }}
                       autoFocus
                     />
                     <button
@@ -2619,7 +2637,7 @@ export default function ViewPDF() {
                       }}
                       className="text-gray-500 hover:text-gray-700"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className={`${isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
@@ -2630,10 +2648,10 @@ export default function ViewPDF() {
                       e.stopPropagation();
                       setShowNewFolderInput(true);
                     }}
-                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all flex items-center gap-1"
+                    className={`${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'} text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all flex items-center gap-1`}
                     title="Add new folder"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`${isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                     <span className="hidden sm:inline">New Folder</span>
@@ -2650,11 +2668,11 @@ export default function ViewPDF() {
                   setNotesContent(e.target.value);
                 }}
                 placeholder="Write your notes here..."
-                className="flex-1 w-full p-4 border-0 resize-none focus:outline-none focus:ring-0"
+                className={`flex-1 w-full border-0 resize-none focus:outline-none focus:ring-0 ${isMobile ? 'p-3' : 'p-4'}`}
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
-                  minHeight: '300px',
-                  fontSize: '14px',
+                  minHeight: isMobile ? '200px' : '300px',
+                  fontSize: isMobile ? '14px' : '14px',
                   lineHeight: '1.6',
                   color: '#1E65AD',
                   cursor: 'text'
@@ -2663,12 +2681,12 @@ export default function ViewPDF() {
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50">
+            <div className={`flex ${isMobile ? 'flex-col' : 'items-center justify-end'} gap-2 ${isMobile ? 'p-3' : 'p-4'} border-t border-gray-200 bg-gray-50`}>
               <button
                 onClick={() => {
                   setShowNotesPopup(false);
                 }}
-                className="px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
+                className={`${isMobile ? 'w-full' : ''} px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium ${isMobile ? 'text-sm' : 'text-sm'}`}
                 style={{ fontFamily: 'Roboto, sans-serif', cursor: 'pointer' }}
                 disabled={savingNote}
               >
@@ -2766,7 +2784,7 @@ export default function ViewPDF() {
                     setSavingNote(false);
                   }
                 }}
-                className="px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`${isMobile ? 'w-full' : ''} px-4 py-2 text-white rounded-lg transition-all font-medium text-sm shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed`}
                 style={{ 
                   fontFamily: 'Roboto, sans-serif',
                   background: 'linear-gradient(90deg, #1E65AD 0%, #CF9B63 100%)',
@@ -2787,9 +2805,10 @@ export default function ViewPDF() {
                 {savingNote ? 'Saving...' : 'Save Notes'}
               </button>
             </div>
-          </div>
-        </>
-      )}
+          </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Icon Animation Styles */}
       <style>{`
