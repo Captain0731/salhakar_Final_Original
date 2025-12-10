@@ -484,33 +484,52 @@ export default function ViewPDF() {
       const fetchMarkdown = async () => {
         setLoadingMarkdown(true);
         setMarkdownError("");
-        setMarkdownFetched(true); // Mark as fetched to prevent re-fetching
+        
         try {
           const judgmentId = judgmentInfo.id || judgmentInfo.act_id;
-          if (judgmentId) {
-            // Determine if it's a Supreme Court judgment
-            const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
-            const isSupremeCourt = courtName && (
-              courtName.toLowerCase().includes('supreme') || 
-              courtName.toLowerCase().includes('sc') ||
-              courtName.toLowerCase() === 'supreme court of india'
-            );
-            
-            // Use appropriate endpoint based on court type
-            let markdown;
-            if (isSupremeCourt) {
-              markdown = await apiService.getSupremeCourtJudgementByIdMarkdown(judgmentId);
-            } else {
-              markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
-            }
-            setMarkdownContent(markdown);
-            setMarkdownError(""); // Clear any previous errors on success
-          } else {
-            setMarkdownError("No judgment ID available");
+          if (!judgmentId) {
+            throw new Error("No judgment ID available");
           }
+
+          // Determine if it's a Supreme Court judgment
+          const courtName = judgmentInfo?.court_name || judgmentInfo?.court || '';
+          const isSupremeCourt = courtName && (
+            courtName.toLowerCase().includes('supreme') || 
+            courtName.toLowerCase().includes('sc') ||
+            courtName.toLowerCase() === 'supreme court of india'
+          );
+          
+          console.log(`📄 Fetching markdown for judgment ${judgmentId} (${isSupremeCourt ? 'Supreme Court' : 'High Court'})`);
+          
+          // Use appropriate endpoint based on court type
+          let markdown;
+          if (isSupremeCourt) {
+            markdown = await apiService.getSupremeCourtJudgementByIdMarkdown(judgmentId);
+          } else {
+            markdown = await apiService.getJudgementByIdMarkdown(judgmentId);
+          }
+          
+          // Validate markdown content
+          if (!markdown || typeof markdown !== 'string') {
+            throw new Error("Invalid markdown content received from server");
+          }
+          
+          console.log(`✅ Markdown fetched successfully (${markdown.length} characters)`);
+          setMarkdownContent(markdown);
+          setMarkdownError(""); // Clear any previous errors on success
+          setMarkdownFetched(true); // Mark as fetched ONLY after successful fetch
         } catch (error) {
-          console.error("Error fetching markdown:", error);
+          console.error("❌ Error fetching markdown:", error);
+          console.error("Error details:", {
+            message: error.message,
+            judgmentId: judgmentInfo?.id || judgmentInfo?.act_id,
+            courtName: judgmentInfo?.court_name || judgmentInfo?.court
+          });
+          
+          // Reset markdownFetched on error to allow retry
+          setMarkdownFetched(false);
           setMarkdownError(error.message || "Failed to load Translated content");
+          setMarkdownContent(""); // Clear content on error
         } finally {
           setLoadingMarkdown(false);
         }
@@ -519,6 +538,50 @@ export default function ViewPDF() {
       fetchMarkdown();
     }
   }, [showMarkdown, judgmentInfo, markdownFetched, loadingMarkdown]);
+
+  // Track previous language to detect changes
+  const previousLangRef = useRef(null);
+
+  // Monitor language changes and reset markdown state to allow re-fetch
+  useEffect(() => {
+    if (showMarkdown && judgmentInfo) {
+      const currentLang = getCurrentLanguage();
+      const langChanged = previousLangRef.current !== null && previousLangRef.current !== currentLang;
+      
+      if (langChanged) {
+        console.log(`🌐 Language changed from ${previousLangRef.current} to ${currentLang}, resetting markdown state`);
+        // Reset state to allow re-fetch
+        setMarkdownFetched(false);
+        setMarkdownError(""); // Clear errors when language changes
+      }
+      
+      previousLangRef.current = currentLang;
+    }
+  }, [showMarkdown, judgmentInfo]);
+
+  // Poll for language changes every 500ms to catch Google Translate cookie updates
+  useEffect(() => {
+    if (!showMarkdown || !judgmentInfo) return;
+
+    const checkLanguage = () => {
+      const currentLang = getCurrentLanguage();
+      const langChanged = previousLangRef.current !== null && previousLangRef.current !== currentLang;
+      
+      if (langChanged) {
+        console.log(`🌐 [Poll] Language changed from ${previousLangRef.current} to ${currentLang}, resetting markdown state`);
+        setMarkdownFetched(false);
+        setMarkdownError("");
+        previousLangRef.current = currentLang;
+      }
+    };
+
+    // Check immediately
+    checkLanguage();
+
+    // Poll every 500ms
+    const intervalId = setInterval(checkLanguage, 500);
+    return () => clearInterval(intervalId);
+  }, [showMarkdown, judgmentInfo]);
 
   // Handle window resize to keep popup within bounds
   useEffect(() => {

@@ -20,9 +20,9 @@ const FALLBACK_URLS = [
 
 class ApiService {
   constructor() {
-    // Start with primary server (pr)
-    this.baseURL = API_BASE_URL_PR;
-    this.currentServerId = 'pr'; // Track which server is currently active
+    // Start with DigitalOcean server (ad) - primary for now due to CORS issues with ngrok
+    this.baseURL = API_BASE_URL_AD;
+    this.currentServerId = 'ad'; // Track which server is currently active
     this.currentUrlIndex = 0;
     this.accessToken = localStorage.getItem('access_token');
     this.refreshToken = localStorage.getItem('refresh_token');
@@ -2555,16 +2555,39 @@ class ApiService {
       ...(token && { 'Authorization': `Bearer ${token}` })
     };
     
-    const response = await fetch(`${this.baseURL}/api/judgements/${judgementId}?format=markdown`, {
-      method: 'GET',
-      headers: headers
-    });
+    // Use DigitalOcean server directly to avoid CORS issues
+    const url = `${API_BASE_URL_AD}/api/judgements/${judgementId}?format=markdown`;
+    console.log(`📄 Fetching High Court markdown from: ${url}`);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch judgment Markdown: ${response.statusText}`);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+        credentials: 'omit'
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => response.statusText);
+        console.error(`❌ Markdown fetch failed:`, {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText,
+          url: url
+        });
+        throw new Error(`Failed to fetch judgment Markdown: ${response.status} ${response.statusText}`);
+      }
+      
+      const markdown = await response.text();
+      console.log(`✅ Markdown fetched successfully (${markdown.length} chars)`);
+      return markdown;
+    } catch (error) {
+      console.error(`❌ Error in getJudgementByIdMarkdown:`, {
+        error: error.message,
+        url: url,
+        judgmentId: judgementId
+      });
+      throw error;
     }
-    
-    return await response.text(); // Return Markdown as text
   }
 
   // Get Supreme Court judgment markdown by ID (uses Supreme Court specific endpoint)
@@ -2576,16 +2599,39 @@ class ApiService {
       ...(token && { 'Authorization': `Bearer ${token}` })
     };
     
-    const response = await fetch(`${this.baseURL}/api/supreme-court-judgements/${judgementId}?format=markdown`, {
-      method: 'GET',
-      headers: headers
-    });
+    // Use DigitalOcean server directly to avoid CORS issues
+    const url = `${API_BASE_URL_AD}/api/supreme-court-judgements/${judgementId}?format=markdown`;
+    console.log(`📄 Fetching Supreme Court markdown from: ${url}`);
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch Supreme Court judgment Markdown: ${response.statusText}`);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+        credentials: 'omit'
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => response.statusText);
+        console.error(`❌ Markdown fetch failed:`, {
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText,
+          url: url
+        });
+        throw new Error(`Failed to fetch Supreme Court judgment Markdown: ${response.status} ${response.statusText}`);
+      }
+      
+      const markdown = await response.text();
+      console.log(`✅ Markdown fetched successfully (${markdown.length} chars)`);
+      return markdown;
+    } catch (error) {
+      console.error(`❌ Error in getSupremeCourtJudgementByIdMarkdown:`, {
+        error: error.message,
+        url: url,
+        judgmentId: judgementId
+      });
+      throw error;
     }
-    
-    return await response.text(); // Return Markdown as text
   }
 
   // Get central act markdown by ID
