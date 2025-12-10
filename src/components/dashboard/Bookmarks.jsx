@@ -838,10 +838,15 @@ const Bookmarks = ({ onBack }) => {
 
   const getTypeColor = (type) => {
     switch (type) {
-      case 'judgment':
+      case 'judgement':
         return 'bg-blue-100 text-blue-800';
-      case 'act':
+      case 'central_act':
+      case 'state_act':
         return 'bg-green-100 text-green-800';
+      case 'bns_ipc_mapping':
+      case 'bsa_iea_mapping':
+      case 'bnss_crpc_mapping':
+        return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -1127,13 +1132,13 @@ const Bookmarks = ({ onBack }) => {
             )}
 
             {viewMode === 'grid' ? (
-              <div className="p-3 sm:p-4 md:p-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+              <div className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
                   {sortedBookmarks.map((bookmark) => (
                     <div
                       key={bookmark.id}
-                      className={`relative bg-white border rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 hover:shadow-lg transition-all duration-200 cursor-pointer group ${
-                        selectedItems.includes(bookmark.id) ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-200 hover:border-gray-300'
+                      className={`relative bg-white border rounded-lg sm:rounded-xl p-4 sm:p-5 hover:shadow-xl transition-all duration-200 cursor-pointer group ${
+                        selectedItems.includes(bookmark.id) ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-200 hover:border-blue-200 hover:border-2'
                       }`}
                       onClick={(e) => {
                         // Only select if clicking on the card itself, not on buttons
@@ -1148,8 +1153,9 @@ const Bookmarks = ({ onBack }) => {
                         type="checkbox"
                         checked={selectedItems.includes(bookmark.id)}
                         onChange={() => handleSelectItem(bookmark.id)}
-                        className="absolute top-2 left-2 sm:top-3 sm:left-3 w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
+                        className="absolute top-2 left-2 sm:top-3 sm:left-3 w-4 h-4 sm:w-4 sm:h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer z-50 bg-white shadow-md"
                         onClick={(e) => e.stopPropagation()}
+                        style={{ zIndex: 50 }}
                       />
 
                       {/* Favorite Star */}
@@ -1169,25 +1175,29 @@ const Bookmarks = ({ onBack }) => {
                       </button>
 
                       {/* File Icon */}
-                      <div className="flex justify-center mb-2 sm:mb-3 md:mb-4 mt-1 sm:mt-2">
-                        <div className={`p-2 sm:p-2.5 md:p-3 rounded-lg ${
+                      <div className="flex justify-center mb-3 sm:mb-4 mt-1 sm:mt-2 pl-5 sm:pl-0">
+                        <div className={`p-3 sm:p-4 rounded-xl transition-transform group-hover:scale-105 ${
                           bookmark.type === 'judgement' ? 'bg-blue-50' :
                           bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'bg-green-50' :
                           'bg-purple-50'
                         }`}>
-                          <FileText className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-blue-600" />
+                          <FileText className={`h-6 w-6 sm:h-8 sm:w-8 ${
+                            bookmark.type === 'judgement' ? 'text-blue-600' :
+                            bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'text-green-600' :
+                            'text-purple-600'
+                          }`} />
                         </div>
                       </div>
 
                       {/* Bookmark Info */}
                       <div className="text-center">
-                        <h3 className="font-semibold text-gray-900 text-xs sm:text-sm mb-1.5 sm:mb-2 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-2 sm:mb-3 line-clamp-2 leading-tight min-h-[2.5rem]" style={{ fontFamily: 'Roboto, sans-serif' }}>
                           {getBookmarkTitle(bookmark)}
                         </h3>
                         
                         {/* Type Badge */}
                         <div className="mb-2 sm:mb-3">
-                          <span className={`inline-flex px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full ${
+                          <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full whitespace-nowrap ${
                             bookmark.type === 'judgement' ? 'bg-blue-100 text-blue-800' :
                             bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'bg-green-100 text-green-800' :
                             'bg-purple-100 text-purple-800'
@@ -1195,60 +1205,61 @@ const Bookmarks = ({ onBack }) => {
                             {bookmark.type === 'judgement' ? 'Judgement' :
                              bookmark.type === 'central_act' ? 'Central Act' :
                              bookmark.type === 'state_act' ? 'State Act' :
-                             bookmark.type === 'bns_ipc_mapping' ? 'BNS IPC' :
-                             bookmark.type === 'bsa_iea_mapping' ? 'BSA IEA' :
-                             bookmark.type === 'bnss_crpc_mapping' ? 'BNSS CrPC' :
+                             bookmark.type === 'bns_ipc_mapping' ? 'BNS-IPC' :
+                             bookmark.type === 'bsa_iea_mapping' ? 'BSA-IEA' :
+                             bookmark.type === 'bnss_crpc_mapping' ? 'BNSS-CrPC' :
                              bookmark.type.replace('_', ' ').replace('mapping', '').trim()}
                           </span>
                         </div>
                         
                         {/* Tags */}
                         {(bookmark.tags || []).length > 0 && (
-                          <div className="flex flex-wrap justify-center gap-1 mb-2 sm:mb-3">
+                          <div className="flex flex-wrap justify-center gap-1.5 mb-3">
                             {(bookmark.tags || []).slice(0, 2).map((tag, index) => (
                               <span
                                 key={index}
-                                className="inline-flex px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs bg-gray-100 text-gray-600 rounded-md"
+                                className="inline-flex px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-md font-medium"
                                 style={{ fontFamily: 'Roboto, sans-serif' }}
                               >
                                 {tag}
                               </span>
                             ))}
                             {(bookmark.tags || []).length > 2 && (
-                              <span className="text-[10px] sm:text-xs text-gray-400" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              <span className="text-xs text-gray-500 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
                                 +{(bookmark.tags || []).length - 2}
                               </span>
                             )}
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-500 pt-1.5 sm:pt-2 border-t border-gray-100" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                          <span className="truncate">{formatDate(bookmark.created_at || bookmark.dateAdded)}</span>
+                        <div className="flex items-center justify-center text-xs text-gray-500 pt-2 sm:pt-3 border-t border-gray-100" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          <Clock className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                          <span>{formatDate(bookmark.created_at || bookmark.dateAdded)}</span>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex space-x-0.5 sm:space-x-1 bg-white rounded-lg shadow-md p-0.5 sm:p-1">
+                      <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex space-x-1 bg-white rounded-lg shadow-lg border border-gray-200 p-1">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleViewBookmark(bookmark);
                             }}
-                            className="p-1 sm:p-1.5 hover:bg-blue-50 rounded transition-colors"
+                            className="p-1.5 hover:bg-blue-50 rounded transition-colors"
                             title="View"
                           >
-                            <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
+                            <Eye className="h-4 w-4 text-blue-600" />
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteBookmark(bookmark);
                             }}
-                            className="p-1 sm:p-1.5 hover:bg-red-50 rounded transition-colors"
+                            className="p-1.5 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
-                            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
+                            <Trash2 className="h-4 w-4 text-red-600" />
                           </button>
                         </div>
                       </div>
@@ -1257,121 +1268,263 @@ const Bookmarks = ({ onBack }) => {
                 </div>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[600px]">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left">
-                        <input
-                          type="checkbox"
-                          checked={selectedItems.length === sortedBookmarks.length && sortedBookmarks.length > 0}
-                          onChange={handleSelectAll}
-                          className="rounded w-3.5 h-3.5 sm:w-4 sm:h-4"
-                        />
-                      </th>
-                      <th className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Bookmark
-                      </th>
-                      <th className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                        Type
-                      </th>
-                      <th className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                        Tags
-                      </th>
-                      <th className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                        Date Added
-                      </th>
-                      <th className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {sortedBookmarks.map((bookmark) => (
-                      <tr
-                        key={bookmark.id}
-                        className={`hover:bg-gray-50 ${selectedItems.includes(bookmark.id) ? 'bg-blue-50' : ''}`}
-                      >
-                        <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap">
+              <div className="space-y-2 sm:space-y-3">
+                {/* List View Header with Select All - Mobile */}
+                {sortedBookmarks.length > 0 && (
+                  <div className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-4 py-2 border-b border-gray-200 bg-gray-50 lg:hidden">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.length === sortedBookmarks.length && sortedBookmarks.length > 0}
+                      onChange={handleSelectAll}
+                      className="rounded w-4 h-4 flex-shrink-0"
+                    />
+                    <span className="text-xs sm:text-sm text-gray-600 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                      Select All
+                    </span>
+                  </div>
+                )}
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="px-4 py-3 text-left w-12">
                           <input
                             type="checkbox"
-                            checked={selectedItems.includes(bookmark.id)}
-                            onChange={() => handleSelectItem(bookmark.id)}
-                            className="rounded w-3.5 h-3.5 sm:w-4 sm:h-4"
+                            checked={selectedItems.length === sortedBookmarks.length && sortedBookmarks.length > 0}
+                            onChange={handleSelectAll}
+                            className="rounded w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
                           />
-                        </td>
-                        <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4">
-                          <div className="flex items-center min-w-0">
-                            <div className="flex-shrink-0">
-                              <FileText className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-blue-600" />
-                            </div>
-                            <div className="ml-2 sm:ml-3 min-w-0 flex-1">
-                              <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
-                                {getBookmarkTitle(bookmark)}
-                              </div>
-                              <div className="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">
-                                {(bookmark.item || bookmark).description || ''}
-                              </div>
-                              <div className="text-[10px] sm:text-xs text-gray-500 sm:hidden">
-                                {formatDate(bookmark.created_at || bookmark.dateAdded)}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                          <span className={`inline-flex px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold rounded-full ${getTypeColor(bookmark.type)}`}>
-                            {bookmark.type}
-                          </span>
-                        </td>
-                        <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 hidden md:table-cell">
-                          <div className="flex flex-wrap gap-1">
-                            {(bookmark.tags || []).slice(0, 2).map((tag, index) => (
-                              <span
-                                key={index}
-                                className="inline-flex px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs bg-gray-100 text-gray-600 rounded-full"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                            {(bookmark.tags || []).length > 2 && (
-                              <span className="text-[10px] sm:text-xs text-gray-400">
-                                +{(bookmark.tags || []).length - 2}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
-                          {formatDate(bookmark.created_at || bookmark.dateAdded)}
-                        </td>
-                        <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
-                          <div className="flex space-x-1 sm:space-x-2">
-                            <button
-                              onClick={() => handleToggleFavorite(bookmark.id)}
-                              className={bookmark.is_favorite ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}
-                              title={bookmark.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
-                            >
-                              <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            </button>
-                            <button
-                              onClick={() => handleViewBookmark(bookmark)}
-                              className="text-blue-600 hover:text-blue-900"
-                              title="View"
-                            >
-                              <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteBookmark(bookmark)}
-                              className="text-red-600 hover:text-red-900"
-                              title="Delete"
-                            >
-                              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                            </button>
-                          </div>
-                        </td>
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          Bookmark
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          Type
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-40" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          Tags
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-32" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          Date Added
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-28" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {sortedBookmarks.map((bookmark) => (
+                        <tr
+                          key={bookmark.id}
+                          className={`transition-colors ${selectedItems.includes(bookmark.id) ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'}`}
+                        >
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <input
+                              type="checkbox"
+                              checked={selectedItems.includes(bookmark.id)}
+                              onChange={() => handleSelectItem(bookmark.id)}
+                              className="rounded w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                            />
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center min-w-0">
+                              <div className="flex-shrink-0 mr-3">
+                                <div className={`p-2 rounded-lg ${
+                                  bookmark.type === 'judgement' ? 'bg-blue-50' :
+                                  bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'bg-green-50' :
+                                  'bg-purple-50'
+                                }`}>
+                                  <FileText className={`h-5 w-5 ${
+                                    bookmark.type === 'judgement' ? 'text-blue-600' :
+                                    bookmark.type === 'central_act' || bookmark.type === 'state_act' ? 'text-green-600' :
+                                    'text-purple-600'
+                                  }`} />
+                                </div>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm font-semibold text-gray-900 truncate mb-1" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                  {getBookmarkTitle(bookmark)}
+                                </div>
+                                {(bookmark.item || bookmark).description && (
+                                  <div className="text-xs text-gray-500 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                    {(bookmark.item || bookmark).description}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${getTypeColor(bookmark.type)}`} style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              {bookmark.type === 'judgement' ? 'Judgement' :
+                               bookmark.type === 'central_act' ? 'Central Act' :
+                               bookmark.type === 'state_act' ? 'State Act' :
+                               bookmark.type === 'bns_ipc_mapping' ? 'BNS-IPC' :
+                               bookmark.type === 'bsa_iea_mapping' ? 'BSA-IEA' :
+                               bookmark.type === 'bnss_crpc_mapping' ? 'BNSS-CrPC' :
+                               bookmark.type.replace('_', ' ').replace('mapping', '').trim()}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex flex-wrap gap-1.5">
+                              {(bookmark.tags || []).slice(0, 2).map((tag, index) => (
+                                <span
+                                  key={index}
+                                  className="inline-flex px-2 py-0.5 text-xs bg-gray-100 text-gray-700 rounded-md font-medium"
+                                  style={{ fontFamily: 'Roboto, sans-serif' }}
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                              {(bookmark.tags || []).length > 2 && (
+                                <span className="inline-flex items-center px-2 py-0.5 text-xs text-gray-500 font-medium" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                  +{(bookmark.tags || []).length - 2}
+                                </span>
+                              )}
+                              {(!bookmark.tags || bookmark.tags.length === 0) && (
+                                <span className="text-xs text-gray-400 italic" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                  No tags
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center text-sm text-gray-600" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              <Clock className="h-4 w-4 mr-1.5 text-gray-400 flex-shrink-0" />
+                              <span>{formatDate(bookmark.created_at || bookmark.dateAdded)}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleToggleFavorite(bookmark.id)}
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  bookmark.is_favorite 
+                                    ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' 
+                                    : 'text-gray-400 hover:text-yellow-500 hover:bg-gray-100'
+                                }`}
+                                title={bookmark.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+                              >
+                                <Star className={`h-4 w-4 ${bookmark.is_favorite ? 'fill-current' : ''}`} />
+                              </button>
+                              <button
+                                onClick={() => handleViewBookmark(bookmark)}
+                                className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
+                                title="View"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteBookmark(bookmark)}
+                                className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                                title="Delete"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Mobile Card View */}
+                <div className="lg:hidden space-y-2 sm:space-y-3 px-2.5 sm:px-4 pb-2.5 sm:pb-4">
+                  {sortedBookmarks.map((bookmark) => {
+                    const colors = getTypeColor(bookmark.type);
+                    return (
+                      <div
+                        key={bookmark.id}
+                        onClick={(e) => {
+                          if (e.target.closest('button') || e.target.closest('input')) {
+                            return;
+                          }
+                          handleViewBookmark(bookmark);
+                        }}
+                        className={`p-2.5 sm:p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md flex items-start sm:items-center justify-between gap-2 sm:gap-3 ${
+                          selectedItems.includes(bookmark.id) ? 'bg-blue-50 border-blue-500' : 'border-gray-200 hover:bg-gray-50'
+                        }`}
+                      >
+                        {/* Selection Checkbox */}
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(bookmark.id)}
+                          onChange={() => handleSelectItem(bookmark.id)}
+                          className="rounded w-4 h-4 flex-shrink-0 mt-1 sm:mt-0"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="flex items-start sm:items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                          <div 
+                            className="p-1.5 sm:p-2.5 rounded-lg flex-shrink-0"
+                            style={{ backgroundColor: bookmark.type === 'judgement' ? '#E3F2FD' : bookmark.type === 'central_act' || bookmark.type === 'state_act' ? '#E8F5E9' : '#F3E5F5' }}
+                          >
+                            <FileText className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: bookmark.type === 'judgement' ? '#1E65AD' : bookmark.type === 'central_act' || bookmark.type === 'state_act' ? '#10B981' : '#8B5CF6' }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1.5 sm:gap-2 mb-1">
+                              <span 
+                                className={`px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs font-medium whitespace-nowrap ${colors}`}
+                                style={{ fontFamily: 'Roboto, sans-serif' }}
+                              >
+                                {bookmark.type === 'judgement' ? 'Judgement' :
+                                 bookmark.type === 'central_act' ? 'Central Act' :
+                                 bookmark.type === 'state_act' ? 'State Act' :
+                                 bookmark.type === 'bns_ipc_mapping' ? 'BNS IPC' :
+                                 bookmark.type === 'bsa_iea_mapping' ? 'BSA IEA' :
+                                 bookmark.type === 'bnss_crpc_mapping' ? 'BNSS CrPC' :
+                                 bookmark.type.replace('_', ' ').replace('mapping', '').trim()}
+                              </span>
+                            </div>
+                            <h3 className="font-semibold text-gray-900 mb-1 sm:mb-1.5 text-sm sm:text-base line-clamp-1 sm:truncate leading-tight" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              {getBookmarkTitle(bookmark)}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 sm:line-clamp-1 mb-1.5 sm:mb-2 leading-relaxed" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              {(bookmark.item || bookmark).description || ''}
+                            </p>
+                            <div className="flex items-center flex-wrap gap-1.5 sm:gap-3 text-[10px] sm:text-xs text-gray-500" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                              <span className="flex items-center space-x-0.5 sm:space-x-1">
+                                <Clock className="h-3 w-3 flex-shrink-0" />
+                                <span className="whitespace-nowrap">{formatDate(bookmark.created_at || bookmark.dateAdded)}</span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1 sm:gap-2 flex-shrink-0 mt-1 sm:mt-0">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleFavorite(bookmark.id);
+                            }}
+                            className={`p-1.5 sm:p-2 rounded hover:bg-gray-100 transition-colors ${bookmark.is_favorite ? 'text-yellow-500' : 'text-gray-400'}`}
+                            title={bookmark.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+                          >
+                            <Star className={`h-4 w-4 ${bookmark.is_favorite ? 'fill-current' : ''}`} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewBookmark(bookmark);
+                            }}
+                            className="p-1.5 sm:p-2 rounded hover:bg-blue-100 transition-colors text-blue-600"
+                            title="View"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteBookmark(bookmark);
+                            }}
+                            className="p-1.5 sm:p-2 rounded hover:bg-red-100 transition-colors text-red-600"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </>

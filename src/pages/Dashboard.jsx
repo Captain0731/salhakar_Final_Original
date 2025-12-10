@@ -367,21 +367,21 @@ const Dashboard = () => {
             </div>
 
             {/* Perfect Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>Bookmarks</p>
-                    <p className="text-2xl sm:text-3xl font-bold mb-0.5 sm:mb-1" style={{ color: '#CF9B63', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                      {bookmarksLoading ? '...' : bookmarks.length}
-                    </p>
-                    <p className="text-xs sm:text-sm text-green-600 font-medium truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {bookmarks.length > 0 ? 'Active bookmarks' : 'No bookmarks yet'}
-                    </p>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+              <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-2.5 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                    <p className="text-[10px] sm:text-sm font-medium text-gray-600 leading-tight flex-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Bookmarks</p>
+                    <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl shadow-sm flex-shrink-0 ml-1" style={{ backgroundColor: '#CF9B63' }}>
+                      <Bookmark className="h-3 w-3 sm:h-6 sm:w-6 text-white" />
+                    </div>
                   </div>
-                  <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-sm flex-shrink-0 ml-2" style={{ backgroundColor: '#CF9B63' }}>
-                    <Bookmark className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
-                  </div>
+                  <p className="text-xl sm:text-3xl font-bold mb-1 sm:mb-1 leading-none" style={{ color: '#CF9B63', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                    {bookmarksLoading ? '...' : bookmarks.length}
+                  </p>
+                  <p className="text-[9px] sm:text-sm text-green-600 font-medium leading-tight mt-auto" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    {bookmarks.length > 0 ? 'Active' : 'No bookmarks'}
+                  </p>
                 </div>
               </div>
 
@@ -390,41 +390,41 @@ const Dashboard = () => {
                   setActiveTab('calendar');
                   setSidebarOpen(false);
                 }}
-                className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full text-left cursor-pointer"
+                className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-2.5 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full text-left cursor-pointer"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>Upcoming Events</p>
-                    <p className="text-2xl sm:text-3xl font-bold mb-0.5 sm:mb-1" style={{ color: '#8C969F', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                      {eventsLoading ? '...' : upcomingEvents.length}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-500 font-medium truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {eventsLoading ? 'Loading...' : upcomingEvents.length > 0 ? 'View all events' : 'No events scheduled'}
-                    </p>
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                    <p className="text-[10px] sm:text-sm font-medium text-gray-600 leading-tight flex-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Events</p>
+                    <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl shadow-sm flex-shrink-0 ml-1" style={{ backgroundColor: '#8C969F' }}>
+                      <CalendarIcon className="h-3 w-3 sm:h-6 sm:w-6 text-white" />
+                    </div>
                   </div>
-                  <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-sm flex-shrink-0 ml-2" style={{ backgroundColor: '#8C969F' }}>
-                    <CalendarIcon className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
-                  </div>
+                  <p className="text-xl sm:text-3xl font-bold mb-1 sm:mb-1 leading-none" style={{ color: '#8C969F', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                    {eventsLoading ? '...' : upcomingEvents.length}
+                  </p>
+                  <p className="text-[9px] sm:text-sm text-gray-500 font-medium leading-tight mt-auto" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    {eventsLoading ? 'Loading...' : upcomingEvents.length > 0 ? 'View all' : 'No events'}
+                  </p>
                 </div>
               </button>
 
               <button
                 onClick={() => setActiveTab('notes')}
-                className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full text-left cursor-pointer"
+                className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-2.5 sm:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full text-left cursor-pointer"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2 truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>Notes</p>
-                    <p className="text-2xl sm:text-3xl font-bold mb-0.5 sm:mb-1" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
-                      {notesLoading ? '...' : notesCount}
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-500 font-medium truncate" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                      {notesCount > 0 ? 'View all notes' : 'No notes yet'}
-                    </p>
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                    <p className="text-[10px] sm:text-sm font-medium text-gray-600 leading-tight flex-1" style={{ fontFamily: 'Roboto, sans-serif' }}>Notes</p>
+                    <div className="p-1.5 sm:p-3 rounded-lg sm:rounded-xl shadow-sm flex-shrink-0 ml-1" style={{ backgroundColor: '#1E65AD' }}>
+                      <FileText className="h-3 w-3 sm:h-6 sm:w-6 text-white" />
+                    </div>
                   </div>
-                  <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-sm flex-shrink-0 ml-2" style={{ backgroundColor: '#1E65AD' }}>
-                    <FileText className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
-                  </div>
+                  <p className="text-xl sm:text-3xl font-bold mb-1 sm:mb-1 leading-none" style={{ color: '#1E65AD', fontFamily: "'Bricolage Grotesque', sans-serif" }}>
+                    {notesLoading ? '...' : notesCount}
+                  </p>
+                  <p className="text-[9px] sm:text-sm text-gray-500 font-medium leading-tight mt-auto" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                    {notesCount > 0 ? 'View all' : 'No notes yet'}
+                  </p>
                 </div>
               </button>
             </div>
