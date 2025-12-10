@@ -1771,8 +1771,18 @@ export default function LegalJudgments() {
                                         dangerouslySetInnerHTML={{
                                           __html: (() => {
                                             // Display highlights if available (Elasticsearch search results)
-                                            if (judgment.highlights?.cnr && Array.isArray(judgment.highlights.cnr)) {
-                                              return judgment.highlights.cnr[0]; // Use first highlight fragment
+                                            // Check for highlights in different possible structures
+                                            const cnrHighlights = judgment.highlights?.cnr || 
+                                                                 (judgment.highlight && judgment.highlight.cnr) ||
+                                                                 null;
+                                            
+                                            if (cnrHighlights) {
+                                              // Handle both array and string formats
+                                              if (Array.isArray(cnrHighlights) && cnrHighlights.length > 0) {
+                                                return cnrHighlights[0]; // Use first highlight fragment
+                                              } else if (typeof cnrHighlights === 'string' && cnrHighlights.trim()) {
+                                                return cnrHighlights;
+                                              }
                                             }
                                             // Fallback to regular CNR
                                             return (judgment.cnr || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
@@ -1796,8 +1806,18 @@ export default function LegalJudgments() {
                                         dangerouslySetInnerHTML={{
                                           __html: (() => {
                                             // Display highlights if available (Elasticsearch search results)
-                                            if (judgment.highlights?.judge && Array.isArray(judgment.highlights.judge)) {
-                                              return judgment.highlights.judge[0]; // Use first highlight fragment
+                                            // Check for highlights in different possible structures
+                                            const judgeHighlights = judgment.highlights?.judge || 
+                                                                   (judgment.highlight && judgment.highlight.judge) ||
+                                                                   null;
+                                            
+                                            if (judgeHighlights) {
+                                              // Handle both array and string formats
+                                              if (Array.isArray(judgeHighlights) && judgeHighlights.length > 0) {
+                                                return judgeHighlights[0]; // Use first highlight fragment
+                                              } else if (typeof judgeHighlights === 'string' && judgeHighlights.trim()) {
+                                                return judgeHighlights;
+                                              }
                                             }
                                             // Fallback to regular judge name
                                             return (judgment.judge || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
@@ -1836,8 +1856,18 @@ export default function LegalJudgments() {
                                         dangerouslySetInnerHTML={{
                                           __html: (() => {
                                             // Display highlights if available (Elasticsearch search results)
-                                            if (judgment.highlights?.petitioner && Array.isArray(judgment.highlights.petitioner)) {
-                                              return judgment.highlights.petitioner[0]; // Use first highlight fragment
+                                            // Check for highlights in different possible structures
+                                            const petitionerHighlights = judgment.highlights?.petitioner || 
+                                                                       (judgment.highlight && judgment.highlight.petitioner) ||
+                                                                       null;
+                                            
+                                            if (petitionerHighlights) {
+                                              // Handle both array and string formats
+                                              if (Array.isArray(petitionerHighlights) && petitionerHighlights.length > 0) {
+                                                return petitionerHighlights[0]; // Use first highlight fragment
+                                              } else if (typeof petitionerHighlights === 'string' && petitionerHighlights.trim()) {
+                                                return petitionerHighlights;
+                                              }
                                             }
                                             // Fallback to regular petitioner name
                                             return (judgment.petitioner || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
@@ -1861,8 +1891,18 @@ export default function LegalJudgments() {
                                         dangerouslySetInnerHTML={{
                                           __html: (() => {
                                             // Display highlights if available (Elasticsearch search results)
-                                            if (judgment.highlights?.respondent && Array.isArray(judgment.highlights.respondent)) {
-                                              return judgment.highlights.respondent[0]; // Use first highlight fragment
+                                            // Check for highlights in different possible structures
+                                            const respondentHighlights = judgment.highlights?.respondent || 
+                                                                        (judgment.highlight && judgment.highlight.respondent) ||
+                                                                        null;
+                                            
+                                            if (respondentHighlights) {
+                                              // Handle both array and string formats
+                                              if (Array.isArray(respondentHighlights) && respondentHighlights.length > 0) {
+                                                return respondentHighlights[0]; // Use first highlight fragment
+                                              } else if (typeof respondentHighlights === 'string' && respondentHighlights.trim()) {
+                                                return respondentHighlights;
+                                              }
                                             }
                                             // Fallback to regular respondent name
                                             return (judgment.respondent || '').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Escape HTML for safety
