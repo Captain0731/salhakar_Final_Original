@@ -399,11 +399,11 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
                   {getReferenceType() && getReferenceId() && (
                     <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
                       <div className="bg-gray-50 rounded-xl p-4 sm:p-5">
-                        <SummaryFeedbackButton
-                          referenceType={getReferenceType()}
-                          referenceId={getReferenceId()}
+                    <SummaryFeedbackButton
+                      referenceType={getReferenceType()}
+                      referenceId={getReferenceId()}
                           summaryText={summary}
-                        />
+                    />
                       </div>
                     </div>
                   )}

@@ -2650,16 +2650,16 @@ class ApiService {
     
     // Try to make a simple request first
     try {
-      const response = await fetch(`${this.baseURL}/api/central_acts/${actId}?format=markdown`, {
-        method: 'GET',
-        headers: headers
-      });
-      
-      if (!response.ok) {
+    const response = await fetch(`${this.baseURL}/api/central_acts/${actId}?format=markdown`, {
+      method: 'GET',
+      headers: headers
+    });
+    
+    if (!response.ok) {
         const errorText = await response.text().catch(() => response.statusText);
         throw new Error(`Failed to fetch central act Markdown: ${response.status} ${response.statusText}. ${errorText.substring(0, 200)}`);
-      }
-      
+    }
+    
       const markdownText = await response.text();
       console.log('✅ getCentralActByIdMarkdown: Successfully fetched markdown, length:', markdownText.length);
       return markdownText;
@@ -2685,16 +2685,16 @@ class ApiService {
     
     // Try to make a simple request first
     try {
-      const response = await fetch(`${this.baseURL}/api/state_acts/${actId}?format=markdown`, {
-        method: 'GET',
-        headers: headers
-      });
-      
-      if (!response.ok) {
+    const response = await fetch(`${this.baseURL}/api/state_acts/${actId}?format=markdown`, {
+      method: 'GET',
+      headers: headers
+    });
+    
+    if (!response.ok) {
         const errorText = await response.text().catch(() => response.statusText);
         throw new Error(`Failed to fetch state act Markdown: ${response.status} ${response.statusText}. ${errorText.substring(0, 200)}`);
-      }
-      
+    }
+    
       const markdownText = await response.text();
       console.log('✅ getStateActByIdMarkdown: Successfully fetched markdown, length:', markdownText.length);
       return markdownText;
