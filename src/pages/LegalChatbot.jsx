@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import apiService from "../services/api";
 import ChatFeedbackButton from "../components/ChatFeedbackButton";
 
@@ -61,7 +62,7 @@ export default function LegalChatbot() {
   const menuRef = useRef(null);
 
   // Load chat sessions from API
-  const loadChatSessions = async () => {
+  const loadChatSessions = useCallback(async () => {
     try {
       setLoadingSessions(true);
       const sessions = await apiService.getChatSessions();
@@ -95,7 +96,7 @@ export default function LegalChatbot() {
     } finally {
       setLoadingSessions(false);
     }
-  };
+  }, []);
 
   const quickQuestions = [
     "What are my rights as a tenant?",
@@ -307,6 +308,27 @@ export default function LegalChatbot() {
     }
   }, [isTyping, scrollToBottom]);
 
+  // Handle initial question from redirect (from Search With Kiki AI)
+  useEffect(() => {
+    const initialQuestion = location.state?.initialQuestion;
+    const judgmentId = location.state?.judgmentId;
+    
+    if (initialQuestion && initialQuestion.trim()) {
+      // Store values before clearing state
+      const question = initialQuestion.trim();
+      const jId = judgmentId;
+      
+      // Clear the state to prevent re-sending on re-renders
+      navigate(location.pathname, { replace: true, state: {} });
+      
+      // Small delay to ensure component is fully mounted
+      setTimeout(() => {
+        sendInitialQuestion(question, jId);
+      }, 500);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state?.initialQuestion, location.state?.judgmentId]);
+
   const handleStopGeneration = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -328,6 +350,118 @@ export default function LegalChatbot() {
       scrollToBottom();
     }, 100);
   };
+
+  // Send initial question from redirect (for judgment Q&A or regular questions)
+  const sendInitialQuestion = useCallback(async (question, judgmentId = null) => {
+    if (!question || !question.trim() || loading) return;
+
+    const userMessage = {
+      id: Date.now(),
+      text: question,
+      sender: "user",
+      timestamp: new Date().toISOString()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Scroll to bottom immediately after adding user message
+    setTimeout(() => {
+      scrollToBottom();
+    }, 50);
+    
+    setLoading(true);
+    setIsTyping(true);
+
+    // Create new AbortController for this request
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
+    try {
+      let data;
+      
+      if (judgmentId) {
+        // Use judgment-specific endpoint
+        console.log(`📚 Asking question about judgment ${judgmentId}:`, question);
+        const apiOptions = {
+          temperature: 0.3,
+          max_tokens: 20000,
+          signal: signal
+        };
+        data = await apiService.askJudgmentQuestion(judgmentId, question, apiOptions);
+      } else {
+        // Use regular AI assistant endpoint
+        const apiOptions = {
+          limit: 10,
+          max_tokens: 2000,
+          temperature: 0.3,
+          signal: signal
+        };
+        data = await apiService.llmChat(question, apiOptions);
+      }
+      
+      // Save session_id from response for conversation continuity
+      if (data.session_id) {
+        console.log('✅ Session created/continued:', data.session_id);
+        setCurrentSessionId(data.session_id);
+        // Save to localStorage for persistence across page refreshes
+        localStorage.setItem('currentChatSessionId', data.session_id.toString());
+        
+        // Reload chat sessions to update sidebar
+        loadChatSessions();
+      } else {
+        console.warn('⚠️ No session_id in response:', data);
+      }
+      
+      const botResponse = {
+        id: Date.now() + 1,
+        text: data.reply || "I'm sorry, I couldn't process your request. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString(),
+        usedTools: data.used_tools || false,
+        toolUsed: data.tool_used || null,
+        searchInfo: data.search_info || null,
+        sessionId: data.session_id || currentSessionId
+      };
+
+      setMessages(prev => [...prev, botResponse]);
+      
+      // Scroll to bottom after bot response
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    } catch (error) {
+      // Don't show error if request was aborted
+      if (error.name === 'AbortError') {
+        console.log('Request aborted by user');
+        return;
+      }
+      
+      console.error('Error getting bot response:', error);
+      
+      // If session becomes invalid, reset it
+      if (error.message.includes('404') || error.message.includes('invalid session')) {
+        setCurrentSessionId(null);
+        localStorage.removeItem('currentChatSessionId');
+      }
+      
+      const errorResponse = {
+        id: Date.now() + 1,
+        text: error.message || "I'm sorry, there was an error processing your message. Please try again.",
+        sender: "bot",
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+      
+      // Scroll to bottom after error response
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    } finally {
+      setLoading(false);
+      setIsTyping(false);
+      abortControllerRef.current = null;
+    }
+  }, [loading, scrollToBottom, currentSessionId, loadChatSessions]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || loading) return;
@@ -1473,6 +1607,7 @@ export default function LegalChatbot() {
                               className="sm:text-[15px]"
                               >
                                 <ReactMarkdown
+                                  remarkPlugins={[remarkGfm]}
                                   components={{
                                     p: ({ children }) => <p style={{ marginBottom: '0.5rem', marginTop: '0' }}>{children}</p>,
                                     h1: ({ children }) => <h1 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', marginTop: '1rem', color: '#1F2937' }}>{children}</h1>,
@@ -1481,6 +1616,62 @@ export default function LegalChatbot() {
                                     ul: ({ children }) => <ul style={{ marginLeft: '1.25rem', marginBottom: '0.75rem', marginTop: '0.5rem', listStyleType: 'disc' }}>{children}</ul>,
                                     ol: ({ children }) => <ol style={{ marginLeft: '1.25rem', marginBottom: '0.75rem', marginTop: '0.5rem', listStyleType: 'decimal' }}>{children}</ol>,
                                     li: ({ children }) => <li style={{ marginBottom: '0.375rem', color: '#374151', paddingLeft: '0.25rem' }}>{children}</li>,
+                                    table: ({ children }) => (
+                                      <div style={{ overflowX: 'auto', marginTop: '1rem', marginBottom: '1rem' }}>
+                                        <table style={{
+                                          width: '100%',
+                                          borderCollapse: 'collapse',
+                                          border: '1px solid #E5E7EB',
+                                          borderRadius: '0.5rem',
+                                          overflow: 'hidden',
+                                          backgroundColor: '#FFFFFF',
+                                          fontFamily: "'Heebo', sans-serif"
+                                        }}>
+                                          {children}
+                                        </table>
+                                      </div>
+                                    ),
+                                    thead: ({ children }) => (
+                                      <thead style={{ backgroundColor: '#1E65AD', color: '#FFFFFF' }}>
+                                        {children}
+                                      </thead>
+                                    ),
+                                    tbody: ({ children }) => (
+                                      <tbody>
+                                        {children}
+                                      </tbody>
+                                    ),
+                                    tr: ({ children, isHeader }) => (
+                                      <tr style={{
+                                        borderBottom: '1px solid #E5E7EB',
+                                        ...(isHeader ? {} : { '&:hover': { backgroundColor: '#F9FAFC' } })
+                                      }}>
+                                        {children}
+                                      </tr>
+                                    ),
+                                    th: ({ children }) => (
+                                      <th style={{
+                                        padding: '0.75rem 1rem',
+                                        textAlign: 'left',
+                                        fontWeight: '600',
+                                        fontSize: '0.875rem',
+                                        color: '#FFFFFF',
+                                        borderRight: '1px solid rgba(255, 255, 255, 0.2)'
+                                      }}>
+                                        {children}
+                                      </th>
+                                    ),
+                                    td: ({ children }) => (
+                                      <td style={{
+                                        padding: '0.75rem 1rem',
+                                        fontSize: '0.875rem',
+                                        color: '#374151',
+                                        borderRight: '1px solid #E5E7EB',
+                                        verticalAlign: 'top'
+                                      }}>
+                                        {children}
+                                      </td>
+                                    ),
                                     code: ({ children, className }) => {
                                       const isInline = !className;
                                       return isInline ? (

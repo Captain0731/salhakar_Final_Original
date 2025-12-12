@@ -1692,9 +1692,26 @@ export default function ViewPDF() {
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && searchQuery.trim()) {
-                          // Trigger PDF search functionality
-                          console.log('Searching for:', searchQuery);
-                          // You can implement PDF search logic here
+                          // Redirect to chatbot with question
+                          const question = searchQuery.trim();
+                          // Check if it's a judgment (not an act)
+                          if (judgmentInfo && !location.state?.act) {
+                            // It's a judgment - pass judgment_id
+                            const judgmentId = judgmentInfo.id || judgmentInfo.cnr || urlId;
+                            navigate('/legal-chatbot', {
+                              state: {
+                                initialQuestion: question,
+                                judgmentId: judgmentId
+                              }
+                            });
+                          } else {
+                            // It's an act or other document - regular question
+                            navigate('/legal-chatbot', {
+                              state: {
+                                initialQuestion: question
+                              }
+                            });
+                          }
                         }
                       }}
                     />

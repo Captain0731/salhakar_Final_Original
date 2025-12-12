@@ -1456,9 +1456,13 @@ export default function ActDetails() {
                       style={{ fontFamily: 'Roboto, sans-serif' }}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' && searchQuery.trim()) {
-                          // Trigger PDF search functionality
-                          console.log('Searching for:', searchQuery);
-                          // You can implement PDF search logic here
+                          // Redirect to chatbot with question
+                          const question = searchQuery.trim();
+                          navigate('/legal-chatbot', {
+                            state: {
+                              initialQuestion: question
+                            }
+                          });
                         }
                       }}
                     />

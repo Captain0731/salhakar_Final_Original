@@ -3420,6 +3420,49 @@ class ApiService {
     return await this.handleResponse(response);
   }
 
+  // Ask a question about a specific judgment
+  async askJudgmentQuestion(judgmentId, message, options = {}) {
+    const {
+      temperature = 0.3,
+      max_tokens = 20000,
+      signal = null // AbortSignal for request cancellation
+    } = options;
+
+    // Build request body
+    const requestBody = {
+      message,
+      temperature: Math.max(0.0, Math.min(2.0, temperature)), // Clamp between 0.0-2.0
+      max_tokens: Math.max(100, Math.min(20000, max_tokens)) // Clamp between 100-20000
+    };
+    
+    console.log(`📤 API Request: Asking question about judgment ${judgmentId}`);
+    console.log('📤 API Request Body:', JSON.stringify(requestBody, null, 2));
+
+    // Use auth headers if token exists, otherwise use public headers
+    const token = localStorage.getItem('access_token') || 
+                  localStorage.getItem('accessToken') || 
+                  localStorage.getItem('token');
+    const hasToken = !!token && token !== 'null' && token !== 'undefined';
+
+    const fetchOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+        ...(hasToken ? this.getAuthHeaders() : this.getPublicHeaders())
+      },
+      body: JSON.stringify(requestBody)
+    };
+
+    // Add abort signal if provided
+    if (signal) {
+      fetchOptions.signal = signal;
+    }
+
+    const response = await fetch(`${this.baseURL}/ai_assistant/judgment/${judgmentId}`, fetchOptions);
+    return await this.handleResponse(response);
+  }
+
   // Get all chat sessions for the current user
   async getChatSessions() {
     const token = localStorage.getItem('access_token') || 
