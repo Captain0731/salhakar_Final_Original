@@ -85,6 +85,73 @@ function ScrollToTop() {
 function AppLayout() {
   const location = useLocation();
   
+  // Restore previous language when navigating away from chatbot
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const isOnChatbotPage = currentPath === '/legal-chatbot' || currentPath === '/chatbot';
+    
+    // If we're not on chatbot page, check if we need to restore previous language
+    if (!isOnChatbotPage) {
+      // Check if we've already restored (prevent multiple restorations)
+      const hasRestored = sessionStorage.getItem('languageRestored');
+      
+      if (!hasRestored) {
+        const previousLang = localStorage.getItem('previousLanguageBeforeChatbot');
+        
+        if (previousLang && previousLang !== 'en') {
+          const langCode = previousLang;
+          
+          // Mark as restored to prevent multiple attempts
+          sessionStorage.setItem('languageRestored', 'true');
+          
+          // Helper function to set cookie with proper attributes
+          const setCookie = (name, value, days = 365) => {
+            if (typeof window === 'undefined') return;
+            
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            
+            const hostname = window.location.hostname;
+            const domain = hostname.includes('localhost') || hostname.includes('127.0.0.1') 
+              ? '' 
+              : hostname.split('.').slice(-2).join('.');
+            
+            let cookieString = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+            
+            if (window.location.protocol === 'https:') {
+              cookieString += '; Secure';
+            }
+            
+            if (domain && !hostname.includes('localhost')) {
+              cookieString += `; domain=.${domain}`;
+            }
+            
+            document.cookie = cookieString;
+            
+            try {
+              localStorage.setItem('selectedLanguage', langCode);
+            } catch (e) {
+              console.warn('localStorage not available:', e);
+            }
+          };
+          
+          // Restore previous language
+          setCookie('googtrans', `/en/${langCode}`, 365);
+          
+          // Clear the stored previous language
+          localStorage.removeItem('previousLanguageBeforeChatbot');
+          
+          // Reload to apply the restored language
+          window.location.reload();
+          return; // Exit early to prevent further execution
+        }
+      }
+    } else {
+      // If we're on chatbot page, clear the restoration flag
+      sessionStorage.removeItem('languageRestored');
+    }
+  }, [location.pathname]);
+  
   // Pages where chatbot should be hidden
   const hideChatbotPaths = [
     '/login',

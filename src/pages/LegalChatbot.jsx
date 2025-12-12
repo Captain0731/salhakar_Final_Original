@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import { 
   Send, User, X, RotateCcw, Mic, MicOff, Upload, 
@@ -16,6 +16,7 @@ import ChatFeedbackButton from "../components/ChatFeedbackButton";
 
 export default function LegalChatbot() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,9 @@ export default function LegalChatbot() {
   const audioChunksRef = useRef([]);
   const fileInputRef = useRef(null);
   const abortControllerRef = useRef(null);
+  
+  // Store previous language to restore when leaving chatbot
+  const previousLanguageRef = useRef(null);
   
   // Sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -103,6 +107,129 @@ export default function LegalChatbot() {
     "What is the procedure for will registration?",
     "How to file an RTI application?"
   ];
+
+  // Force English language when entering chatbot page
+  useEffect(() => {
+    // Helper function to clear cookie with proper domain handling
+    const clearCookie = (name) => {
+      if (typeof window === 'undefined') return;
+      
+      const hostname = window.location.hostname;
+      const domain = hostname.includes('localhost') || hostname.includes('127.0.0.1') 
+        ? '' 
+        : hostname.split('.').slice(-2).join('.');
+      
+      // Get current cookie value to save it
+      const cookie = document.cookie
+        .split('; ')
+        .find(row => row.trim().startsWith(`${name}=`));
+      
+      if (cookie) {
+        try {
+          const value = decodeURIComponent(cookie.split('=').slice(1).join('='));
+          if (value && value !== '/en/en' && value !== '') {
+            // Save previous language (excluding English)
+            const lang = value.replace('/en/', '').toLowerCase().split(';')[0].trim();
+            if (lang && lang !== 'en') {
+              previousLanguageRef.current = lang;
+              // Also save to localStorage for persistence across page reloads
+              try {
+                localStorage.setItem('previousLanguageBeforeChatbot', lang);
+              } catch (e) {
+                console.warn('localStorage not available:', e);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Error parsing cookie:', e);
+        }
+      }
+      
+      // Clear cookie with all possible combinations
+      const clearOptions = [
+        `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`,
+        `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${hostname};`,
+      ];
+      
+      if (domain && !hostname.includes('localhost')) {
+        clearOptions.push(`${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain};`);
+      }
+      
+      if (window.location.protocol === 'https:') {
+        clearOptions.forEach(opt => {
+          document.cookie = opt + ' Secure;';
+        });
+      } else {
+        clearOptions.forEach(opt => {
+          document.cookie = opt;
+        });
+      }
+      
+      // Also clear from localStorage
+      try {
+        localStorage.removeItem('selectedLanguage');
+      } catch (e) {
+        console.warn('localStorage not available:', e);
+      }
+    };
+    
+    // Save current language and force English
+    clearCookie('googtrans');
+    
+    // Reload page to apply English (only if language was changed)
+    if (previousLanguageRef.current) {
+      // Small delay to ensure cookie is cleared before reload
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    }
+    
+    // Cleanup: Restore previous language when leaving chatbot
+    return () => {
+      if (previousLanguageRef.current) {
+        const langCode = previousLanguageRef.current;
+        
+        // Helper function to set cookie with proper attributes
+        const setCookie = (name, value, days = 365) => {
+          if (typeof window === 'undefined') return;
+          
+          const expires = new Date();
+          expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+          
+          const hostname = window.location.hostname;
+          const domain = hostname.includes('localhost') || hostname.includes('127.0.0.1') 
+            ? '' 
+            : hostname.split('.').slice(-2).join('.');
+          
+          let cookieString = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+          
+          if (window.location.protocol === 'https:') {
+            cookieString += '; Secure';
+          }
+          
+          if (domain && !hostname.includes('localhost')) {
+            cookieString += `; domain=.${domain}`;
+          }
+          
+          document.cookie = cookieString;
+          
+          try {
+            localStorage.setItem('selectedLanguage', langCode);
+          } catch (e) {
+            console.warn('localStorage not available:', e);
+          }
+        };
+        
+        // Restore previous language
+        setCookie('googtrans', `/en/${langCode}`, 365);
+        
+        // Clear the stored previous language
+        previousLanguageRef.current = null;
+      }
+    };
+  }, []);
+
+  // Note: Language restoration is handled in App.js to avoid conflicts
 
   useEffect(() => {
     // Load chat sessions on mount

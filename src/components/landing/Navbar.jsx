@@ -68,6 +68,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout, login } = useAuth();
+  
+  // Hide language selector on legal chatbot page
+  const isChatbotPage = location.pathname === '/legal-chatbot' || location.pathname === '/chatbot';
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null); // index of main dropdown
   // Changed: track both main index and sub index to avoid collisions
@@ -335,13 +338,15 @@ const Navbar = () => {
           isScrolled ? 'gap-1' : 'gap-1.5 sm:gap-2'
         }`}>
           {/* Language Selector - Mobile (in navbar bar) */}
-          <div className={`flex-shrink-0 transition-all duration-300 ${
-            isScrolled 
-              ? 'max-w-[70px] sm:max-w-[85px] scale-90' 
-              : 'max-w-[80px] sm:max-w-[100px] scale-100'
-          }`}>
-            <LanguageSelector />
-          </div>
+          {!isChatbotPage && (
+            <div className={`flex-shrink-0 transition-all duration-300 ${
+              isScrolled 
+                ? 'max-w-[70px] sm:max-w-[85px] scale-90' 
+                : 'max-w-[80px] sm:max-w-[100px] scale-100'
+            }`}>
+              <LanguageSelector />
+            </div>
+          )}
           
           {/* Menu Button - Mobile */}
           <button
@@ -784,9 +789,11 @@ const Navbar = () => {
           isScrolled ? 'gap-2' : 'gap-3'
         }`}>
           {/* Language Selector */}
-          <div className={isScrolled ? 'scale-90' : 'scale-100'} style={{ transition: 'transform 0.3s ease-in-out' }}>
-            <LanguageSelector />
-          </div>
+          {!isChatbotPage && (
+            <div className={isScrolled ? 'scale-90' : 'scale-100'} style={{ transition: 'transform 0.3s ease-in-out' }}>
+              <LanguageSelector />
+            </div>
+          )}
           
           {isAuthenticated ? (
             <div className="relative">
