@@ -35,11 +35,14 @@
     "react-pdf": "^10.2.0",
     "react-router-dom": "^7.9.3",
     "react-scripts": "5.0.1",
+    "serve": "^14.2.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 react-scripts build",
+    "build:prod": "NODE_OPTIONS=--max-old-space-size=4096 CI=false react-scripts build",
+    "serve": "serve -s build -l 3000",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
