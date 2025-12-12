@@ -64,21 +64,36 @@ export default function ViewPDF() {
   // Summary popup state
   const [summaryPopupOpen, setSummaryPopupOpen] = useState(false);
 
-  // Get current language from cookie (Google Translate)
+  // Get current language from cookie (Google Translate) with improved detection
   const getCurrentLanguage = () => {
     if (typeof window === 'undefined') return 'en';
     
     const cookie = document.cookie
       .split('; ')
-      .find(row => row.startsWith('googtrans='));
+      .find(row => row.trim().startsWith('googtrans='));
     
     if (cookie) {
-      const value = cookie.split('=')[1];
-      // Extract language code from /en/xx format
-      if (value && value.startsWith('/en/')) {
-        return value.replace('/en/', '').toLowerCase();
+      try {
+        const value = decodeURIComponent(cookie.split('=').slice(1).join('='));
+        if (value && value.startsWith('/en/')) {
+          const lang = value.replace('/en/', '').toLowerCase().split(';')[0].trim();
+          if (lang) return lang;
+        }
+      } catch (e) {
+        console.warn('Error parsing googtrans cookie:', e);
       }
     }
+    
+    // Fallback to localStorage
+    try {
+      const storedLang = localStorage.getItem('selectedLanguage');
+      if (storedLang && storedLang !== 'en') {
+        return storedLang.toLowerCase();
+      }
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
+    
     return 'en';
   };
 

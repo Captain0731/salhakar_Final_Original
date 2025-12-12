@@ -36,22 +36,104 @@ const GoogleTranslate = ({ pdfUrl = null }) => {
     { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' }
   ];
 
-  // Get current language from cookie - supports all languages
+  // Get current language from cookie - supports all languages with improved detection
   const getCurrentLanguage = () => {
     if (typeof window === 'undefined') return 'en';
     
+    // Try to get from googtrans cookie first
     const cookie = document.cookie
       .split('; ')
-      .find(row => row.startsWith('googtrans='));
+      .find(row => row.trim().startsWith('googtrans='));
     
     if (cookie) {
-      const value = cookie.split('=')[1];
-      // Extract language code from /en/xx format
-      if (value && value.startsWith('/en/')) {
-        return value.replace('/en/', '').toLowerCase();
+      try {
+        const value = decodeURIComponent(cookie.split('=').slice(1).join('='));
+        if (value && value.startsWith('/en/')) {
+          const lang = value.replace('/en/', '').toLowerCase().split(';')[0].trim();
+          if (lang) return lang;
+        }
+      } catch (e) {
+        console.warn('Error parsing googtrans cookie:', e);
       }
     }
+    
+    // Fallback to localStorage
+    try {
+      const storedLang = localStorage.getItem('selectedLanguage');
+      if (storedLang && storedLang !== 'en') {
+        return storedLang.toLowerCase();
+      }
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
+    
     return 'en';
+  };
+
+  // Helper function to set cookie with proper attributes
+  const setCookie = (name, value, days = 365) => {
+    if (typeof window === 'undefined') return;
+    
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    
+    const hostname = window.location.hostname;
+    const domain = hostname.includes('localhost') || hostname.includes('127.0.0.1') 
+      ? '' 
+      : hostname.split('.').slice(-2).join('.');
+    
+    let cookieString = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+    
+    if (window.location.protocol === 'https:') {
+      cookieString += '; Secure';
+    }
+    
+    if (domain && !hostname.includes('localhost')) {
+      cookieString += `; domain=.${domain}`;
+    }
+    
+    document.cookie = cookieString;
+    
+    try {
+      localStorage.setItem('selectedLanguage', value.replace('/en/', '') || 'en');
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
+  };
+
+  // Helper function to clear cookie
+  const clearCookie = (name) => {
+    if (typeof window === 'undefined') return;
+    
+    const hostname = window.location.hostname;
+    const domain = hostname.includes('localhost') || hostname.includes('127.0.0.1') 
+      ? '' 
+      : hostname.split('.').slice(-2).join('.');
+    
+    const clearOptions = [
+      `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`,
+      `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${hostname};`,
+    ];
+    
+    if (domain && !hostname.includes('localhost')) {
+      clearOptions.push(`${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain};`);
+    }
+    
+    if (window.location.protocol === 'https:') {
+      clearOptions.forEach(opt => {
+        document.cookie = opt + ' Secure;';
+      });
+    } else {
+      clearOptions.forEach(opt => {
+        document.cookie = opt;
+      });
+    }
+    
+    try {
+      localStorage.removeItem('selectedLanguage');
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
   };
 
   // Set googtrans cookie and reload page
@@ -60,15 +142,17 @@ const GoogleTranslate = ({ pdfUrl = null }) => {
 
     if (langCode === 'en') {
       // Clear translation - remove cookie
-      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      clearCookie('googtrans');
     } else {
       // Set translation cookie
       const cookieValue = `/en/${langCode}`;
-      document.cookie = `googtrans=${cookieValue}; path=/; max-age=31536000`; // 1 year
+      setCookie('googtrans', cookieValue, 365);
     }
 
-    // Reload page to apply translation
-    window.location.reload();
+    // Small delay to ensure cookie is set before reload
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   // Create Google Translate URL for PDF translation with smart routing

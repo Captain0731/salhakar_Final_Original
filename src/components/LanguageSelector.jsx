@@ -40,22 +40,115 @@ const LanguageSelector = () => {
       { code: 'te', langCode: 'Te', name: 'తెలుగు', flag: '🇮🇳', country: 'IN', display: 'IN' },
   ];
 
-  // Get current language from cookie
+  // Get current language from cookie with improved detection
   const getCurrentLanguage = () => {
     if (typeof window === 'undefined') return 'en';
     
+    // Try to get from googtrans cookie first
     const cookie = document.cookie
       .split('; ')
-      .find(row => row.startsWith('googtrans='));
+      .find(row => row.trim().startsWith('googtrans='));
     
     if (cookie) {
-      const value = cookie.split('=')[1];
-      // Extract language code from /en/xx format
-      if (value && value.startsWith('/en/')) {
-        return value.replace('/en/', '').toLowerCase();
+      try {
+        // Handle URL-encoded values
+        const value = decodeURIComponent(cookie.split('=').slice(1).join('='));
+        // Extract language code from /en/xx format
+        if (value && value.startsWith('/en/')) {
+          const lang = value.replace('/en/', '').toLowerCase().split(';')[0].trim();
+          if (lang) return lang;
+        }
+      } catch (e) {
+        console.warn('Error parsing googtrans cookie:', e);
       }
     }
+    
+    // Fallback to localStorage
+    try {
+      const storedLang = localStorage.getItem('selectedLanguage');
+      if (storedLang && storedLang !== 'en') {
+        return storedLang.toLowerCase();
+      }
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
+    
     return 'en';
+  };
+
+  // Helper function to set cookie with proper attributes for cross-domain support
+  const setCookie = (name, value, days = 365) => {
+    if (typeof window === 'undefined') return;
+    
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    
+    // Get current domain
+    const hostname = window.location.hostname;
+    // For production domains, use the root domain (e.g., .example.com)
+    // For localhost, don't set domain
+    const domain = hostname.includes('localhost') || hostname.includes('127.0.0.1') 
+      ? '' 
+      : hostname.split('.').slice(-2).join('.'); // Get root domain
+    
+    // Build cookie string with all necessary attributes
+    let cookieString = `${name}=${value}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+    
+    // Add Secure flag for HTTPS (required for production)
+    if (window.location.protocol === 'https:') {
+      cookieString += '; Secure';
+    }
+    
+    // Add domain if not localhost
+    if (domain && !hostname.includes('localhost')) {
+      cookieString += `; domain=.${domain}`;
+    }
+    
+    document.cookie = cookieString;
+    
+    // Also set in localStorage as backup
+    try {
+      localStorage.setItem('selectedLanguage', value.replace('/en/', '') || 'en');
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
+  };
+
+  // Helper function to clear cookie
+  const clearCookie = (name) => {
+    if (typeof window === 'undefined') return;
+    
+    const hostname = window.location.hostname;
+    const domain = hostname.includes('localhost') || hostname.includes('127.0.0.1') 
+      ? '' 
+      : hostname.split('.').slice(-2).join('.');
+    
+    // Clear cookie with all possible combinations
+    const clearOptions = [
+      `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`,
+      `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${hostname};`,
+    ];
+    
+    if (domain && !hostname.includes('localhost')) {
+      clearOptions.push(`${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${domain};`);
+    }
+    
+    if (window.location.protocol === 'https:') {
+      clearOptions.forEach(opt => {
+        document.cookie = opt + ' Secure;';
+      });
+    } else {
+      clearOptions.forEach(opt => {
+        document.cookie = opt;
+      });
+    }
+    
+    // Clear from localStorage
+    try {
+      localStorage.removeItem('selectedLanguage');
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
   };
 
   // Set language and reload page
@@ -65,13 +158,16 @@ const LanguageSelector = () => {
     // Allow all languages to be translated without authentication
     if (langCode === 'en') {
       // Clear translation for English
-      document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      clearCookie('googtrans');
     } else {
       // Set translation cookie for selected language
-      document.cookie = `googtrans=/en/${langCode}; path=/; max-age=31536000; SameSite=Lax`;
+      setCookie('googtrans', `/en/${langCode}`, 365);
     }
-    // Reload page to apply translation
-    window.location.reload();
+    
+    // Small delay to ensure cookie is set before reload
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   };
 
   // Update current language on mount

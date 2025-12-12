@@ -61,34 +61,52 @@ export default function ActDetails() {
   const [markdownError, setMarkdownError] = useState("");
   const [lastLanguage, setLastLanguage] = useState('en'); // Track last language for state acts
 
-  // Language functions (similar to ViewPDF.jsx)
+  // Language functions (similar to ViewPDF.jsx) with improved cookie detection
   const getCurrentLanguage = () => {
     if (typeof window === 'undefined') return 'en';
     
     // Check googtrans cookie first (used by Google Translate)
     const googtransCookie = document.cookie
       .split('; ')
-      .find(row => row.startsWith('googtrans='));
+      .find(row => row.trim().startsWith('googtrans='));
     
     if (googtransCookie) {
-      const value = googtransCookie.split('=')[1];
-      // Extract language code from /en/xx format
-      if (value && value.startsWith('/en/')) {
-        return value.replace('/en/', '').toLowerCase();
+      try {
+        // Handle URL-encoded values and multiple = signs
+        const value = decodeURIComponent(googtransCookie.split('=').slice(1).join('='));
+        // Extract language code from /en/xx format
+        if (value && value.startsWith('/en/')) {
+          const lang = value.replace('/en/', '').toLowerCase().split(';')[0].trim();
+          if (lang) return lang;
+        }
+      } catch (e) {
+        console.warn('Error parsing googtrans cookie:', e);
       }
     }
     
     // Fallback to selectedLanguage cookie
     const selectedLangCookie = document.cookie
       .split('; ')
-      .find(row => row.startsWith('selectedLanguage='));
+      .find(row => row.trim().startsWith('selectedLanguage='));
     
     if (selectedLangCookie) {
-      return selectedLangCookie.split('=')[1] || 'en';
+      try {
+        const value = decodeURIComponent(selectedLangCookie.split('=').slice(1).join('='));
+        if (value) return value.split(';')[0].trim().toLowerCase();
+      } catch (e) {
+        console.warn('Error parsing selectedLanguage cookie:', e);
+      }
     }
     
     // Final fallback to localStorage
-    return localStorage.getItem('selectedLanguage') || 'en';
+    try {
+      const storedLang = localStorage.getItem('selectedLanguage');
+      if (storedLang) return storedLang.toLowerCase();
+    } catch (e) {
+      console.warn('localStorage not available:', e);
+    }
+    
+    return 'en';
   };
 
   const getLanguageName = (langCode) => {
