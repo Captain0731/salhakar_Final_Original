@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import apiService from "../../services/api";
 
 const sentences = [
-  "  Judgments",
-  " Old to new law mapping",
+  "  Legal Judgments",
+  "  law Mapping",
+  "  Law Library",
+  "  Smart Dashboard",
   " Legal Templates",
-  " Youtube Summary"
+  " Youtube Summary",
+  " Kiki AI"
 ];
 
 const TYPING_SPEED = 80; // milliseconds per character

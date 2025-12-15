@@ -633,53 +633,29 @@ export default function LegalChatbot() {
     setIsTyping(true);
 
     try {
-      // Create a File object from the blob
-      const audioFile = new File([audioBlob], 'recording.webm', { type: 'audio/webm' });
-      
-      // Call the Speech API
-      const response = await apiService.speechToGemini(audioFile);
+      const audioFile = new File([audioBlob], "recording.webm", { type: "audio/webm" });
+      const transcription = await apiService.transcribeAudio(audioFile);
+      const transcriptText = transcription?.text?.trim();
 
-      // Note: The new API doesn't return transcription separately
-      // The transcription is handled internally and only the AI reply is returned
-      // We'll show a placeholder message for voice input
-      const userMessage = {
-        id: Date.now(),
-        text: "[Voice message]",
-        sender: "user",
-        timestamp: new Date().toISOString(),
-        isVoice: true
-      };
-      setMessages(prev => [...prev, userMessage]);
-      setTimeout(() => scrollToBottom(), 50);
-
-      // Save session_id if provided in response (if voice API supports it)
-      if (response.session_id) {
-        setCurrentSessionId(response.session_id);
-        localStorage.setItem('currentChatSessionId', response.session_id.toString());
+      if (!transcriptText) {
+        throw new Error("No speech detected. Please try again.");
       }
 
-      // Add bot response
-      const botResponse = {
-        id: Date.now() + 1,
-        text: response.reply || "I'm sorry, I couldn't process your voice input. Please try again.",
-        sender: "bot",
-        timestamp: new Date().toISOString(),
-        usedTools: response.used_tools || false,
-        toolUsed: response.tool_used || null,
-        searchInfo: response.search_info || null,
-        sessionId: response.session_id || currentSessionId
-      };
-      setMessages(prev => [...prev, botResponse]);
-      setTimeout(() => scrollToBottom(), 100);
+      setInputMessage(prev => prev ? `${prev} ${transcriptText}` : transcriptText);
+      setTimeout(() => {
+        adjustTextareaHeight();
+        inputRef.current?.focus();
+      }, 0);
     } catch (error) {
-      console.error('Error processing voice input:', error);
+      console.error("Error processing voice input:", error);
       const errorResponse = {
         id: Date.now() + 1,
-        text: "I'm sorry, there was an error processing your voice input. Please try again.",
+        text: error.message || "I'm sorry, there was an error transcribing your voice input. Please try again.",
         sender: "bot",
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorResponse]);
+      setTimeout(() => scrollToBottom(), 100);
     } finally {
       setIsProcessingVoice(false);
       setIsTyping(false);
@@ -700,53 +676,31 @@ export default function LegalChatbot() {
     setIsTyping(true);
 
     try {
-      const response = await apiService.speechToGemini(file);
+      const transcription = await apiService.transcribeAudio(file);
+      const transcriptText = transcription?.text?.trim();
 
-      // Note: The new API doesn't return transcription separately
-      // The transcription is handled internally and only the AI reply is returned
-      // We'll show a placeholder message for uploaded audio
-      const userMessage = {
-        id: Date.now(),
-        text: "[Audio file uploaded]",
-        sender: "user",
-        timestamp: new Date().toISOString(),
-        isVoice: true
-      };
-      setMessages(prev => [...prev, userMessage]);
-      setTimeout(() => scrollToBottom(), 50);
-
-      // Save session_id if provided in response
-      if (response.session_id) {
-        setCurrentSessionId(response.session_id);
-        localStorage.setItem('currentChatSessionId', response.session_id.toString());
+      if (!transcriptText) {
+        throw new Error("No speech detected. Please try again.");
       }
 
-      // Add bot response
-      const botResponse = {
-        id: Date.now() + 1,
-        text: response.reply || "I'm sorry, I couldn't process your audio file. Please try again.",
-        sender: "bot",
-        timestamp: new Date().toISOString(),
-        usedTools: response.used_tools || false,
-        toolUsed: response.tool_used || null,
-        searchInfo: response.search_info || null,
-        sessionId: response.session_id || currentSessionId
-      };
-      setMessages(prev => [...prev, botResponse]);
-      setTimeout(() => scrollToBottom(), 100);
+      setInputMessage(prev => prev ? `${prev} ${transcriptText}` : transcriptText);
+      setTimeout(() => {
+        adjustTextareaHeight();
+        inputRef.current?.focus();
+      }, 0);
     } catch (error) {
-      console.error('Error processing audio file:', error);
+      console.error("Error processing audio file:", error);
       const errorResponse = {
         id: Date.now() + 1,
-        text: "I'm sorry, there was an error processing your audio file. Please try again.",
+        text: error.message || "I'm sorry, there was an error transcribing your audio file. Please try again.",
         sender: "bot",
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorResponse]);
+      setTimeout(() => scrollToBottom(), 100);
     } finally {
       setIsProcessingVoice(false);
       setIsTyping(false);
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

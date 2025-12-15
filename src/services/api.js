@@ -1,6 +1,6 @@
 // API Service for Legal Platform - Complete Integration
 // Primary server (ad) - DigitalOcean
-const API_BASE_URL_AD = 'https://hammerhead-app-a45bw.ondigitalocean.app';
+const API_BASE_URL_AD = 'https://unquestioned-gunnar-medially.ngrok-free.dev';
 
 // Server configuration with identifiers
 const API_SERVERS = [
@@ -3190,7 +3190,7 @@ class ApiService {
   // Update user profile
   async updateUserProfile(profileData) {
     const response = await fetch(`${this.baseURL}/api/user/profile`, {
-      method: 'PUT',
+      method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(profileData)
     });
@@ -3222,6 +3222,34 @@ class ApiService {
       method: 'PUT',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(settingsData)
+    });
+    return await this.handleResponse(response);
+  }
+
+  // ==================== AVATAR API METHODS ====================
+  async getCurrentUser() {
+    const response = await fetch(`${this.baseURL}/auth/me`, {
+      method: 'GET',
+      headers: this.getAuthHeaders()
+    });
+    return await this.handleResponse(response);
+  }
+
+  async listAvatars() {
+    const response = await fetch(`${this.baseURL}/api/avatars`, {
+      method: 'GET',
+      headers: {
+        'ngrok-skip-browser-warning': 'true'
+      }
+    });
+    return await this.handleResponse(response);
+  }
+
+  async setAvatar(avatarId) {
+    const response = await fetch(`${this.baseURL}/auth/avatar`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ avatar_id: avatarId })
     });
     return await this.handleResponse(response);
   }
@@ -3569,6 +3597,33 @@ class ApiService {
       headers: headers,
       body: formData
     });
+    return await this.handleResponse(response);
+  }
+
+  async transcribeAudio(audioFile) {
+    const formData = new FormData();
+    // Backend expects the field name "file"
+    formData.append('file', audioFile);
+
+    const token = localStorage.getItem('access_token') ||
+                  localStorage.getItem('accessToken') ||
+                  localStorage.getItem('token') ||
+                  this.accessToken;
+
+    const headers = {
+      'ngrok-skip-browser-warning': 'true'
+    };
+
+    if (token && token !== 'null' && token !== 'undefined') {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${this.baseURL}/api/transcribe`, {
+      method: 'POST',
+      headers: headers,
+      body: formData
+    });
+
     return await this.handleResponse(response);
   }
 

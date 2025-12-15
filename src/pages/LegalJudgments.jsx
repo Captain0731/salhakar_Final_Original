@@ -1296,36 +1296,7 @@ export default function LegalJudgments() {
                     style={{ fontFamily: 'Roboto, sans-serif' }}
                   />
                 </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    Petitioner
-                  </label>
-                  <input
-                    type="text"
-                    value={getInputValue('petitioner')}
-                    onChange={(e) => handleFilterChange('petitioner', e.target.value)}
-                    onFocus={() => handleInputFocus('petitioner')}
-                    onBlur={() => handleInputBlur('petitioner')}
-                    placeholder="e.g., State of Maharashtra"
-                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    Respondent
-                  </label>
-                  <input
-                    type="text"
-                    value={getInputValue('respondent')}
-                    onChange={(e) => handleFilterChange('respondent', e.target.value)}
-                    onFocus={() => handleInputFocus('respondent')}
-                    onBlur={() => handleInputBlur('respondent')}
-                    placeholder="e.g., Union of India"
-                    className="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    style={{ fontFamily: 'Roboto, sans-serif' }}
-                  />
-                </div>
+                {/* Petitioner/Respondent filters intentionally hidden for Supreme Court */}
               </div>
             ) : (
               /* High Court Filters */

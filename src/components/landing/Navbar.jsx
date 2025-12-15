@@ -6,6 +6,8 @@ import UserIcon from "../UserIcon";
 import { Menu, X } from "lucide-react";
 import apiService from "../../services/api";
 
+const dropdownHoverColor = "rgba(30, 101, 173, 0.08)";
+
 const navItems = [
   {
     label: "Home",
@@ -304,33 +306,37 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 flex justify-between items-center">
         
         {/* Brand Logo - Left Corner */}
-        <div
-          className="cursor-pointer group flex items-center"
-          onClick={() => navigate("/")}
-        >
-          <img
-            src="/logo4.png"
-            alt="सलहाकार Logo"
-            className="w-auto object-contain group-hover:scale-110 transition-all duration-300 ease-out"
-            style={{ 
-              height: 'auto',
-              maxHeight: isScrolled 
-                ? 'clamp(1.5rem, 4vw, 2rem)' 
-                : 'clamp(1.75rem, 4.5vw, 2.25rem)',
-              width: 'auto'
-            }}
-            onError={(e) => {
-              if (e.target.src.includes('logo4.png')) {
-                e.target.src = '/logo.png';
-              } else if (e.target.src.includes('logo.png')) {
-                e.target.src = '/logo 3.PNG';
-              } else if (e.target.src.includes('logo 3.PNG')) {
-                e.target.src = '/laogo2.jpeg';
-              } else {
-                e.target.src = '/logo4.png';
-              }
-            }}
-          />
+        <div className="group flex items-center">
+          <button
+            type="button"
+            className="flex items-center focus:outline-none"
+            onClick={() => handleNavClick("/")}
+            aria-label="Go to home"
+          >
+            <img
+              src="/main2.PNG"
+              alt="सलहाकार Logo"
+              className="w-auto object-contain group-hover:scale-110 transition-all duration-300 ease-out"
+              style={{ 
+                height: 'auto',
+                maxHeight: isScrolled 
+                  ? 'clamp(1.5rem, 4vw, 2rem)' 
+                  : 'clamp(1.75rem, 4.5vw, 2.25rem)',
+                width: 'auto'
+              }}
+              onError={(e) => {
+                if (e.target.src.includes('logo4.png')) {
+                  e.target.src = '/logo.png';
+                } else if (e.target.src.includes('logo.png')) {
+                  e.target.src = '/logo 3.PNG';
+                } else if (e.target.src.includes('logo 3.PNG')) {
+                  e.target.src = '/laogo2.jpeg';
+                } else {
+                  e.target.src = '/logo4.png';
+                }
+              }}
+            />
+          </button>
         </div>
 
         {/* Right Side - Mobile: Language Selector + Menu Button */}
@@ -546,22 +552,18 @@ const Navbar = () => {
                             minHeight: '36px',
                             transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                           }}
-                          onMouseEnter={(e) => {
-                            if (window.innerWidth >= 768) {
-                              e.currentTarget.style.color = 'white';
-                              e.currentTarget.style.backgroundColor = '#1E65AD';
-                              e.currentTarget.style.transform = 'translateX(4px)';
-                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(30, 101, 173, 0.2)';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (window.innerWidth >= 768) {
-                              e.currentTarget.style.color = '#1f2937';
-                              e.currentTarget.style.backgroundColor = 'transparent';
-                              e.currentTarget.style.transform = 'translateX(0)';
-                              e.currentTarget.style.boxShadow = 'none';
-                            }
-                          }}
+                        onMouseEnter={(e) => {
+                          if (window.innerWidth >= 768) {
+                            e.currentTarget.style.color = '#1E65AD';
+                            e.currentTarget.style.backgroundColor = dropdownHoverColor;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (window.innerWidth >= 768) {
+                            e.currentTarget.style.color = '#1f2937';
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
                         >
                           <span>{link.label}</span>
                           {link.subLinks && link.subLinks.length > 0 && (
@@ -630,18 +632,14 @@ const Navbar = () => {
                                 }}
                                 onMouseEnter={(e) => {
                                   if (window.innerWidth >= 768) {
-                                    e.currentTarget.style.color = 'white';
-                                    e.currentTarget.style.backgroundColor = '#CF9B63';
-                                    e.currentTarget.style.transform = 'translateX(4px)';
-                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(207, 155, 99, 0.2)';
+                                    e.currentTarget.style.color = '#1E65AD';
+                                    e.currentTarget.style.backgroundColor = dropdownHoverColor;
                                   }
                                 }}
                                 onMouseLeave={(e) => {
                                   if (window.innerWidth >= 768) {
                                     e.currentTarget.style.color = '#1f2937';
                                     e.currentTarget.style.backgroundColor = 'transparent';
-                                    e.currentTarget.style.transform = 'translateX(0)';
-                                    e.currentTarget.style.boxShadow = 'none';
                                   }
                                 }}
                               >

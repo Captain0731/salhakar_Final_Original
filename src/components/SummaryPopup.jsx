@@ -197,7 +197,8 @@ const SummaryPopup = ({ isOpen, onClose, item, itemType }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 pt-0 sm:pt-20"
+          className="fixed left-0 right-0 bottom-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          style={{ top: '88px' }}
           onClick={onClose}
         >
           {/* Backdrop with better blur */}

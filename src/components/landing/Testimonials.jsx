@@ -204,23 +204,23 @@ const Testimonials = () => {
               
               if (isMobile && !isCenter) return null;
                 
-                return (
-                  <div 
-                  key={`${testimonial.id}-${position}`}
-                  className="flex-shrink-0 transition-all duration-500 ease-out"
-                  style={{
-                    width: isMobile 
-                      ? 'clamp(280px, 90vw, 360px)' 
-                      : isCenter 
-                        ? 'clamp(320px, 25vw, 420px)' 
-                        : 'clamp(280px, 20vw, 350px)',
-                    maxWidth: isMobile ? 'clamp(280px, 90vw, 360px)' : 'none',
-                    minWidth: isMobile ? '280px' : isCenter ? 'clamp(320px, 25vw, 420px)' : 'clamp(280px, 20vw, 350px)',
-                    opacity: isCenter ? 1 : 0.5,
-                    transform: `scale(${isCenter ? 1 : 0.85}) translateY(${isCenter ? 0 : 20}px)`,
-                    zIndex: isCenter ? 10 : 5
-                  }}
-                >
+            return (
+              <div 
+              key={`${testimonial.id}-${position}`}
+              className="flex-shrink-0 transition-all duration-500 ease-out"
+              style={{
+                width: isMobile 
+                  ? 'clamp(280px, 90vw, 360px)' 
+                  : isCenter 
+                    ? 'clamp(320px, 25vw, 420px)' 
+                    : 'clamp(280px, 20vw, 350px)',
+                maxWidth: isMobile ? 'clamp(280px, 90vw, 360px)' : 'none',
+                minWidth: isMobile ? '280px' : isCenter ? 'clamp(320px, 25vw, 420px)' : 'clamp(280px, 20vw, 350px)',
+                opacity: isCenter ? 1 : 0.5,
+                transform: `scale(${isCenter ? 1 : 0.85}) translateY(${isCenter ? 0 : 20}px) translateX(${position === 'left' ? '-20px' : position === 'right' ? '20px' : '0'})`,
+                zIndex: isCenter ? 10 : 5
+              }}
+            >
                   <div
                     onClick={() => openModal(testimonial)}
                     className="rounded-3xl transition-all duration-300 relative overflow-hidden cursor-pointer hover:scale-105"

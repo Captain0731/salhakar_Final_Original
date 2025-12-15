@@ -77,15 +77,20 @@ const Hero = forwardRef((props, ref) => {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-6xl mx-auto w-full pt-4 sm:pt-8 md:pt-12 lg:pt-16 pb-4 sm:pb-8 md:pb-12 lg:pb-16">
+      <div className="relative z-10 max-w-6xl mx-auto w-full pt-2 sm:pt-4 md:pt-8 lg:pt-6 pb-4 sm:pb-8 md:pb-12 lg:pb-16">
         {/* Heading */}
-        <div className="flex flex-col items-center justify-center mb-4 sm:mb-6 md:mb-8 lg:mb-12 px-2 sm:px-4">
+        <div className="flex flex-col items-center justify-center mb-2 sm:mb-4 md:mb-6 lg:mb-8 px-2 sm:px-4">
           
           <img 
-            src="/logo31.png" 
+            src="/main3.PNG" 
             alt="सलहाकार Logo" 
-            className="w-40 sm:w-48 md:w-56 lg:w-64 xl:w-72 h-auto object-contain mb-3 sm:mb-4 md:mb-6" 
-            style={{ maxWidth: '90%' }}
+            className="object-contain "
+            style={{
+              width: 'auto',
+              height: 'auto',
+              maxWidth: '480px',
+              maxHeight: '200px'
+            }}
           />
 
           <p 

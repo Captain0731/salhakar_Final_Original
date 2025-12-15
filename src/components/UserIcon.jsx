@@ -32,11 +32,11 @@ const AVAILABLE_ICONS = [
   '1011.jpeg',
   '1012.jpeg',
   '1013.jpeg',
-  '1014.jpeg',
-  
+  '1014.jpeg'
 ];
 
 const DEFAULT_ICON = '1011.jpeg';
+const AVATAR_CDN = 'https://storing.sfo3.digitaloceanspaces.com/profile';
 
 const UserIcon = ({ 
   size = 'md', 
@@ -44,7 +44,7 @@ const UserIcon = ({
   className = '',
   onClick = null 
 }) => {
-  const { user, updateProfile, login } = useAuth();
+  const { user, login } = useAuth();
   const [showIconModal, setShowIconModal] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -67,9 +67,11 @@ const UserIcon = ({
 
   // Get current user icon or default
   const getUserIcon = () => {
-    if (user?.avatar) {
-      return `/usericons/${user.avatar}`;
+    const avatarId = user?.avatar_id;
+    if (avatarId && Number.isInteger(avatarId)) {
+      return `${AVATAR_CDN}/${avatarId}.jpeg`;
     }
+    // Fallback to legacy local asset
     return `/usericons/${DEFAULT_ICON}`;
   };
 
@@ -98,27 +100,25 @@ const UserIcon = ({
     let updateSuccess = false;
     
     try {
-      // Try to update via API first
-      try {
-        await updateProfile({ avatar: iconName });
-        console.log('Icon updated successfully via API');
-        updateSuccess = true;
-      } catch (apiError) {
-        console.warn('API update failed, updating locally:', apiError);
-        // Fallback: Update locally if API fails
-        if (user && login) {
-          const updatedUser = { ...user, avatar: iconName };
-          // Update localStorage
-          localStorage.setItem('user', JSON.stringify(updatedUser));
-          // Update context by calling login with updated user (this updates the context)
-          login(updatedUser);
-          updateSuccess = true;
-          console.log('Icon updated successfully (local storage)');
-        } else {
-          throw new Error('Unable to update icon: user data or login function not available');
-        }
+      const avatarId = parseInt(iconName.replace('.jpeg', ''), 10);
+      if (!Number.isInteger(avatarId)) {
+        throw new Error('Invalid avatar selected.');
       }
-      
+
+      // Persist avatar selection via backend
+      const updated = await apiService.setAvatar(avatarId);
+
+      // Update auth context/local storage with new avatar_id
+      if (user && login) {
+        const updatedUser = { ...user, avatar_id: avatarId };
+        // backend response may already contain avatar_id; prefer it
+        const mergedUser = { ...updatedUser, ...(updated || {}) };
+        localStorage.setItem('user', JSON.stringify(mergedUser));
+        login(mergedUser);
+      }
+
+      updateSuccess = true;
+
       if (updateSuccess) {
         setShowIconModal(false);
         // Optionally show a success toast/notification here instead of alert
@@ -195,7 +195,10 @@ const UserIcon = ({
 
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
                 {AVAILABLE_ICONS.map((iconName) => {
-                  const isSelected = selectedIcon === iconName || (!selectedIcon && user?.avatar === iconName) || (!selectedIcon && !user?.avatar && iconName === DEFAULT_ICON);
+                  const numericId = parseInt(iconName.replace('.jpeg', ''), 10);
+                  const isSelected = selectedIcon === iconName 
+                    || (!selectedIcon && user?.avatar_id === numericId)
+                    || (!selectedIcon && !user?.avatar_id && iconName === DEFAULT_ICON);
                   return (
                     <div
                       key={iconName}
